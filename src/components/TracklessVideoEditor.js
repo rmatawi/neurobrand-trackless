@@ -64,6 +64,12 @@ const TracklessVideoEditor = () => {
   const [videoName, setVideoName] = useState('');
   const [videoDuration, setVideoDuration] = useState(10);
 
+  // State for alert dialogs
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertCallback, setAlertCallback] = useState(null);
+
   // Get the environment variables
   const apiVideoKey = process.env.REACT_APP_API_VIDEO_KEY;
   const chillinApiKey = process.env.REACT_APP_CHILLIN;
@@ -122,7 +128,7 @@ const TracklessVideoEditor = () => {
   // Function to create a custom template based on current selection
   const createTemplateFromCurrent = () => {
     if (!template || selectedVideos.length === 0) {
-      alert("Please select a template and add videos before creating a custom template");
+      showAlert("Please select a template and add videos before creating a custom template", "Missing Template or Videos");
       return;
     }
     setCreateFromCurrentDialogOpen(true);
@@ -151,7 +157,7 @@ const TracklessVideoEditor = () => {
   const editCustomTemplate = (templateId) => {
     const templateToEdit = customTemplates.find(t => t.id === templateId);
     if (!templateToEdit) {
-      alert("Template not found");
+      showAlert("Template not found", "Error");
       return;
     }
 
@@ -166,13 +172,13 @@ const TracklessVideoEditor = () => {
 
     const templateToEdit = customTemplates.find(t => t.id === editTemplateId);
     if (!templateToEdit) {
-      alert("Template not found");
+      showAlert("Template not found", "Error");
       return;
     }
 
     const newName = videoName.trim();
     if (!newName) {
-      alert("Template name cannot be empty");
+      showAlert("Template name cannot be empty", "Invalid Name");
       return;
     }
 
@@ -182,7 +188,7 @@ const TracklessVideoEditor = () => {
         (t) => t.id !== editTemplateId && t.name === newName
       )
     ) {
-      alert("A template with this name already exists");
+      showAlert("A template with this name already exists", "Duplicate Name");
       return;
     }
 
@@ -193,13 +199,13 @@ const TracklessVideoEditor = () => {
         t.id === editTemplateId ? { ...t, name: newName } : t
       );
       saveCustomTemplates(updatedTemplates);
-      alert("Template name updated successfully");
+      showAlert("Template name updated successfully", "Success");
     } else {
       // For templates created from scratch, we can edit name, required videos, and descriptions
       const numVideosStr = prompt(`How many videos does this template require? (Current: ${templateToEdit.requiredVideos})`, templateToEdit.requiredVideos);
       const num = parseInt(numVideosStr);
       if (isNaN(num) || num <= 0 || num > 10) {
-        alert("Please enter a valid number between 1 and 10");
+        showAlert("Please enter a valid number between 1 and 10", "Invalid Number");
         return;
       }
 
@@ -222,7 +228,7 @@ const TracklessVideoEditor = () => {
             const durationInput = prompt(`Enter duration for video ${descriptionIndex + 1} in seconds (e.g., 5 for 5 seconds):`, currentDuration.toString());
             const duration = parseFloat(durationInput);
             if (isNaN(duration) || duration <= 0) {
-              alert("Please enter a valid positive number for duration.");
+              showAlert("Please enter a valid positive number for duration.", "Invalid Duration");
               // Re-collect for the current video if invalid
               collectNewDescriptionsAndDurations();
               return;
@@ -245,7 +251,7 @@ const TracklessVideoEditor = () => {
               : t
           );
           saveCustomTemplates(updatedTemplates);
-          alert("Template updated successfully");
+          showAlert("Template updated successfully", "Success");
         }
       };
 
@@ -268,7 +274,7 @@ const TracklessVideoEditor = () => {
   const handlePickFromDevice = async (requiredVideos, currentTemplate, targetIndex = null) => {
     // Check if videos have already been added for Template 1 or 3 but we need 2, or Template 2 but we need 3
     if (targetIndex === null && selectedVideos.length >= requiredVideos) {
-      alert(`Template ${currentTemplate} requires exactly ${requiredVideos} videos. Remove current videos before adding more.`);
+      showAlert(`Template ${currentTemplate} requires exactly ${requiredVideos} videos. Remove current videos before adding more.`, "Too Many Videos");
       return;
     }
 
@@ -304,7 +310,7 @@ const TracklessVideoEditor = () => {
         } else {
           // Check if we've reached the limit for current template
           if (selectedVideos.length >= requiredVideos) {
-            alert(`Template ${currentTemplate} requires exactly ${requiredVideos} videos.`);
+            showAlert(`Template ${currentTemplate} requires exactly ${requiredVideos} videos.`, "Video Limit Reached");
             return;
           }
 
@@ -316,7 +322,7 @@ const TracklessVideoEditor = () => {
         }
       } catch (error) {
         console.error("Error processing device video:", error);
-        alert(`Error loading video: ${error.message}`);
+        showAlert(`Error loading video: ${error.message}`, "Processing Error");
       }
     };
 
@@ -437,7 +443,7 @@ const TracklessVideoEditor = () => {
         };
 
         audioElement.onerror = () => {
-          alert("Could not load audio to get duration");
+          showAlert("Could not load audio to get duration", "Error");
           URL.revokeObjectURL(audioUrl);
         };
       }
@@ -464,7 +470,7 @@ const TracklessVideoEditor = () => {
       },
     }));
 
-    alert(`Audio file added to Video ${videoIndex + 1}`);
+    showAlert(`Audio file added to Video ${videoIndex + 1}`, "Audio Added");
   };
 
   // Function to remove audio from a video
@@ -479,7 +485,7 @@ const TracklessVideoEditor = () => {
       return newTracks;
     });
 
-    alert(`Audio removed from Video ${videoIndex + 1}`);
+    showAlert(`Audio removed from Video ${videoIndex + 1}`, "Audio Removed");
   };
 
   // Function to set video volume
@@ -726,18 +732,18 @@ const TracklessVideoEditor = () => {
       if (data?.data?.render?.state == "success") {
         console.log({ data: data.data.render.video_url });
         setDownloadUrl(data.data.render.video_url);
-        alert(`Your video is ready! Video URL: ${data.data.render.video_url}`);
+        showAlert(`Your video is ready! Video URL: ${data.data.render.video_url}`, "Render Success");
       }
       if (data?.data?.render?.state == "pending") {
         setDownloadUrl();
-        alert("Please try again later.");
+        showAlert("Please try again later.", "Pending");
       }
       if (data?.data?.render?.state == "failed") {
         setDownloadUrl();
-        alert("Render job failed.");
+        showAlert("Render job failed.", "Failed");
       }
     } catch (error) {
-      alert(`Error getting render result: ${error.message}`);
+      showAlert(`Error getting render result: ${error.message}`, "Error");
     }
   };
 
@@ -767,7 +773,7 @@ const TracklessVideoEditor = () => {
     } else if (video.src) {
       videoUrl = video.src;
     } else {
-      alert("Video source not available");
+      showAlert("Video source not available", "Error");
       return;
     }
 
@@ -868,7 +874,7 @@ const TracklessVideoEditor = () => {
 
           // Validate that inPoint is before outPoint
           if (currentTime >= currentOutPoint) {
-            alert(`In point must be before out point (${currentOutPoint.toFixed(2)}s)`);
+            showAlert(`In point must be before out point (${currentOutPoint.toFixed(2)}s)`, "Invalid In Point");
             return;
           }
 
@@ -886,7 +892,7 @@ const TracklessVideoEditor = () => {
 
           // Validate that outPoint is after inPoint
           if (currentTime <= currentInPoint) {
-            alert(`Out point must be after in point (${currentInPoint.toFixed(2)}s)`);
+            showAlert(`Out point must be after in point (${currentInPoint.toFixed(2)}s)`, "Invalid Out Point");
             return;
           }
 
@@ -955,7 +961,7 @@ const TracklessVideoEditor = () => {
     };
 
     videoElement.onerror = () => {
-      alert("Could not load video to get duration");
+      showAlert("Could not load video to get duration", "Error");
       if (video.blob) {
         URL.revokeObjectURL(videoUrl);
       }
@@ -979,7 +985,7 @@ const TracklessVideoEditor = () => {
     }
 
     if (!selectedVideos || selectedVideos.length !== requiredVideos) {
-      alert(
+      showAlert(
         `Template ${template} requires exactly ${requiredVideos} videos. You currently have ${selectedVideos.length} videos.`,
         "Incorrect Video Count"
       );
@@ -1321,7 +1327,7 @@ const TracklessVideoEditor = () => {
     // Set the data and add a small delay to ensure sheet is open before rendering
     setChillinProjectJson(chillinJson);
 
-    alert("Chillin preview data set! The preview would now be displayed.");
+    showAlert("Chillin preview data set! The preview would now be displayed.", "Preview Ready");
   };
 
   // Function to send a test job to Chillin with two 3sec videos from specified URLs
@@ -1417,7 +1423,7 @@ const TracklessVideoEditor = () => {
 
     try {
       // Show loading indicator
-      alert("Sending test job to Chillin...");
+      showAlert("Sending test job to Chillin...", "Processing");
 
       // Send the job to the Chillin API using the same endpoint and auth as in useChillinAPI
       const response = await fetch(
@@ -1438,7 +1444,7 @@ const TracklessVideoEditor = () => {
         console.log("Test job sent successfully:", result);
 
         // Show success with the actual render ID from the API (same as in useChillinAPI)
-        alert(`Test job sent successfully! Render ID: ${result.data.render_id}`);
+        showAlert(`Test job sent successfully! Render ID: ${result.data.render_id}`, "Success");
       } else {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
@@ -1449,7 +1455,7 @@ const TracklessVideoEditor = () => {
       }
     } catch (error) {
       console.error("Error sending test job to Chillin:", error);
-      alert(`Error sending test job: ${error.message}`);
+      showAlert(`Error sending test job: ${error.message}`, "Error");
     }
   };
 
@@ -1569,6 +1575,23 @@ const TracklessVideoEditor = () => {
       console.error("Error listing videos from api.video:", error);
       throw error;
     }
+  };
+
+  // Function to display an alert using Radix UI dialog
+  const showAlert = (message, title = "Alert", callback = null) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertCallback(() => callback); // Wrap the callback to make sure it's a function
+    setAlertOpen(true);
+  };
+
+  // Function to handle closing the alert dialog
+  const handleAlertClose = () => {
+    setAlertOpen(false);
+    if (typeof alertCallback === 'function') {
+      alertCallback();
+    }
+    setAlertCallback(null);
   };
 
   // Create template preview data for each template
@@ -2046,12 +2069,12 @@ const TracklessVideoEditor = () => {
       const result = await response.json();
       console.log("Chillin render result:", result);
 
-      alert(`Render result retrieved successfully! Render ID: ${renderId}`);
+      showAlert(`Render result retrieved successfully! Render ID: ${renderId}`, "Success");
 
       return result;
     } catch (error) {
       console.error("Error getting render result:", error);
-      alert(`Error: ${error.message}`);
+      showAlert(`Error: ${error.message}`, "Error");
       throw error;
     }
   };
@@ -2059,7 +2082,7 @@ const TracklessVideoEditor = () => {
   // Handle Chillin project creation
   const createChillinProject = async (selectedVideos, template = null) => {
     if (!selectedVideos || selectedVideos.length === 0) {
-      alert("No videos selected for processing. Please add videos to the sequence first.");
+      showAlert("No videos selected for processing. Please add videos to the sequence first.", "No Videos Selected");
       return;
     }
 
@@ -2073,7 +2096,7 @@ const TracklessVideoEditor = () => {
 
     try {
       // Show processing dialog
-      alert("Processing videos project with smart chunking...");
+      showAlert("Processing videos project with smart chunking...", "Processing");
 
       // Calculate total duration of all videos
       const totalDuration = selectedVideos.reduce((acc, video) => {
@@ -2151,7 +2174,7 @@ const TracklessVideoEditor = () => {
       }
 
       // Show processing dialog
-      alert("Sending project to Chillin renderer...");
+      showAlert("Sending project to Chillin renderer...", "Processing");
 
       // Wait 10 seconds to simulate processing
       await new Promise(resolve => setTimeout(resolve, 10000));
@@ -2201,12 +2224,12 @@ const TracklessVideoEditor = () => {
       setChillinRenders(updatedRenders);
 
       // Show success with the actual render ID from the API
-      alert(`Video project created with smart chunking! Project ID: ${result.data.render_id}`);
+      showAlert(`Video project created with smart chunking! Project ID: ${result.data.render_id}`, "Project Created");
 
       setActiveTab("render");
     } catch (error) {
       console.error("Error sending project to Chillin renderer:", error);
-      alert(`Error: ${error.message}`);
+      showAlert(`Error: ${error.message}`, "Error");
     }
   };
 
@@ -2214,19 +2237,19 @@ const TracklessVideoEditor = () => {
   const handleCreateCustomTemplate = () => {
     const name = videoName.trim();
     if (!name) {
-      alert("Template name cannot be empty");
+      showAlert("Template name cannot be empty", "Invalid Name");
       return;
     }
 
     // Check if template name already exists
     if (customTemplates.some((t) => t.name === name)) {
-      alert("A template with this name already exists");
+      showAlert("A template with this name already exists", "Duplicate Name");
       return;
     }
 
     const numVideos = parseInt(videoDuration);
     if (isNaN(numVideos) || numVideos <= 0 || numVideos > 10) {
-      alert("Please enter a valid number between 1 and 10");
+      showAlert("Please enter a valid number between 1 and 10", "Invalid Number");
       return;
     }
 
@@ -2250,7 +2273,7 @@ const TracklessVideoEditor = () => {
     const updatedTemplates = [...customTemplates, newTemplate];
     saveCustomTemplates(updatedTemplates);
 
-    alert(`Custom template "${name}" has been created! Now select it to configure.`);
+    showAlert(`Custom template "${name}" has been created! Now select it to configure.`, "Template Created");
     setCreateTemplateDialogOpen(false);
     setVideoName('');
     setVideoDuration(10);
@@ -2260,13 +2283,13 @@ const TracklessVideoEditor = () => {
   const handleCreateTemplateFromCurrent = () => {
     const name = videoName.trim();
     if (!name) {
-      alert("Template name cannot be empty");
+      showAlert("Template name cannot be empty", "Invalid Name");
       return;
     }
 
     // Check if template name already exists
     if (customTemplates.some((t) => t.name === name)) {
-      alert("A template with this name already exists");
+      showAlert("A template with this name already exists", "Duplicate Name");
       return;
     }
 
@@ -2287,7 +2310,7 @@ const TracklessVideoEditor = () => {
     const updatedTemplates = [...customTemplates, newTemplate];
     saveCustomTemplates(updatedTemplates);
 
-    alert(`Custom template "${name.trim()}" has been created!`);
+    showAlert(`Custom template "${name.trim()}" has been created!`, "Template Created");
     setCreateFromCurrentDialogOpen(false);
     setVideoName('');
   };
@@ -2299,7 +2322,7 @@ const TracklessVideoEditor = () => {
         (t) => t.id !== deleteTemplateId
       );
       saveCustomTemplates(updatedTemplates);
-      alert("Template deleted successfully");
+      showAlert("Template deleted successfully", "Deleted");
     }
     setDeleteTemplateDialogOpen(false);
     setDeleteTemplateId(null);
@@ -2309,7 +2332,7 @@ const TracklessVideoEditor = () => {
   const handleVideoSelectionFlow = useCallback(
     async (targetIndex = null) => {
       if (!template) {
-        alert("Please select a template first");
+        showAlert("Please select a template first", "No Template Selected");
         return;
       }
 
@@ -2329,14 +2352,15 @@ const TracklessVideoEditor = () => {
 
       const videosNeeded = requiredVideos - selectedVideos.length;
       if (videosNeeded <= 0) {
-        alert(
-          `Template ${template} already has the required ${requiredVideos} videos. Remove some videos before adding more.`
+        showAlert(
+          `Template ${template} already has the required ${requiredVideos} videos. Remove some videos before adding more.`,
+          "Too Many Videos"
         );
         return;
       }
 
       // Show progress to indicate how many videos are needed vs selected
-      alert(`Add videos for Template ${template}. Selected: ${selectedVideos.length}/${requiredVideos} videos`);
+      showAlert(`Add videos for Template ${template}. Selected: ${selectedVideos.length}/${requiredVideos} videos`, "Add Videos");
 
       // Call the function to pick from device
       handlePickFromDevice(requiredVideos, template).catch((error) =>
@@ -3063,6 +3087,21 @@ const TracklessVideoEditor = () => {
           </div>
           <DialogFooter>
             <Button onClick={() => setShowTemplatePreviewDialog(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Alert Dialog Replacement */}
+      <Dialog open={alertOpen} onOpenChange={setAlertOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{alertTitle}</DialogTitle>
+            <DialogDescription>
+              {alertMessage}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={handleAlertClose}>OK</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
