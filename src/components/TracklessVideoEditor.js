@@ -15,8 +15,6 @@ const TracklessVideoEditor = () => {
   const [downloadUrl, setDownloadUrl] = useState();
 
   const [chillinRenders, setChillinRenders] = useState([]);
-  // Chillin API key (same as used in useChillinAPI hook)
-  const chillinApiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjQzMTI1NiwiT3BlbklEIjoiIiwiRnJvbSI6ImFwaSIsIm5iZiI6MTc1ODc0NjAxOCwiaWF0IjoxNzU4NzQ2MDE4fQ.JZkrdUkFTk-imkKde2o4l26xEtKSycGFQJBKrh0-858";
 
   // Helper function to get required videos for a template
   const getRequiredVideos = (templateId) => {
@@ -65,6 +63,10 @@ const TracklessVideoEditor = () => {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(null);
   const [videoName, setVideoName] = useState('');
   const [videoDuration, setVideoDuration] = useState(10);
+
+  // Get the environment variables
+  const apiVideoKey = process.env.REACT_APP_API_VIDEO_KEY;
+  const chillinApiKey = process.env.REACT_APP_CHILLIN;
 
   // Clean up object URLs when videos change
   React.useEffect(() => {
@@ -1448,6 +1450,124 @@ const TracklessVideoEditor = () => {
     } catch (error) {
       console.error("Error sending test job to Chillin:", error);
       alert(`Error sending test job: ${error.message}`);
+    }
+  };
+
+  // Function to interact with api.video service
+  const getApiVideoBaseUrl = () => {
+    // For this implementation, we'll use the standard API, but you can customize based on environment
+    return "https://ws.api.video";
+  };
+
+  // Function to upload video to api.video using the API key
+  const uploadVideoToApiVideo = async (file) => {
+    if (!apiVideoKey) {
+      throw new Error("API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables.");
+    }
+
+    try {
+      // First, create a new video entry
+      const createResponse = await fetch(`${getApiVideoBaseUrl()}/video`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiVideoKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          title: file.name || `TracklessVideo-${Date.now()}`,
+          description: `Uploaded via TracklessVideoEditor on ${new Date().toISOString()}`
+        })
+      });
+
+      if (!createResponse.ok) {
+        const error = await createResponse.json().catch(() => ({ message: `HTTP ${createResponse.status}: ${createResponse.statusText}` }));
+        throw new Error(error.message || `Failed to create video entry: ${createResponse.statusText}`);
+      }
+
+      const videoData = await createResponse.json();
+
+      // Then upload the actual file
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const uploadResponse = await fetch(
+        `${getApiVideoBaseUrl()}/video/${videoData.videoId}/source`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${apiVideoKey}`
+          },
+          body: formData
+        }
+      );
+
+      if (!uploadResponse.ok) {
+        const error = await uploadResponse.json().catch(() => ({ message: `HTTP ${uploadResponse.status}: ${uploadResponse.statusText}` }));
+        throw new Error(error.message || `Failed to upload video: ${uploadResponse.statusText}`);
+      }
+
+      const uploadedVideo = await uploadResponse.json();
+      console.log("Video uploaded successfully to api.video:", uploadedVideo);
+
+      return uploadedVideo;
+    } catch (error) {
+      console.error("Error uploading video to api.video:", error);
+      throw error;
+    }
+  };
+
+  // Function to get video status from api.video
+  const getApiVideoStatus = async (videoId) => {
+    if (!apiVideoKey) {
+      throw new Error("API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables.");
+    }
+
+    try {
+      const response = await fetch(`${getApiVideoBaseUrl()}/video/${videoId}`, {
+        headers: {
+          "Authorization": `Bearer ${apiVideoKey}`,
+          "Accept": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: `HTTP ${response.status}: ${response.statusText}` }));
+        throw new Error(error.message || `Failed to get video status: ${response.statusText}`);
+      }
+
+      const videoData = await response.json();
+      return videoData;
+    } catch (error) {
+      console.error("Error getting video status from api.video:", error);
+      throw error;
+    }
+  };
+
+  // Function to list videos from api.video
+  const listApiVideos = async () => {
+    if (!apiVideoKey) {
+      throw new Error("API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables.");
+    }
+
+    try {
+      const response = await fetch(`${getApiVideoBaseUrl()}/videos`, {
+        headers: {
+          "Authorization": `Bearer ${apiVideoKey}`,
+          "Accept": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: `HTTP ${response.status}: ${response.statusText}` }));
+        throw new Error(error.message || `Failed to list videos: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("Retrieved videos from api.video:", data);
+      return data;
+    } catch (error) {
+      console.error("Error listing videos from api.video:", error);
+      throw error;
     }
   };
 
