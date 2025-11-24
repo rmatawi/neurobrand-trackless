@@ -1,0 +1,150 @@
+content.js:6 DEFAULT
+array.js:1 [Violation] 'load' handler took 822ms
+WebSocketClient.js:13  WebSocket connection to 'ws://localhost:443/ws' failed: 
+WebSocketClient @ WebSocketClient.js:13
+initSocket @ socket.js:27
+./node_modules/webpack-dev-server/client/index.js?protocol=ws%3A&hostname=0.0.0.0&port=443&pathname=%2Fws&logging=none&overlay=%7B%22errors%22%3Atrue%2C%22warnings%22%3Afalse%7D&reconnect=10&hot=true&live-reload=true @ index.js:320
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+(anonymous) @ startup:5
+(anonymous) @ startup:7
+WebSocketClient.js:13  WebSocket connection to 'ws://localhost:443/ws' failed: 
+WebSocketClient @ WebSocketClient.js:13
+initSocket @ socket.js:27
+(anonymous) @ socket.js:51
+rrweb-plugin-console-record.js:2447  React.jsx: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports. Error Component Stack
+    at TracklessVideoEditor (TracklessVideoEditor.js:13:1)
+    at RenderedRoute (chunk-LSOULM7L.mjs:5077:1)
+    at Routes (chunk-LSOULM7L.mjs:5770:1)
+    at Router (chunk-LSOULM7L.mjs:5713:1)
+    at BrowserRouter (chunk-LSOULM7L.mjs:7999:1)
+    at div (<anonymous>)
+    at App (<anonymous>)
+overrideMethod @ installHook.js:1
+to.name @ rrweb-plugin-console-record.js:2447
+jsxDEVImpl @ react-jsx-dev-runtime.development.js:479
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:658
+TracklessVideoEditor @ TracklessVideoEditor.js:1241
+react-stack-bottom-frame @ react-dom-client.development.js:22428
+renderWithHooks @ react-dom-client.development.js:5757
+updateFunctionComponent @ react-dom-client.development.js:8018
+beginWork @ react-dom-client.development.js:9683
+runWithFiberInDEV @ react-dom-client.development.js:543
+performUnitOfWork @ react-dom-client.development.js:15042
+workLoopSync @ react-dom-client.development.js:14870
+renderRootSync @ react-dom-client.development.js:14850
+performWorkOnRoot @ react-dom-client.development.js:14332
+performSyncWorkOnRoot @ react-dom-client.development.js:15946
+flushSyncWorkAcrossRoots_impl @ react-dom-client.development.js:15798
+processRootScheduleInMicrotask @ react-dom-client.development.js:15841
+(anonymous) @ react-dom-client.development.js:15960
+rrweb-plugin-console-record.js:2447  React.jsx: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports. Error Component Stack
+    at TracklessVideoEditor (TracklessVideoEditor.js:13:1)
+    at RenderedRoute (chunk-LSOULM7L.mjs:5077:1)
+    at Routes (chunk-LSOULM7L.mjs:5770:1)
+    at Router (chunk-LSOULM7L.mjs:5713:1)
+    at BrowserRouter (chunk-LSOULM7L.mjs:7999:1)
+    at div (<anonymous>)
+    at App (<anonymous>)
+overrideMethod @ installHook.js:1
+to.name @ rrweb-plugin-console-record.js:2447
+jsxDEVImpl @ react-jsx-dev-runtime.development.js:479
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:658
+TracklessVideoEditor @ TracklessVideoEditor.js:1241
+react-stack-bottom-frame @ react-dom-client.development.js:22428
+renderWithHooksAgain @ react-dom-client.development.js:5857
+renderWithHooks @ react-dom-client.development.js:5769
+updateFunctionComponent @ react-dom-client.development.js:8018
+beginWork @ react-dom-client.development.js:9683
+runWithFiberInDEV @ react-dom-client.development.js:543
+performUnitOfWork @ react-dom-client.development.js:15042
+workLoopSync @ react-dom-client.development.js:14870
+renderRootSync @ react-dom-client.development.js:14850
+performWorkOnRoot @ react-dom-client.development.js:14332
+performSyncWorkOnRoot @ react-dom-client.development.js:15946
+flushSyncWorkAcrossRoots_impl @ react-dom-client.development.js:15798
+processRootScheduleInMicrotask @ react-dom-client.development.js:15841
+(anonymous) @ react-dom-client.development.js:15960
+rrweb-plugin-console-record.js:2447  React.jsx: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports. Error Component Stack
+    at TracklessVideoEditor (TracklessVideoEditor.js:13:1)
+    at RenderedRoute (chunk-LSOULM7L.mjs:5077:1)
+    at Routes (chunk-LSOULM7L.mjs:5770:1)
+    at Router (chunk-LSOULM7L.mjs:5713:1)
+    at BrowserRouter (chunk-LSOULM7L.mjs:7999:1)
+    at div (<anonymous>)
+    at App (<anonymous>)
+overrideMethod @ installHook.js:1
+to.name @ rrweb-plugin-console-record.js:2447
+jsxDEVImpl @ react-jsx-dev-runtime.development.js:479
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:658
+TracklessVideoEditor @ TracklessVideoEditor.js:1241
+react-stack-bottom-frame @ react-dom-client.development.js:22428
+renderWithHooks @ react-dom-client.development.js:5757
+updateFunctionComponent @ react-dom-client.development.js:8018
+beginWork @ react-dom-client.development.js:9683
+runWithFiberInDEV @ react-dom-client.development.js:543
+performUnitOfWork @ react-dom-client.development.js:15042
+workLoopSync @ react-dom-client.development.js:14870
+renderRootSync @ react-dom-client.development.js:14850
+performWorkOnRoot @ react-dom-client.development.js:14384
+performSyncWorkOnRoot @ react-dom-client.development.js:15946
+flushSyncWorkAcrossRoots_impl @ react-dom-client.development.js:15798
+processRootScheduleInMicrotask @ react-dom-client.development.js:15841
+(anonymous) @ react-dom-client.development.js:15960
+rrweb-plugin-console-record.js:2447  React.jsx: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports. Error Component Stack
+    at TracklessVideoEditor (TracklessVideoEditor.js:13:1)
+    at RenderedRoute (chunk-LSOULM7L.mjs:5077:1)
+    at Routes (chunk-LSOULM7L.mjs:5770:1)
+    at Router (chunk-LSOULM7L.mjs:5713:1)
+    at BrowserRouter (chunk-LSOULM7L.mjs:7999:1)
+    at div (<anonymous>)
+    at App (<anonymous>)
+overrideMethod @ installHook.js:1
+to.name @ rrweb-plugin-console-record.js:2447
+jsxDEVImpl @ react-jsx-dev-runtime.development.js:479
+exports.jsxDEV @ react-jsx-dev-runtime.development.js:658
+TracklessVideoEditor @ TracklessVideoEditor.js:1241
+react-stack-bottom-frame @ react-dom-client.development.js:22428
+renderWithHooksAgain @ react-dom-client.development.js:5857
+renderWithHooks @ react-dom-client.development.js:5769
+updateFunctionComponent @ react-dom-client.development.js:8018
+beginWork @ react-dom-client.development.js:9683
+runWithFiberInDEV @ react-dom-client.development.js:543
+performUnitOfWork @ react-dom-client.development.js:15042
+workLoopSync @ react-dom-client.development.js:14870
+renderRootSync @ react-dom-client.development.js:14850
+performWorkOnRoot @ react-dom-client.development.js:14384
+performSyncWorkOnRoot @ react-dom-client.development.js:15946
+flushSyncWorkAcrossRoots_impl @ react-dom-client.development.js:15798
+processRootScheduleInMicrotask @ react-dom-client.development.js:15841
+(anonymous) @ react-dom-client.development.js:15960
+overlay.js:252 [Violation] 'change' handler took 263ms
+react-dom-client.development.js:13350  Uncaught Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.
+
+Check the render method of `TracklessVideoEditor`.
+    at createFiberFromTypeAndProps (react-dom-client.development.js:13350:1)
+    at createFiberFromElement (react-dom-client.development.js:13364:1)
+    at reconcileChildFibersImpl (react-dom-client.development.js:5226:1)
+    at react-dom-client.development.js:5415:1
+    at reconcileChildren (react-dom-client.development.js:7736:1)
+    at beginWork (react-dom-client.development.js:9890:1)
+    at runWithFiberInDEV (react-dom-client.development.js:543:1)
+    at performUnitOfWork (react-dom-client.development.js:15042:1)
+    at workLoopSync (react-dom-client.development.js:14870:1)
+    at renderRootSync (react-dom-client.development.js:14850:1)
+createFiberFromTypeAndProps @ react-dom-client.development.js:13350
+createFiberFromElement @ react-dom-client.development.js:13364
+reconcileChildFibersImpl @ react-dom-client.development.js:5226
+(anonymous) @ react-dom-client.development.js:5415
+reconcileChildren @ react-dom-client.development.js:7736
+beginWork @ react-dom-client.development.js:9890
+runWithFiberInDEV @ react-dom-client.development.js:543
+performUnitOfWork @ react-dom-client.development.js:15042
+workLoopSync @ react-dom-client.development.js:14870
+renderRootSync @ react-dom-client.development.js:14850
+performWorkOnRoot @ react-dom-client.development.js:14384
+performSyncWorkOnRoot @ react-dom-client.development.js:15946
+flushSyncWorkAcrossRoots_impl @ react-dom-client.development.js:15798
+processRootScheduleInMicrotask @ react-dom-client.development.js:15841
+(anonymous) @ react-dom-client.development.js:15960
+react-dom-client.development.js:15959 [Violation] 'change' handler took 291ms
