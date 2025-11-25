@@ -5,11 +5,10 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Slider } from './ui/slider';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Composition, continueRender, delayRender } from 'remotion';
 import { Player } from '@remotion/player';
+import { Transitions, Fade } from '@remotion/transitions';
 import VideoComposition from '../remotion/VideoComposition';
-
-// Import Chillin API functionality
-import { processTimelineChunks } from '../services/chunkProcessingService'; // Assuming this needs to be available
 
 const TracklessVideoEditor = () => {
   const [activeTab, setActiveTab] = useState("templates");
@@ -64,12 +63,18 @@ const TracklessVideoEditor = () => {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(null);
   const [videoName, setVideoName] = useState('');
   const [videoDuration, setVideoDuration] = useState(10);
-  const [numVideosForTemplate, setNumVideosForTemplate] = useState(2); // Number of videos required in custom template
 
+  // State for alert dialogs
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertCallback, setAlertCallback] = useState(null);
 
   // Get the environment variables
   const apiVideoKey = process.env.REACT_APP_API_VIDEO_KEY;
+  console.log({apiVideoKey});
   const chillinApiKey = process.env.REACT_APP_CHILLIN;
+  console.log({chillinApiKey});
 
   // Clean up object URLs when videos change
   React.useEffect(() => {
@@ -125,7 +130,7 @@ const TracklessVideoEditor = () => {
   // Function to create a custom template based on current selection
   const createTemplateFromCurrent = () => {
     if (!template || selectedVideos.length === 0) {
-      alert("Please select a template and add videos before creating a custom template");
+      showAlert("Please select a template and add videos before creating a custom template", "Missing Template or Videos");
       return;
     }
     setCreateFromCurrentDialogOpen(true);
@@ -154,7 +159,7 @@ const TracklessVideoEditor = () => {
   const editCustomTemplate = (templateId) => {
     const templateToEdit = customTemplates.find(t => t.id === templateId);
     if (!templateToEdit) {
-      alert("Template not found");
+      showAlert("Template not found", "Error");
       return;
     }
 
@@ -169,13 +174,13 @@ const TracklessVideoEditor = () => {
 
     const templateToEdit = customTemplates.find(t => t.id === editTemplateId);
     if (!templateToEdit) {
-      alert("Template not found");
+      showAlert("Template not found", "Error");
       return;
     }
 
     const newName = videoName.trim();
     if (!newName) {
-      alert("Template name cannot be empty");
+      showAlert("Template name cannot be empty", "Invalid Name");
       return;
     }
 
@@ -185,7 +190,7 @@ const TracklessVideoEditor = () => {
         (t) => t.id !== editTemplateId && t.name === newName
       )
     ) {
-      alert("A template with this name already exists");
+      showAlert("A template with this name already exists", "Duplicate Name");
       return;
     }
 
@@ -196,13 +201,13 @@ const TracklessVideoEditor = () => {
         t.id === editTemplateId ? { ...t, name: newName } : t
       );
       saveCustomTemplates(updatedTemplates);
-      alert("Template name updated successfully");
+      showAlert("Template name updated successfully", "Success");
     } else {
       // For templates created from scratch, we can edit name, required videos, and descriptions
       const numVideosStr = prompt(`How many videos does this template require? (Current: ${templateToEdit.requiredVideos})`, templateToEdit.requiredVideos);
       const num = parseInt(numVideosStr);
       if (isNaN(num) || num <= 0 || num > 10) {
-        alert("Please enter a valid number between 1 and 10");
+        showAlert("Please enter a valid number between 1 and 10", "Invalid Number");
         return;
       }
 
@@ -225,7 +230,7 @@ const TracklessVideoEditor = () => {
             const durationInput = prompt(`Enter duration for video ${descriptionIndex + 1} in seconds (e.g., 5 for 5 seconds):`, currentDuration.toString());
             const duration = parseFloat(durationInput);
             if (isNaN(duration) || duration <= 0) {
-              alert("Please enter a valid positive number for duration.");
+              showAlert("Please enter a valid positive number for duration.", "Invalid Duration");
               // Re-collect for the current video if invalid
               collectNewDescriptionsAndDurations();
               return;
@@ -248,7 +253,7 @@ const TracklessVideoEditor = () => {
               : t
           );
           saveCustomTemplates(updatedTemplates);
-          alert("Template updated successfully");
+          showAlert("Template updated successfully", "Success");
         }
       };
 
@@ -271,7 +276,7 @@ const TracklessVideoEditor = () => {
   const handlePickFromDevice = async (requiredVideos, currentTemplate, targetIndex = null) => {
     // Check if videos have already been added for Template 1 or 3 but we need 2, or Template 2 but we need 3
     if (targetIndex === null && selectedVideos.length >= requiredVideos) {
-      alert(`Template ${currentTemplate} requires exactly ${requiredVideos} videos. Remove current videos before adding more.`);
+      showAlert(`Template ${currentTemplate} requires exactly ${requiredVideos} videos. Remove current videos before adding more.`, "Too Many Videos");
       return;
     }
 
@@ -307,7 +312,7 @@ const TracklessVideoEditor = () => {
         } else {
           // Check if we've reached the limit for current template
           if (selectedVideos.length >= requiredVideos) {
-            alert(`Template ${currentTemplate} requires exactly ${requiredVideos} videos.`);
+            showAlert(`Template ${currentTemplate} requires exactly ${requiredVideos} videos.`, "Video Limit Reached");
             return;
           }
 
@@ -319,7 +324,7 @@ const TracklessVideoEditor = () => {
         }
       } catch (error) {
         console.error("Error processing device video:", error);
-        alert(`Error loading video: ${error.message}`);
+        showAlert(`Error loading video: ${error.message}`, "Processing Error");
       }
     };
 
@@ -360,18 +365,6 @@ const TracklessVideoEditor = () => {
         return newVideos;
       });
     }
-  };
-
-  // Helper function to set only in point for a video
-  const setInPointForVideo = (index, value) => {
-    const current = getInOutPoints(index);
-    setInOutPoints(index, value, current.outPoint);
-  };
-
-  // Helper function to set only out point for a video
-  const setOutPointForVideo = (index, value) => {
-    const current = getInOutPoints(index);
-    setInOutPoints(index, current.inPoint, value);
   };
 
   // Handle setting in/out points
@@ -452,7 +445,7 @@ const TracklessVideoEditor = () => {
         };
 
         audioElement.onerror = () => {
-          alert("Could not load audio to get duration");
+          showAlert("Could not load audio to get duration", "Error");
           URL.revokeObjectURL(audioUrl);
         };
       }
@@ -479,7 +472,7 @@ const TracklessVideoEditor = () => {
       },
     }));
 
-    alert(`Audio file added to Video ${videoIndex + 1}`);
+    showAlert(`Audio file added to Video ${videoIndex + 1}`, "Audio Added");
   };
 
   // Function to remove audio from a video
@@ -494,7 +487,7 @@ const TracklessVideoEditor = () => {
       return newTracks;
     });
 
-    alert(`Audio removed from Video ${videoIndex + 1}`);
+    showAlert(`Audio removed from Video ${videoIndex + 1}`, "Audio Removed");
   };
 
   // Function to set video volume
@@ -511,420 +504,6 @@ const TracklessVideoEditor = () => {
       ...prevVolumes,
       [videoIndex]: volume,
     }));
-  };
-
-  // Internal function to handle the actual upload and project creation using chunking
-  const processVideoUploadAndCreateProject = async (
-    setSelectedVideos,
-    selectedVideos,
-    template = null,
-    customTemplates = []
-  ) => {
-    try {
-      selectedVideos.forEach((video, index) => {
-        const inPoint =
-          video.inOutPoints?.inPoint !== undefined
-            ? video.inOutPoints.inPoint
-            : 0;
-
-        // Determine outPoint based on custom template durations if applicable
-        let outPoint;
-        if (video.inOutPoints?.outPoint !== undefined) {
-          outPoint = video.inOutPoints.outPoint;
-        } else {
-          // Check if there's a custom template and use its duration
-          const customTemplate = customTemplates.find((t) => t.id === template);
-          if (
-            customTemplate &&
-            customTemplate.videoDurations &&
-            customTemplate.videoDurations[index] !== undefined
-          ) {
-            // Use the custom template's specified duration
-            outPoint = inPoint + customTemplate.videoDurations[index];
-          } else {
-            // Fallback to video duration or 3 seconds
-            outPoint = inPoint + (video.duration || 3);
-          }
-        }
-
-        const sourceDuration = outPoint - inPoint;
-        console.log(
-          `[CHILLIN_CHUNKING]    Video ${index + 1}: ${
-            video.name || `Video ${index + 1}`
-          } (${inPoint.toFixed(2)}s → ${outPoint.toFixed(
-            2
-          )}s, duration: ${sourceDuration.toFixed(2)}s)`
-        );
-      });
-
-      // Show loading dialog during processing
-      alert("Processing videos project with smart chunking...");
-
-      // Check if there are any selected videos to process
-      if (!selectedVideos || selectedVideos.length === 0) {
-        throw new Error(
-          "No videos selected for processing. Please add videos to the sequence first."
-        );
-      }
-
-      // Create video layers with in/out points for chunking system
-      const videoLayers = selectedVideos.map((video, index) => {
-        // Get in/out points if they exist
-        const inPoint =
-          video.inOutPoints?.inPoint !== undefined
-            ? video.inOutPoints.inPoint
-            : 0;
-
-        // Determine outPoint based on custom template durations if applicable
-        let outPoint;
-        if (video.inOutPoints?.outPoint !== undefined) {
-          outPoint = video.inOutPoints.outPoint;
-        } else {
-          // Check if there's a custom template and use its duration
-          const customTemplate = customTemplates.find((t) => t.id === template);
-          if (
-            customTemplate &&
-            customTemplate.videoDurations &&
-            customTemplate.videoDurations[index] !== undefined
-          ) {
-            // Use the custom template's specified duration
-            outPoint = inPoint + customTemplate.videoDurations[index];
-          } else {
-            // Fallback to video duration or 3 seconds
-            outPoint = inPoint + (video.duration || 3);
-          }
-        }
-
-        const sourceDuration = outPoint - inPoint;
-
-        // Calculate start time based on previous videos' durations (using in/out points)
-        const startTime =
-          index === 0
-            ? 0
-            : selectedVideos.slice(0, index).reduce((acc, v, prevIndex) => {
-                const prevInPoint =
-                  v.inOutPoints?.inPoint !== undefined
-                    ? v.inOutPoints.inPoint
-                    : 0;
-
-                // Calculate outPoint for the previous video considering custom template
-                let prevOutPoint;
-                if (v.inOutPoints?.outPoint !== undefined) {
-                  prevOutPoint = v.inOutPoints.outPoint;
-                } else {
-                  const customTemplate = customTemplates.find(
-                    (t) => t.id === template
-                  );
-                  if (
-                    customTemplate &&
-                    customTemplate.videoDurations &&
-                    customTemplate.videoDurations[prevIndex] !== undefined
-                  ) {
-                    // Use the custom template's specified duration
-                    prevOutPoint =
-                      prevInPoint + customTemplate.videoDurations[prevIndex];
-                  } else {
-                    // Fallback to video duration or 3 seconds
-                    prevOutPoint = prevInPoint + (v.duration || 3);
-                  }
-                }
-
-                return acc + (prevOutPoint - prevInPoint);
-              }, 0);
-
-        // Create src URL from blob if available
-        let videoSrc = video.src;
-        if (!videoSrc && video.blob) {
-          videoSrc = URL.createObjectURL(video.blob);
-        }
-
-        return {
-          id: video.id || `video-${index}`,
-          name: video.name || `Video ${index + 1}`, // ✅ CRITICAL: Pass name for tracking
-          type: "video", // Lowercase for chunking system
-          start: startTime, // Start position in the timeline
-          duration: sourceDuration, // Duration based on in/out points
-          trackIndex: 0,
-          x: 0,
-          y: 0,
-          width: 1280,
-          height: 720,
-          blendMode: "normal",
-          anchorX: 640,
-          anchorY: 360,
-          rotation: 0,
-          scaleX: 1,
-          scaleY: 1,
-          alpha: 1,
-          skewX: 0,
-          skewY: 0,
-          hidden: false,
-          locked: false,
-          keyframes: [],
-          src: videoSrc, // Original source for chunking system to process
-          blob: video.blob, // ✅ CRITICAL: Pass the blob to chunking service
-          ext: "mp4", // Assuming all videos are mp4
-          inPoint: inPoint, // Start point in source video
-          outPoint: outPoint, // End point in source video
-          volume: 1,
-          hasAudio: true,
-          playrate: 1,
-          isFrontTrimmed: false,
-          sourceDuration: sourceDuration,
-          mediaDuration: sourceDuration,
-        };
-      });
-
-      // Create tracks structure for chunking system
-      const tracks = [
-        {
-          id: "video-track-0",
-          name: "Video Track",
-          items: videoLayers,
-          type: "video",
-        },
-      ];
-
-      // Calculate total duration of all videos
-      const totalDuration = selectedVideos.reduce((acc, video) => {
-        const inPoint =
-          video.inOutPoints?.inPoint !== undefined
-            ? video.inOutPoints.inPoint
-            : 0;
-        const outPoint =
-          video.inOutPoints?.outPoint !== undefined
-            ? video.inOutPoints.outPoint
-            : video.duration || 3;
-        return acc + (outPoint - inPoint);
-      }, 0);
-
-      // Generate job ID for this processing session
-      const jobId = `chillin_${Date.now()}_${Math.random()
-        .toString(36)
-        .substr(2, 9)}`;
-
-      // Process chunks using the smart chunking system
-      alert("Analyzing videos and extracting chunks...");
-
-      // Update the progress callback function
-      const onProgress = (message) => {
-        console.log(message);
-        // In a real UI, you would update a progress bar here
-      };
-
-      // Process chunks using the actual chunk processing service
-      const updatedTracks = await processTimelineChunks(
-        tracks,
-        jobId,
-        onProgress,
-        "http://localhost" // Renderer API URL - using local by default for chunk processing
-      );
-
-      alert("Creating Chillin project with chunked videos...");
-
-      // Create Chillin API request payload with chunk URLs
-      const chillinApiPayload = {
-        compositeWidth: 1280,
-        compositeHeight: 720,
-        fps: 30,
-        projectData: {
-          type: "",
-          width: 1280,
-          height: 720,
-          fill: "#000000",
-          duration: totalDuration, // Total duration of all videos
-          version: 0,
-          view: updatedTracks[0].items.map((item, index) => ({
-            ...item,
-            type: "Video", // Capitalize for Chillin API
-            externalUrl: item.src, // Use the chunk URL from processing
-            startInSource: item.inPoint, // Start point in chunk (0 for extracted chunks)
-            sourceDuration: item.sourceDuration, // Duration of the chunk
-          })),
-          audio: [],
-          effect: [],
-          transition: [],
-        },
-      };
-
-      if (!chillinApiKey) {
-        throw new Error(
-          "Chillin API key not found. Please set your API key in settings."
-        );
-      }
-
-      // Make the actual API call to Chillin
-      alert("Sending project to Chillin renderer...");
-
-      // Show a 10-second simulation
-      alert("Preparing project for Chillin renderer (simulating 10s process)...");
-
-      // Separate function for the API call
-      const handleSendToChillin = async () => {
-        try {
-          alert("Sending project to Chillin renderer...");
-
-          const response = await fetch(
-            "https://render-api.chillin.online/render/v1",
-            {
-              method: "POST",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${chillinApiKey}`,
-              },
-              body: JSON.stringify(chillinApiPayload),
-            }
-          );
-
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(
-              `${response.status} ${response.statusText}: ${
-                errorData.msg || "API request failed"
-              }`
-            );
-          }
-
-          const result = await response.json();
-
-          // Store the render ID in localStorage
-          const storedRenders = JSON.parse(
-            localStorage.getItem("chillinRenders") || "[]"
-          );
-          const updatedRenders = [
-            ...storedRenders,
-            {
-              render_id: result.data.render_id,
-              timestamp: new Date().toISOString(),
-              status: "pending", // Default status
-            },
-          ];
-          localStorage.setItem(
-            "chillinRenders",
-            JSON.stringify(updatedRenders)
-          );
-
-          // Update state with the new renders
-          const sortedRenders = updatedRenders.sort(
-            (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-          );
-          setChillinRenders(sortedRenders);
-
-          alert(
-            `Video project created with smart chunking! Project ID: ${result.data.render_id}`,
-            "Success"
-          );
-
-          // Note: We don't update selectedVideos here since we're using chunks and the user may want to keep their original videos
-          return result;
-        } catch (error) {
-          console.error("Error sending project to Chillin renderer:", error);
-          alert(`Error: ${error.message}`, "API Error");
-          throw error;
-        }
-      };
-
-      // Simulate the confirmation dialog behavior with a simple confirmation
-      const confirmSend = window.confirm("Click OK to send your project to the Chillin renderer?");
-      if (confirmSend) {
-        return handleSendToChillin();
-      } else {
-        // User cancelled
-        const cancellationError = new Error(
-          "User cancelled Chillin project submission"
-        );
-        cancellationError.userCancelled = true;
-        throw cancellationError;
-      }
-    } catch (error) {
-      console.error("Error in processVideoUploadAndCreateProject:", error);
-      if (!error.userCancelled) {
-        alert(`Error: ${error.message}`, "Processing Error");
-      }
-      throw error; // Re-throw the error so calling code can handle it if needed
-    }
-  };
-
-  // Handle Chillin project creation (equivalent to createChillinProject in useChillinAPI)
-  const createChillinProject = async (
-    setSelectedVideos,
-    selectedVideos,
-    template = null,
-    customTemplates = []
-  ) => {
-    // Show dialog to notify user and ask for confirmation to process
-    const confirmProcess = window.confirm(
-      "This will process your videos with smart chunking first before creating render project. Only the portions you've selected with in/out points will be processed. Click OK to proceed."
-    );
-
-    if (confirmProcess) {
-      try {
-        // Process the video upload and create project with chunking
-        const result = await processVideoUploadAndCreateProject(
-          setSelectedVideos,
-          selectedVideos,
-          template,
-          customTemplates
-        );
-        return result;
-      } catch (error) {
-        if (!error.userCancelled) {
-          alert(`Error: ${error.message}`, "Processing Error");
-        }
-        throw error;
-      }
-    } else {
-      // Cancel callback
-      const cancellationError = new Error(
-        "User cancelled video processing"
-      );
-      cancellationError.userCancelled = true;
-      throw cancellationError;
-    }
-  };
-
-  // Function to get render result by render_id
-  const getRenderResult = async (renderId) => {
-    try {
-      const response = await fetch(
-        "https://render-api.chillin.online/render/result",
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${chillinApiKey}`,
-          },
-          body: JSON.stringify({
-            render_id: renderId,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          `${response.status} ${response.statusText}: ${
-            errorData.error_message || "Failed to get render result"
-          }`
-        );
-      }
-
-      const result = await response.json();
-      console.log("Chillin render result:", result);
-
-      alert(
-        `Render result retrieved successfully! Render ID: ${renderId}`,
-        "Success"
-      );
-
-      return result;
-    } catch (error) {
-      console.error("Error getting render result:", error);
-      alert(`Error: ${error.message}`, "Render Result Error");
-      throw error;
-    }
   };
 
   // Function to open volume adjustment dialog
@@ -1155,18 +734,18 @@ const TracklessVideoEditor = () => {
       if (data?.data?.render?.state == "success") {
         console.log({ data: data.data.render.video_url });
         setDownloadUrl(data.data.render.video_url);
-        alert(`Your video is ready! Video URL: ${data.data.render.video_url}`);
+        showAlert(`Your video is ready! Video URL: ${data.data.render.video_url}`, "Render Success");
       }
       if (data?.data?.render?.state == "pending") {
         setDownloadUrl();
-        alert("Please try again later.");
+        showAlert("Please try again later.", "Pending");
       }
       if (data?.data?.render?.state == "failed") {
         setDownloadUrl();
-        alert("Render job failed.");
+        showAlert("Render job failed.", "Failed");
       }
     } catch (error) {
-      alert(`Error getting render result: ${error.message}`);
+      showAlert(`Error getting render result: ${error.message}`, "Error");
     }
   };
 
@@ -1196,7 +775,7 @@ const TracklessVideoEditor = () => {
     } else if (video.src) {
       videoUrl = video.src;
     } else {
-      alert("Video source not available");
+      showAlert("Video source not available", "Error");
       return;
     }
 
@@ -1297,7 +876,7 @@ const TracklessVideoEditor = () => {
 
           // Validate that inPoint is before outPoint
           if (currentTime >= currentOutPoint) {
-            alert(`In point must be before out point (${currentOutPoint.toFixed(2)}s)`);
+            showAlert(`In point must be before out point (${currentOutPoint.toFixed(2)}s)`, "Invalid In Point");
             return;
           }
 
@@ -1315,7 +894,7 @@ const TracklessVideoEditor = () => {
 
           // Validate that outPoint is after inPoint
           if (currentTime <= currentInPoint) {
-            alert(`Out point must be after in point (${currentInPoint.toFixed(2)}s)`);
+            showAlert(`Out point must be after in point (${currentInPoint.toFixed(2)}s)`, "Invalid Out Point");
             return;
           }
 
@@ -1330,7 +909,8 @@ const TracklessVideoEditor = () => {
       if (savePointsBtn) {
         savePointsBtn.onclick = () => {
           // Set the in/out points in the state
-          setInOutPoints(videoIndex, currentInPoint, currentOutPoint);
+          setInPoint(videoIndex, currentInPoint);
+          setOutPoint(videoIndex, currentOutPoint);
 
           // Update audio duration if this video has audio attached
           updateAudioDuration(videoIndex);
@@ -1383,7 +963,7 @@ const TracklessVideoEditor = () => {
     };
 
     videoElement.onerror = () => {
-      alert("Could not load video to get duration");
+      showAlert("Could not load video to get duration", "Error");
       if (video.blob) {
         URL.revokeObjectURL(videoUrl);
       }
@@ -1407,7 +987,10 @@ const TracklessVideoEditor = () => {
     }
 
     if (!selectedVideos || selectedVideos.length !== requiredVideos) {
-      alert(`Template ${template} requires exactly ${requiredVideos} videos. You currently have ${selectedVideos.length} videos.`);
+      showAlert(
+        `Template ${template} requires exactly ${requiredVideos} videos. You currently have ${selectedVideos.length} videos.`,
+        "Incorrect Video Count"
+      );
       return;
     }
 
@@ -1746,32 +1329,7 @@ const TracklessVideoEditor = () => {
     // Set the data and add a small delay to ensure sheet is open before rendering
     setChillinProjectJson(chillinJson);
 
-    alert("Chillin preview data set! The preview would now be displayed.");
-  };
-
-  // Function to send the Chillin project to the renderer
-  const sendChillinProjectToRenderer = async () => {
-    try {
-      // Validate that we have videos to process
-      if (!selectedVideos || selectedVideos.length === 0) {
-        alert("No videos selected. Please add videos before sending to renderer.");
-        return;
-      }
-
-      // Use the createChillinProject function we defined above
-      await createChillinProject(
-        setSelectedVideos,
-        selectedVideos,
-        template,
-        customTemplates
-      );
-
-      alert("Project sent to Chillin renderer successfully!");
-    } catch (error) {
-      if (!error.userCancelled) {
-        alert(`Error sending project to renderer: ${error.message}`);
-      }
-    }
+    showAlert("Chillin preview data set! The preview would now be displayed.", "Preview Ready");
   };
 
   // Function to send a test job to Chillin with two 3sec videos from specified URLs
@@ -1867,7 +1425,7 @@ const TracklessVideoEditor = () => {
 
     try {
       // Show loading indicator
-      alert("Sending test job to Chillin...");
+      showAlert("Sending test job to Chillin...", "Processing");
 
       // Send the job to the Chillin API using the same endpoint and auth as in useChillinAPI
       const response = await fetch(
@@ -1888,7 +1446,7 @@ const TracklessVideoEditor = () => {
         console.log("Test job sent successfully:", result);
 
         // Show success with the actual render ID from the API (same as in useChillinAPI)
-        alert(`Test job sent successfully! Render ID: ${result.data.render_id}`);
+        showAlert(`Test job sent successfully! Render ID: ${result.data.render_id}`, "Success");
       } else {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
@@ -1899,7 +1457,7 @@ const TracklessVideoEditor = () => {
       }
     } catch (error) {
       console.error("Error sending test job to Chillin:", error);
-      alert(`Error sending test job: ${error.message}`);
+      showAlert(`Error sending test job: ${error.message}`, "Error");
     }
   };
 
@@ -2021,6 +1579,22 @@ const TracklessVideoEditor = () => {
     }
   };
 
+  // Function to display an alert using Radix UI dialog
+  const showAlert = (message, title = "Alert", callback = null) => {
+    setAlertTitle(title);
+    setAlertMessage(message);
+    setAlertCallback(() => callback); // Wrap the callback to make sure it's a function
+    setAlertOpen(true);
+  };
+
+  // Function to handle closing the alert dialog
+  const handleAlertClose = () => {
+    setAlertOpen(false);
+    if (typeof alertCallback === 'function') {
+      alertCallback();
+    }
+    setAlertCallback(null);
+  };
 
   // Create template preview data for each template
   const createTemplatePreviewData = (templateNum) => {
@@ -2467,23 +2041,217 @@ const TracklessVideoEditor = () => {
     };
   };
 
+  // Function to get render result by render_id
+  const getRenderResult = async (renderId) => {
+    try {
+      const response = await fetch(
+        "https://render-api.chillin.online/render/result",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${chillinApiKey}`,
+          },
+          body: JSON.stringify({
+            render_id: renderId,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          `${response.status} ${response.statusText}: ${
+            errorData.error_message || "Failed to get render result"
+          }`
+        );
+      }
+
+      const result = await response.json();
+      console.log("Chillin render result:", result);
+
+      showAlert(`Render result retrieved successfully! Render ID: ${renderId}`, "Success");
+
+      return result;
+    } catch (error) {
+      console.error("Error getting render result:", error);
+      showAlert(`Error: ${error.message}`, "Error");
+      throw error;
+    }
+  };
+
+  // Handle Chillin project creation
+  const createChillinProject = async (selectedVideos, template = null) => {
+    if (!selectedVideos || selectedVideos.length === 0) {
+      showAlert("No videos selected for processing. Please add videos to the sequence first.", "No Videos Selected");
+      return;
+    }
+
+    const confirmation = window.confirm(
+      "This will process your videos with smart chunking first before creating render project. Only the portions you've selected with in/out points will be processed. Click OK to proceed."
+    );
+
+    if (!confirmation) {
+      return;
+    }
+
+    try {
+      // Show processing dialog
+      showAlert("Processing videos project with smart chunking...", "Processing");
+
+      // Calculate total duration of all videos
+      const totalDuration = selectedVideos.reduce((acc, video) => {
+        const inPoint = video.inOutPoints?.inPoint !== undefined ? video.inOutPoints.inPoint : 0;
+        const outPoint = video.inOutPoints?.outPoint !== undefined ? video.inOutPoints.outPoint : 3;
+        return acc + (outPoint - inPoint);
+      }, 0);
+
+      // Generate job ID for this processing session
+      const jobId = `chillin_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      // Create Chillin API request payload
+      const chillinApiPayload = {
+        compositeWidth: 1280,
+        compositeHeight: 720,
+        fps: 30,
+        projectData: {
+          type: "",
+          width: 1280,
+          height: 720,
+          fill: "#000000",
+          duration: totalDuration, // Total duration of all videos
+          version: 0,
+          view: selectedVideos.map((video, index) => {
+            const inPoint = video.inOutPoints?.inPoint !== undefined ? video.inOutPoints.inPoint : 0;
+            const outPoint = video.inOutPoints?.outPoint !== undefined ? video.inOutPoints.outPoint : 3;
+
+            return {
+              id: video.id || `video-${index}`,
+              type: "Video",
+              description: `Video ${index + 1}`,
+              start: index === 0 ? 0 : selectedVideos.slice(0, index).reduce((acc, v) => {
+                const prevInPoint = v.inOutPoints?.inPoint !== undefined ? v.inOutPoints.inPoint : 0;
+                const prevOutPoint = v.inOutPoints?.outPoint !== undefined ? v.inOutPoints.outPoint : 3;
+                return acc + (prevOutPoint - prevInPoint);
+              }, 0),
+              duration: outPoint - inPoint,
+              trackIndex: 0,
+              x: 0,
+              y: 0,
+              width: 1280,
+              height: 720,
+              blendMode: "normal",
+              anchorX: 640,
+              anchorY: 360,
+              rotation: 0,
+              scaleX: 1,
+              scaleY: 1,
+              alpha: 1,
+              skewX: 0,
+              skewY: 0,
+              hidden: false,
+              locked: false,
+              keyframes: [],
+              externalUrl: video.src || URL.createObjectURL(video.blob), // Use the video source
+              ext: "mp4",
+              startInSource: inPoint, // Start point in source video
+              sourceDuration: outPoint - inPoint,
+              volume: 1,
+              hasAudio: true,
+              playrate: 1,
+              isFrontTrimmed: false,
+            };
+          }),
+          audio: [],
+          effect: [],
+          transition: [],
+        },
+      };
+
+      if (!chillinApiKey) {
+        throw new Error(
+          "Chillin API key not found. Please set your API key in settings."
+        );
+      }
+
+      // Show processing dialog
+      showAlert("Sending project to Chillin renderer...", "Processing");
+
+      // Wait 10 seconds to simulate processing
+      await new Promise(resolve => setTimeout(resolve, 10000));
+
+      const response = await fetch(
+        "https://render-api.chillin.online/render/v1",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${chillinApiKey}`,
+          },
+          body: JSON.stringify(chillinApiPayload),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          `${response.status} ${response.statusText}: ${
+            errorData.msg || "API request failed"
+          }`
+        );
+      }
+
+      const result = await response.json();
+
+      // Store the render ID in localStorage
+      const storedRenders = JSON.parse(
+        localStorage.getItem("chillinRenders") || "[]"
+      );
+      const updatedRenders = [
+        ...storedRenders,
+        {
+          render_id: result.data.render_id,
+          timestamp: new Date().toISOString(),
+          status: "pending", // Default status
+        },
+      ];
+      localStorage.setItem(
+        "chillinRenders",
+        JSON.stringify(updatedRenders)
+      );
+
+      // Update the state with the new renders
+      setChillinRenders(updatedRenders);
+
+      // Show success with the actual render ID from the API
+      showAlert(`Video project created with smart chunking! Project ID: ${result.data.render_id}`, "Project Created");
+
+      setActiveTab("render");
+    } catch (error) {
+      console.error("Error sending project to Chillin renderer:", error);
+      showAlert(`Error: ${error.message}`, "Error");
+    }
+  };
+
   // Handle creating a custom template from dialog
   const handleCreateCustomTemplate = () => {
     const name = videoName.trim();
     if (!name) {
-      alert("Template name cannot be empty");
+      showAlert("Template name cannot be empty", "Invalid Name");
       return;
     }
 
     // Check if template name already exists
     if (customTemplates.some((t) => t.name === name)) {
-      alert("A template with this name already exists");
+      showAlert("A template with this name already exists", "Duplicate Name");
       return;
     }
 
-    const numVideos = parseInt(numVideosForTemplate);
+    const numVideos = parseInt(videoDuration);
     if (isNaN(numVideos) || numVideos <= 0 || numVideos > 10) {
-      alert("Please enter a valid number between 1 and 10");
+      showAlert("Please enter a valid number between 1 and 10", "Invalid Number");
       return;
     }
 
@@ -2507,23 +2275,23 @@ const TracklessVideoEditor = () => {
     const updatedTemplates = [...customTemplates, newTemplate];
     saveCustomTemplates(updatedTemplates);
 
-    alert(`Custom template "${name}" has been created! Now select it to configure.`);
+    showAlert(`Custom template "${name}" has been created! Now select it to configure.`, "Template Created");
     setCreateTemplateDialogOpen(false);
     setVideoName('');
-    setNumVideosForTemplate(2); // Reset to default
+    setVideoDuration(10);
   };
 
   // Handle creating template from current selection
   const handleCreateTemplateFromCurrent = () => {
     const name = videoName.trim();
     if (!name) {
-      alert("Template name cannot be empty");
+      showAlert("Template name cannot be empty", "Invalid Name");
       return;
     }
 
     // Check if template name already exists
     if (customTemplates.some((t) => t.name === name)) {
-      alert("A template with this name already exists");
+      showAlert("A template with this name already exists", "Duplicate Name");
       return;
     }
 
@@ -2544,7 +2312,7 @@ const TracklessVideoEditor = () => {
     const updatedTemplates = [...customTemplates, newTemplate];
     saveCustomTemplates(updatedTemplates);
 
-    alert(`Custom template "${name.trim()}" has been created!`);
+    showAlert(`Custom template "${name.trim()}" has been created!`, "Template Created");
     setCreateFromCurrentDialogOpen(false);
     setVideoName('');
   };
@@ -2556,7 +2324,7 @@ const TracklessVideoEditor = () => {
         (t) => t.id !== deleteTemplateId
       );
       saveCustomTemplates(updatedTemplates);
-      alert("Template deleted successfully");
+      showAlert("Template deleted successfully", "Deleted");
     }
     setDeleteTemplateDialogOpen(false);
     setDeleteTemplateId(null);
@@ -2566,7 +2334,7 @@ const TracklessVideoEditor = () => {
   const handleVideoSelectionFlow = useCallback(
     async (targetIndex = null) => {
       if (!template) {
-        alert("Please select a template first");
+        showAlert("Please select a template first", "No Template Selected");
         return;
       }
 
@@ -2586,12 +2354,15 @@ const TracklessVideoEditor = () => {
 
       const videosNeeded = requiredVideos - selectedVideos.length;
       if (videosNeeded <= 0) {
-        alert(`Template ${template} already has the required ${requiredVideos} videos. Remove some videos before adding more.`);
+        showAlert(
+          `Template ${template} already has the required ${requiredVideos} videos. Remove some videos before adding more.`,
+          "Too Many Videos"
+        );
         return;
       }
 
       // Show progress to indicate how many videos are needed vs selected
-      alert(`Add videos for Template ${template}. Selected: ${selectedVideos.length}/${requiredVideos} videos`);
+      showAlert(`Add videos for Template ${template}. Selected: ${selectedVideos.length}/${requiredVideos} videos`, "Add Videos");
 
       // Call the function to pick from device
       handlePickFromDevice(requiredVideos, template).catch((error) =>
@@ -2867,7 +2638,7 @@ const TracklessVideoEditor = () => {
             <div className="bg-gray-50 p-6 rounded-lg">
               <h2 className="text-xl font-bold mb-4">Video Sequence Display</h2>
 
-              <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Button
                   variant="outline"
                   className="w-full border-dashed border-2 border-gray-300"
@@ -2881,12 +2652,6 @@ const TracklessVideoEditor = () => {
                   onClick={() => sendTestJobToChillin()}
                 >
                   Send Test Job to Chillin
-                </Button>
-                <Button
-                  className="w-full bg-[#A01E25] hover:bg-[#80171e] text-white"
-                  onClick={() => createChillinProject(setSelectedVideos, selectedVideos, template, customTemplates)}
-                >
-                  Start Render
                 </Button>
               </div>
 
@@ -3036,7 +2801,7 @@ const TracklessVideoEditor = () => {
               <div className="mb-4">
                 <Button
                   className="bg-[#A01E25] hover:bg-[#80171e]"
-                  onClick={() => createChillinProject(setSelectedVideos, selectedVideos, template, customTemplates)}
+                  onClick={() => createChillinProject(selectedVideos, template)}
                 >
                   Start New Render
                 </Button>
@@ -3143,8 +2908,8 @@ const TracklessVideoEditor = () => {
               <Input
                 id="numVideos"
                 type="number"
-                value={numVideosForTemplate}
-                onChange={(e) => setNumVideosForTemplate(Number(e.target.value))}
+                value={videoDuration}
+                onChange={(e) => setVideoDuration(Number(e.target.value))}
                 min="1"
                 max="10"
                 placeholder="Enter number of videos (1-10)"
@@ -3328,6 +3093,20 @@ const TracklessVideoEditor = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Alert Dialog Replacement */}
+      <Dialog open={alertOpen} onOpenChange={setAlertOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{alertTitle}</DialogTitle>
+            <DialogDescription>
+              {alertMessage}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={handleAlertClose}>OK</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,0 +1,146 @@
+import { getApiVideoBaseUrl } from "../js/utils.js";
+
+const API_VIDEO_KEY = process.env.REACT_APP_API_VIDEO_KEY; // api.video sandbox key
+
+/**
+ * Create a new video on api.video
+ * @param {Object} videoData - Video creation data (title, etc.)
+ * @returns {Promise<Object>} Created video object
+ */
+export const createApiVideo = async (videoData) => {
+  try {
+    const response = await fetch(`${getApiVideoBaseUrl()}/videos`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${API_VIDEO_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: videoData.title,
+        public: videoData.public !== undefined ? videoData.public : true, // Default to public
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to create video: ${response.status} ${response.statusText}, ${errorText}`
+      );
+    }
+
+    const createdVideo = await response.json();
+    return createdVideo;
+  } catch (error) {
+    console.error("Error creating video on api.video:", error);
+    throw error;
+  }
+};
+
+/**
+ * Upload source file to an existing api.video
+ * @param {File|Blob} file - File or blob to upload
+ * @param {string} videoId - ID of the video to upload to
+ * @param {string} fileName - Name of the file being uploaded
+ * @returns {Promise<Object>} Uploaded video object
+ */
+export const uploadApiVideoSource = async (
+  file,
+  videoId,
+  fileName = "video.mp4"
+) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file, fileName);
+
+    const response = await fetch(
+      `${getApiVideoBaseUrl()}/videos/${videoId}/source`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${API_VIDEO_KEY}`,
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to upload video source: ${response.status} ${response.statusText}, ${errorText}`
+      );
+    }
+
+    const uploadedVideo = await response.json();
+    return uploadedVideo;
+  } catch (error) {
+    console.error("Error uploading video source to api.video:", error);
+    throw error;
+  }
+};
+
+/**
+ * Complete video upload workflow: create video and upload source
+ * @param {File|Blob} file - File to upload
+ * @param {Object} videoData - Video creation data (title, etc.)
+ * @param {string} fileName - Name of the file being uploaded
+ * @returns {Promise<Object>} Complete video object with assets
+ */
+export const uploadApiVideo = async (file, videoData, fileName = file.name) => {
+  try {
+    // First create the video
+    const createdVideo = await createApiVideo(videoData);
+
+    // Then upload the source file
+    const uploadedVideo = await uploadApiVideoSource(
+      file,
+      createdVideo.videoId,
+      fileName
+    );
+
+    // Return the complete video info
+    return {
+      ...uploadedVideo,
+      videoId: createdVideo.videoId,
+      title: createdVideo.title,
+    };
+  } catch (error) {
+    console.error("Error in complete api.video upload:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get video details from api.video
+ * @param {string} videoId - ID of the video to retrieve
+ * @returns {Promise<Object>} Video object
+ */
+export const getApiVideo = async (videoId) => {
+  try {
+    const response = await fetch(`${getApiVideoBaseUrl()}/videos/${videoId}`, {
+      headers: {
+        Authorization: `Bearer ${API_VIDEO_KEY}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Failed to get video: ${response.status} ${response.statusText}, ${errorText}`
+      );
+    }
+
+    const video = await response.json();
+    return video;
+  } catch (error) {
+    console.error("Error getting video from api.video:", error);
+    throw error;
+  }
+};
+
+// Export an object with all functions for convenience
+export default {
+  createApiVideo,
+  uploadApiVideoSource,
+  uploadApiVideo,
+  getApiVideo,
+};
