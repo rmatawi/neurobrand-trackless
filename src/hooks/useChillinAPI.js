@@ -67,7 +67,16 @@ export const useChillinAPI = (dialogManager) => {
       });
 
       // Show loading dialog during processing
-      dialogManager.showAlert("Processing", "Processing videos project with smart chunking...");
+      dialogManager.create({
+        title: "Processing",
+        text: "Processing videos project with smart chunking...",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
 
       // Check if there are any selected videos to process
       if (!selectedVideos || selectedVideos.length === 0) {
@@ -215,7 +224,16 @@ export const useChillinAPI = (dialogManager) => {
       );
 
       // Process chunks using the smart chunking system
-      dialogManager.showAlert("Processing", "Analyzing videos and extracting chunks...");
+      dialogManager.create({
+        title: "Processing",
+        text: "Analyzing videos and extracting chunks...",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
 
       const jobId = `chillin_${Date.now()}_${Math.random()
         .toString(36)
@@ -236,7 +254,16 @@ export const useChillinAPI = (dialogManager) => {
         "http://localhost" // Renderer API URL - using local by default for chunk processing
       );
 
-      dialogManager.showAlert("Processing", "Creating Chillin project with chunked videos...");
+      dialogManager.create({
+        title: "Processing",
+        text: "Creating Chillin project with chunked videos...",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
 
       // Create Chillin API request payload with chunk URLs
       const chillinApiPayload = {
@@ -257,15 +284,42 @@ export const useChillinAPI = (dialogManager) => {
       };
 
       // Make the actual API call to Chillin
-      dialogManager.showAlert("Processing", "Sending project to Chillin renderer...");
+      dialogManager.create({
+        title: "Processing",
+        text: "Sending project to Chillin renderer...",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
 
       // Show a 10-second simulation
-      dialogManager.showAlert("Processing", "Preparing project for Chillin renderer (simulating 10s process)...");
+      dialogManager.create({
+        title: "Processing",
+        text: "Preparing project for Chillin renderer (simulating 10s process)...",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
 
       // Separate function for the API call
       const handleSendToChillin = async () => {
         try {
-          dialogManager.showAlert("Processing", "Sending project to Chillin renderer...");
+          dialogManager.create({
+            title: "Processing",
+            text: "Sending project to Chillin renderer...",
+            buttons: [
+              {
+                text: "OK",
+                onClick: () => {}
+              }
+            ]
+          }).open();
 
           const response = await fetch(
             "https://render-api.chillin.online/render/v1",
@@ -304,13 +358,31 @@ export const useChillinAPI = (dialogManager) => {
           localStorage.setItem("chillinRenders", JSON.stringify(updatedRenders));
           setChillinRenders(updatedRenders);
 
-          dialogManager.showAlert("Project Created", `Video project created with smart chunking! Project ID: ${result.data.render_id}`);
+          dialogManager.create({
+            title: "Project Created",
+            text: `Video project created with smart chunking! Project ID: ${result.data.render_id}`,
+            buttons: [
+              {
+                text: "OK",
+                onClick: () => {}
+              }
+            ]
+          }).open();
 
           // Note: We don't update selectedVideos here since we're using chunks and the user may want to keep their original videos
           return result;
         } catch (error) {
           console.error("Error sending project to Chillin renderer:", error);
-          dialogManager.showAlert("API Error", `Error: ${error.message}`);
+          dialogManager.create({
+            title: "API Error",
+            text: `Error: ${error.message}`,
+            buttons: [
+              {
+                text: "OK",
+                onClick: () => {}
+              }
+            ]
+          }).open();
           throw error;
         }
       };
@@ -332,7 +404,16 @@ export const useChillinAPI = (dialogManager) => {
     } catch (error) {
       console.error("Error in processVideoUploadAndCreateProject:", error);
       if (!error.userCancelled) {
-        dialogManager.showAlert("Processing Error", `Error: ${error.message}`);
+        dialogManager.create({
+          title: "Processing Error",
+          text: `Error: ${error.message}`,
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {}
+            }
+          ]
+        }).open();
       }
       throw error; // Re-throw the error so calling code can handle it if needed
     }
@@ -367,12 +448,30 @@ export const useChillinAPI = (dialogManager) => {
       const result = await response.json();
       console.log("Chillin render result:", result);
 
-      dialogManager.showAlert("Success", `Render result retrieved successfully! Render ID: ${renderId}`);
+      dialogManager.create({
+        title: "Success",
+        text: `Render result retrieved successfully! Render ID: ${renderId}`,
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
 
       return result;
     } catch (error) {
       console.error("Error getting render result:", error);
-      dialogManager.showAlert("Render Result Error", `Error: ${error.message}`);
+      dialogManager.create({
+        title: "Render Result Error",
+        text: `Error: ${error.message}`,
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
       throw error;
     }
   };
@@ -382,7 +481,16 @@ export const useChillinAPI = (dialogManager) => {
     try {
       // Validate that we have videos to process
       if (!selectedVideos || selectedVideos.length === 0) {
-        dialogManager.showAlert("No Videos Selected", "No videos selected. Please add videos before sending to renderer.");
+        dialogManager.create({
+          title: "No Videos Selected",
+          text: "No videos selected. Please add videos before sending to renderer.",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {}
+            }
+          ]
+        }).open();
         return;
       }
 
@@ -394,7 +502,16 @@ export const useChillinAPI = (dialogManager) => {
       );
     } catch (error) {
       if (!error.userCancelled) {
-        dialogManager.showAlert("Processing Error", `Error: ${error.message}`);
+        dialogManager.create({
+          title: "Processing Error",
+          text: `Error: ${error.message}`,
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {}
+            }
+          ]
+        }).open();
       }
       throw error;
     }
@@ -485,7 +602,16 @@ export const useChillinAPI = (dialogManager) => {
       };
 
       // Show loading indicator
-      dialogManager.showAlert("Processing", "Sending test job to Chillin...");
+      dialogManager.create({
+        title: "Processing",
+        text: "Sending test job to Chillin...",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
 
       // Send the job to the Chillin API using the same endpoint and auth as in useChillinAPI
       const response = await fetch(
@@ -506,7 +632,16 @@ export const useChillinAPI = (dialogManager) => {
         console.log("Test job sent successfully:", result);
 
         // Show success with the actual render ID from the API (same as in useChillinAPI)
-        dialogManager.showAlert("Success", `Test job sent successfully! Render ID: ${result.data.render_id}`);
+        dialogManager.create({
+          title: "Success",
+          text: `Test job sent successfully! Render ID: ${result.data.render_id}`,
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {}
+            }
+          ]
+        }).open();
       } else {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
@@ -517,7 +652,16 @@ export const useChillinAPI = (dialogManager) => {
       }
     } catch (error) {
       console.error("Error sending test job to Chillin:", error);
-      dialogManager.showAlert("Error", `Error sending test job: ${error.message}`);
+      dialogManager.create({
+        title: "Error",
+        text: `Error sending test job: ${error.message}`,
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
     }
   };
 

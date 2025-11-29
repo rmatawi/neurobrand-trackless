@@ -70,7 +70,16 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
   // Function to create a custom template based on current selection
   const createTemplateFromCurrent = (selectedVideos, template) => {
     if (!template || selectedVideos.length === 0) {
-      dialogManager.showAlert("Missing Template or Videos", "Please select a template and add videos before creating a custom template");
+      dialogManager.create({
+        title: "Missing Template or Videos",
+        text: "Please select a template and add videos before creating a custom template",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
       return;
     }
     setCreateFromCurrentDialogOpen(true);
@@ -99,7 +108,11 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
   const editCustomTemplate = (templateId) => {
     const templateToEdit = customTemplates.find((t) => t.id === templateId);
     if (!templateToEdit) {
-      dialogManager.showAlert("Error", "Template not found");
+      dialogManager.create({
+        title: "Error",
+        text: "Template not found",
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
       return;
     }
 
@@ -114,13 +127,21 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
 
     const templateToEdit = customTemplates.find((t) => t.id === editTemplateId);
     if (!templateToEdit) {
-      dialogManager.showAlert("Error", "Template not found");
+      dialogManager.create({
+        title: "Error",
+        text: "Template not found",
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
       return;
     }
 
     const newName = videoName.trim();
     if (!newName) {
-      dialogManager.showAlert("Invalid Name", "Template name cannot be empty");
+      dialogManager.create({
+        title: "Invalid Name",
+        text: "Template name cannot be empty",
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
       return;
     }
 
@@ -128,7 +149,11 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
     if (
       customTemplates.some((t) => t.id !== editTemplateId && t.name === newName)
     ) {
-      dialogManager.showAlert("Duplicate Name", "A template with this name already exists");
+      dialogManager.create({
+        title: "Duplicate Name",
+        text: "A template with this name already exists",
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
       return;
     }
 
@@ -139,7 +164,11 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
         t.id === editTemplateId ? { ...t, name: newName } : t
       );
       saveCustomTemplates(updatedTemplates);
-      dialogManager.showAlert("Success", "Template name updated successfully");
+      dialogManager.create({
+        title: "Success",
+        text: "Template name updated successfully",
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
     } else {
       // For templates created from scratch, we can edit name, required videos, and descriptions
       const numVideosStr = prompt(
@@ -148,7 +177,11 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
       );
       const num = parseInt(numVideosStr);
       if (isNaN(num) || num <= 0 || num > 10) {
-        dialogManager.showAlert("Invalid Number", "Please enter a valid number between 1 and 10");
+        dialogManager.create({
+          title: "Invalid Number",
+          text: "Please enter a valid number between 1 and 10",
+          buttons: [{ text: "OK", onClick: () => {} }]
+        }).open();
         return;
       }
 
@@ -204,7 +237,11 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
               : t
           );
           saveCustomTemplates(updatedTemplates);
-          dialogManager.showAlert("Success", "Template updated successfully");
+          dialogManager.create({
+            title: "Success",
+            text: "Template updated successfully",
+            buttons: [{ text: "OK", onClick: () => {} }]
+          }).open();
         }
       };
 
@@ -230,7 +267,11 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
         (t) => t.id !== deleteTemplateId
       );
       saveCustomTemplates(updatedTemplates);
-      dialogManager.showAlert("Deleted", "Template deleted successfully");
+      dialogManager.create({
+        title: "Deleted",
+        text: "Template deleted successfully",
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
     }
     setDeleteTemplateDialogOpen(false);
     setDeleteTemplateId(null);
@@ -240,19 +281,31 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
   const handleCreateCustomTemplate = () => {
     const name = videoName.trim();
     if (!name) {
-      dialogManager.showAlert("Invalid Name", "Template name cannot be empty");
+      dialogManager.create({
+        title: "Invalid Name",
+        text: "Template name cannot be empty",
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
       return;
     }
 
     // Check if template name already exists
     if (customTemplates.some((t) => t.name === name)) {
-      dialogManager.showAlert("Duplicate Name", "A template with this name already exists");
+      dialogManager.create({
+        title: "Duplicate Name",
+        text: "A template with this name already exists",
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
       return;
     }
 
     const numVideos = parseInt(numVideosForTemplate);
     if (isNaN(numVideos) || numVideos <= 0 || numVideos > 10) {
-      dialogManager.showAlert("Invalid Number", "Please enter a valid number between 1 and 10");
+      dialogManager.create({
+        title: "Invalid Number",
+        text: "Please enter a valid number between 1 and 10",
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
       return;
     }
 
@@ -276,7 +329,11 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
     const updatedTemplates = [...customTemplates, newTemplate];
     saveCustomTemplates(updatedTemplates);
 
-    dialogManager.showAlert("Template Created", `Custom template "${name}" has been created! Now select it to configure.`);
+    dialogManager.create({
+      title: "Template Created",
+      text: `Custom template "${name}" has been created! Now select it to configure.`,
+      buttons: [{ text: "OK", onClick: () => {} }]
+    }).open();
     setCreateTemplateDialogOpen(false);
     setVideoName("");
     setNumVideosForTemplate(2); // Reset to default
@@ -286,13 +343,21 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
   const handleCreateTemplateFromCurrent = (selectedVideos, videoAudioTracks, videoVolumes, audioVolumes) => {
     const name = videoName.trim();
     if (!name) {
-      dialogManager.showAlert("Invalid Name", "Template name cannot be empty");
+      dialogManager.create({
+        title: "Invalid Name",
+        text: "Template name cannot be empty",
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
       return;
     }
 
     // Check if template name already exists
     if (customTemplates.some((t) => t.name === name)) {
-      dialogManager.showAlert("Duplicate Name", "A template with this name already exists");
+      dialogManager.create({
+        title: "Duplicate Name",
+        text: "A template with this name already exists",
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
       return;
     }
 
@@ -311,7 +376,11 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
     const updatedTemplates = [...customTemplates, newTemplate];
     saveCustomTemplates(updatedTemplates);
 
-    dialogManager.showAlert("Template Created", `Custom template "${name.trim()}" has been created!`);
+    dialogManager.create({
+      title: "Template Created",
+      text: `Custom template "${name.trim()}" has been created!`,
+      buttons: [{ text: "OK", onClick: () => {} }]
+    }).open();
     setCreateFromCurrentDialogOpen(false);
     setVideoName("");
   };
@@ -333,7 +402,11 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
     }
 
     if (!selectedVideos || selectedVideos.length !== requiredVideos) {
-      dialogManager.showAlert("Add Videos", `Template ${template} requires exactly ${requiredVideos} videos. You currently have ${selectedVideos.length} videos.`);
+      dialogManager.create({
+        title: "Add Videos",
+        text: `Template ${template} requires exactly ${requiredVideos} videos. You currently have ${selectedVideos.length} videos.`,
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
       return;
     }
 
@@ -581,7 +654,11 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
     // Set the data and add a small delay to ensure sheet is open before rendering
     setChillinProjectJson(chillinJson);
 
-    dialogManager.showAlert("Preview Ready", "Chillin preview data set! The preview would now be displayed.");
+    dialogManager.create({
+      title: "Preview Ready",
+      text: "Chillin preview data set! The preview would now be displayed.",
+      buttons: [{ text: "OK", onClick: () => {} }]
+    }).open();
 
     setShowTemplatePreviewDialog(true);
   };

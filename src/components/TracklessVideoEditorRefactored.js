@@ -127,7 +127,6 @@ const TracklessVideoEditor = () => {
     getRenderResult,
     sendChillinProjectToRenderer,
     sendTestJobToChillin,
-    createChillinProject,
   } = useChillinAPI(dialogManager);
 
   // Handle video selection functionality with improved flow
@@ -562,20 +561,55 @@ const TracklessVideoEditor = () => {
                 <Button
                   variant="outline"
                   className="w-full border-dashed border-2 border-gray-300 bg-blue-50 text-blue-700"
-                  onClick={() => sendTestJobToChillin()}
+                  onClick={() => {
+                    dialogManager
+                      .create({
+                        title: "Send Test Job",
+                        text: "Are you sure you want to send a test job to Chillin?",
+                        buttons: [
+                          {
+                            text: "Send",
+                            onClick: () => {
+                              sendTestJobToChillin();
+                            },
+                          },
+                          {
+                            text: "Cancel",
+                            onClick: () => {},
+                          },
+                        ],
+                      })
+                      .open();
+                  }}
                 >
                   Send Test Job to Chillin
                 </Button>
                 <Button
                   className="w-full bg-[#A01E25] hover:bg-[#80171e] text-white"
-                  onClick={() =>
-                    createChillinProject(
-                      selectedVideos,
-                      template,
-                      customTemplates,
-                      setSelectedVideos
-                    )
-                  }
+                  onClick={() => {
+                    dialogManager
+                      .create({
+                        title: "Start Render",
+                        text: `Are you sure you want to start rendering? You have ${selectedVideos.length} video(s) selected with template ${template}.`,
+                        buttons: [
+                          {
+                            text: "Start Render",
+                            onClick: () => {
+                              sendChillinProjectToRenderer(
+                                selectedVideos,
+                                template,
+                                customTemplates
+                              );
+                            },
+                          },
+                          {
+                            text: "Cancel",
+                            onClick: () => {},
+                          },
+                        ],
+                      })
+                      .open();
+                  }}
                 >
                   Start Render
                 </Button>
@@ -781,14 +815,30 @@ const TracklessVideoEditor = () => {
               <div className="mb-4">
                 <Button
                   className="bg-[#A01E25] hover:bg-[#80171e]"
-                  onClick={() =>
-                    createChillinProject(
-                      selectedVideos,
-                      template,
-                      customTemplates,
-                      setSelectedVideos
-                    )
-                  }
+                  onClick={() => {
+                    dialogManager
+                      .create({
+                        title: "Start New Render",
+                        text: `Are you sure you want to start a new render? You have ${selectedVideos.length} video(s) selected with template ${template}.`,
+                        buttons: [
+                          {
+                            text: "Start Render",
+                            onClick: () => {
+                              sendChillinProjectToRenderer(
+                                selectedVideos,
+                                template,
+                                customTemplates
+                              );
+                            },
+                          },
+                          {
+                            text: "Cancel",
+                            onClick: () => {},
+                          },
+                        ],
+                      })
+                      .open();
+                  }}
                 >
                   Start New Render
                 </Button>
