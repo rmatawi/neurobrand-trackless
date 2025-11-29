@@ -1,0 +1,307 @@
+import { useState } from 'react';
+
+// Custom hook for managing video handling
+export const useVideoHandling = (chillinApiKey, dialogManager) => {
+  // State for video handling
+  const [selectedVideos, setSelectedVideos] = useState([]);
+  const [videoAudioTracks, setVideoAudioTracks] = useState({});
+  const [videoVolumes, setVideoVolumes] = useState({}); // For video tracks
+  const [audioVolumes, setAudioVolumes] = useState({}); // For audio tracks
+  const [inOutDialogOpen, setInOutDialogOpen] = useState(false);
+  const [inPoint, setInPoint] = useState(0);
+  const [outPoint, setOutPoint] = useState(10);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(null);
+  const [videoDuration, setVideoDuration] = useState(10);
+
+  // Clean up object URLs when videos change
+  const cleanupVideoUrls = (videos) => {
+    videos.forEach((video) => {
+      if (video.blob && video.src && video.src.startsWith("blob:")) {
+        URL.revokeObjectURL(video.src);
+      }
+    });
+  };
+
+  // Handle picking video from device
+  const handlePickFromDevice = async (
+    requiredVideos,
+    currentTemplate,
+    targetIndex = null
+  ) => {
+    // Check if videos have already been added for Template 1 or 3 but we need 2, or Template 2 but we need 3
+    if (targetIndex === null && selectedVideos.length >= requiredVideos) {
+      dialogManager.showAlert("Too Many Videos", `Template ${currentTemplate} requires exactly ${requiredVideos} videos. Remove current videos before adding more.`);
+      return;
+    }
+
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "video/*";
+    fileInput.multiple = false;
+
+    fileInput.onchange = async (event) => {
+      const file = event.target.files[0];
+      if (!file) {
+        return;
+      }
+
+      try {
+        const deviceVideo = {
+          id: `device-${Date.now()}`,
+          name: file.name,
+          blob: file,
+          timestamp: Date.now(),
+          size: file.size,
+          duration: videoDuration, // Duration specified by the user
+          inOutPoints: { inPoint: 0, outPoint: videoDuration },
+        };
+
+        if (targetIndex !== null) {
+          // Replace the video at the specific index
+          setSelectedVideos((prev) => {
+            const newVideos = [...prev];
+            newVideos[targetIndex] = deviceVideo; // Replace at specific index
+            return newVideos;
+          });
+        } else {
+          // Check if we've reached the limit for current template
+          if (selectedVideos.length >= requiredVideos) {
+            dialogManager.showAlert("Video Limit Reached", `Template ${currentTemplate} requires exactly ${requiredVideos} videos.`);
+            return;
+          }
+
+          // Add the selected video from device to collection
+          setSelectedVideos((prev) => {
+            const newVideos = [...prev, deviceVideo];
+            return newVideos;
+          });
+        }
+      } catch (error) {
+        console.error("Error processing device video:", error);
+        dialogManager.showAlert("Processing Error", `Error loading video: ${error.message}`);
+      }
+    };
+
+    fileInput.click();
+  };
+
+  // Handle opening in/out point dialog for a video
+  const openInOutDialog = (index) => {
+    const video = selectedVideos[index];
+    if (video && video.inOutPoints) {
+      setInPoint(video.inOutPoints.inPoint || 0);
+      setOutPoint(video.inOutPoints.outPoint || video.duration || 10);
+    } else {
+      setInPoint(0);
+      setOutPoint(video.duration || 10);
+    }
+    setCurrentVideoIndex(index);
+    setInOutDialogOpen(true);
+  };
+
+  // Function to get in/out points for a video
+  const getInOutPoints = (index) => {
+    if (index >= 0 && index < selectedVideos.length) {
+      return (
+        selectedVideos[index].inOutPoints || {
+          inPoint: 0,
+          outPoint: selectedVideos[index].duration || 10,
+        }
+      );
+    }
+    return { inPoint: 0, outPoint: 10 };
+  };
+
+  // Set in/out points for a video
+  const setInOutPoints = (index, inPoint, outPoint) => {
+    if (index >= 0 && index < selectedVideos.length) {
+      setSelectedVideos((prev) => {
+        const newVideos = [...prev];
+        if (!newVideos[index].inOutPoints) {
+          newVideos[index].inOutPoints = {};
+        }
+        newVideos[index].inOutPoints = { inPoint, outPoint };
+        return newVideos;
+      });
+    }
+  };
+
+  // Helper function to set only in point for a video
+  const setInPointForVideo = (index, value) => {
+    const current = getInOutPoints(index);
+    setInOutPoints(index, value, current.outPoint);
+  };
+
+  // Helper function to set only out point for a video
+  const setOutPointForVideo = (index, value) => {
+    const current = getInOutPoints(index);
+    setInOutPoints(index, current.inPoint, value);
+  };
+
+  // Handle setting in/out points
+  const handleSetInOutPoints = () => {
+    if (currentVideoIndex !== null) {
+      setInOutPoints(currentVideoIndex, inPoint, outPoint);
+    }
+    setInOutDialogOpen(false);
+  };
+
+  // Remove a video
+  const removeVideo = (index) => {
+    setSelectedVideos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Function to handle adding audio to a specific video
+  const handleAddAudioToVideo = (videoIndex) => {
+    // Create a file input to select audio files
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "audio/*"; // Accept all audio formats
+
+    fileInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        // Create an audio element to get duration
+        const audioElement = document.createElement("audio");
+        const audioUrl = URL.createObjectURL(file);
+
+        audioElement.src = audioUrl;
+
+        audioElement.onloadedmetadata = () => {
+          const audioDuration = audioElement.duration;
+
+          // Ask user if they want to trim the audio to match the video length
+          const videoInOutPoints = getInOutPoints(videoIndex);
+          const videoOutPoint =
+            videoInOutPoints.outPoint !== undefined
+              ? videoInOutPoints.outPoint
+              : 3;
+          const videoInPoint =
+            videoInOutPoints.inPoint !== undefined
+              ? videoInOutPoints.inPoint
+              : 0;
+          const videoDuration = videoOutPoint - videoInPoint;
+
+          // Check if video duration is less than audio duration
+          if (videoDuration < audioDuration) {
+            const shouldTrim = window.confirm(
+              `Video duration is ${videoDuration.toFixed(
+                2
+              )}s, but audio is ${audioDuration.toFixed(
+                2
+              )}s long. Trim audio to match video length?`
+            );
+
+            if (shouldTrim) {
+              // User wants to trim audio, store audio reference with video
+              addAudioToVideo(videoIndex, file, true, videoDuration);
+            } else {
+              // User doesn't want to trim, use full audio
+              addAudioToVideo(videoIndex, file, false, audioDuration);
+            }
+          } else {
+            // Video is longer than or equal to audio, no need to trim
+            addAudioToVideo(videoIndex, file, false, audioDuration);
+          }
+        };
+
+        audioElement.onerror = () => {
+          dialogManager.showAlert("Error", "Could not load audio to get duration");
+          URL.revokeObjectURL(audioUrl);
+        };
+      }
+    };
+
+    fileInput.click();
+  };
+
+  // Helper function to add audio to a video
+  const addAudioToVideo = (
+    videoIndex,
+    audioFile,
+    shouldTrim,
+    audioDuration
+  ) => {
+    // Update the videoAudioTracks state to store the audio file for this video index
+    setVideoAudioTracks((prevTracks) => ({
+      ...prevTracks,
+      [videoIndex]: {
+        file: audioFile,
+        shouldTrim: shouldTrim,
+        duration: audioDuration,
+        url: URL.createObjectURL(audioFile), // Create URL for the audio file
+      },
+    }));
+
+    dialogManager.showAlert("Audio Added", `Audio file added to Video ${videoIndex + 1}`);
+  };
+
+  // Function to remove audio from a video
+  const removeAudioFromVideo = (videoIndex) => {
+    setVideoAudioTracks((prevTracks) => {
+      const newTracks = { ...prevTracks };
+      if (newTracks[videoIndex]) {
+        // Revoke the object URL to free memory
+        URL.revokeObjectURL(newTracks[videoIndex].url);
+        delete newTracks[videoIndex];
+      }
+      return newTracks;
+    });
+
+    dialogManager.showAlert("Audio Removed", `Audio removed from Video ${videoIndex + 1}`);
+  };
+
+  // Function to set video volume
+  const setVideoVolume = (videoIndex, volume) => {
+    setVideoVolumes((prevVolumes) => ({
+      ...prevVolumes,
+      [videoIndex]: volume,
+    }));
+  };
+
+  // Function to set audio volume
+  const setAudioVolume = (videoIndex, volume) => {
+    setAudioVolumes((prevVolumes) => ({
+      ...prevVolumes,
+      [videoIndex]: volume,
+    }));
+  };
+
+  return {
+    // State
+    selectedVideos,
+    setSelectedVideos,
+    videoAudioTracks,
+    setVideoAudioTracks,
+    videoVolumes,
+    setVideoVolumes,
+    audioVolumes,
+    setAudioVolumes,
+    inOutDialogOpen,
+    setInOutDialogOpen,
+    inPoint,
+    setInPoint,
+    outPoint,
+    setOutPoint,
+    currentVideoIndex,
+    setCurrentVideoIndex,
+    videoDuration,
+    setVideoDuration,
+    
+    // Functions
+    cleanupVideoUrls,
+    handlePickFromDevice,
+    openInOutDialog,
+    getInOutPoints,
+    setInOutPoints,
+    setInPointForVideo,
+    setOutPointForVideo,
+    handleSetInOutPoints,
+    removeVideo,
+    handleAddAudioToVideo,
+    addAudioToVideo,
+    removeAudioFromVideo,
+    setVideoVolume,
+    setAudioVolume
+  };
+};

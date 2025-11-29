@@ -139,9 +139,18 @@ const TracklessVideoEditor = () => {
   // Function to create a custom template based on current selection
   const createTemplateFromCurrent = () => {
     if (!template || selectedVideos.length === 0) {
-      alert(
-        "Please select a template and add videos before creating a custom template"
-      );
+      dialog
+        .create({
+          title: "Missing Template or Videos",
+          text: "Please select a template and add videos before creating a custom template",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
       return;
     }
     setCreateFromCurrentDialogOpen(true);
@@ -170,7 +179,18 @@ const TracklessVideoEditor = () => {
   const editCustomTemplate = (templateId) => {
     const templateToEdit = customTemplates.find((t) => t.id === templateId);
     if (!templateToEdit) {
-      alert("Template not found");
+      dialog
+        .create({
+          title: "Error",
+          text: "Template not found",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
       return;
     }
 
@@ -185,13 +205,35 @@ const TracklessVideoEditor = () => {
 
     const templateToEdit = customTemplates.find((t) => t.id === editTemplateId);
     if (!templateToEdit) {
-      alert("Template not found");
+      dialog
+        .create({
+          title: "Error",
+          text: "Template not found",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
       return;
     }
 
     const newName = videoName.trim();
     if (!newName) {
-      alert("Template name cannot be empty");
+      dialog
+        .create({
+          title: "Invalid Name",
+          text: "Template name cannot be empty",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
       return;
     }
 
@@ -199,7 +241,18 @@ const TracklessVideoEditor = () => {
     if (
       customTemplates.some((t) => t.id !== editTemplateId && t.name === newName)
     ) {
-      alert("A template with this name already exists");
+      dialog
+        .create({
+          title: "Duplicate Name",
+          text: "A template with this name already exists",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
       return;
     }
 
@@ -210,7 +263,18 @@ const TracklessVideoEditor = () => {
         t.id === editTemplateId ? { ...t, name: newName } : t
       );
       saveCustomTemplates(updatedTemplates);
-      alert("Template name updated successfully");
+      dialog
+        .create({
+          title: "Success",
+          text: "Template name updated successfully",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
     } else {
       // For templates created from scratch, we can edit name, required videos, and descriptions
       const numVideosStr = prompt(
@@ -219,7 +283,18 @@ const TracklessVideoEditor = () => {
       );
       const num = parseInt(numVideosStr);
       if (isNaN(num) || num <= 0 || num > 10) {
-        alert("Please enter a valid number between 1 and 10");
+        dialog
+          .create({
+            title: "Invalid Number",
+            text: "Please enter a valid number between 1 and 10",
+            buttons: [
+              {
+                text: "OK",
+                onClick: () => {},
+              },
+            ],
+          })
+          .open();
         return;
       }
 
@@ -302,9 +377,18 @@ const TracklessVideoEditor = () => {
   ) => {
     // Check if videos have already been added for Template 1 or 3 but we need 2, or Template 2 but we need 3
     if (targetIndex === null && selectedVideos.length >= requiredVideos) {
-      alert(
-        `Template ${currentTemplate} requires exactly ${requiredVideos} videos. Remove current videos before adding more.`
-      );
+      dialog
+        .create({
+          title: "Too Many Videos",
+          text: `Template ${currentTemplate} requires exactly ${requiredVideos} videos. Remove current videos before adding more.`,
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
       return;
     }
 
@@ -340,9 +424,18 @@ const TracklessVideoEditor = () => {
         } else {
           // Check if we've reached the limit for current template
           if (selectedVideos.length >= requiredVideos) {
-            alert(
-              `Template ${currentTemplate} requires exactly ${requiredVideos} videos.`
-            );
+            dialog
+              .create({
+                title: "Video Limit Reached",
+                text: `Template ${currentTemplate} requires exactly ${requiredVideos} videos.`,
+                buttons: [
+                  {
+                    text: "OK",
+                    onClick: () => {},
+                  },
+                ],
+              })
+              .open();
             return;
           }
 
@@ -354,7 +447,18 @@ const TracklessVideoEditor = () => {
         }
       } catch (error) {
         console.error("Error processing device video:", error);
-        alert(`Error loading video: ${error.message}`);
+        dialog
+          .create({
+            title: "Processing Error",
+            text: `Error loading video: ${error.message}`,
+            buttons: [
+              {
+                text: "OK",
+                onClick: () => {},
+              },
+            ],
+          })
+          .open();
       }
     };
 
@@ -482,7 +586,18 @@ const TracklessVideoEditor = () => {
         };
 
         audioElement.onerror = () => {
-          alert("Could not load audio to get duration");
+          dialog
+            .create({
+              title: "Error",
+              text: "Could not load audio to get duration",
+              buttons: [
+                {
+                  text: "OK",
+                  onClick: () => {},
+                },
+              ],
+            })
+            .open();
           URL.revokeObjectURL(audioUrl);
         };
       }
@@ -509,7 +624,18 @@ const TracklessVideoEditor = () => {
       },
     }));
 
-    alert(`Audio file added to Video ${videoIndex + 1}`);
+    dialog
+      .create({
+        title: "Audio Added",
+        text: `Audio file added to Video ${videoIndex + 1}`,
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
   };
 
   // Function to remove audio from a video
@@ -524,7 +650,18 @@ const TracklessVideoEditor = () => {
       return newTracks;
     });
 
-    alert(`Audio removed from Video ${videoIndex + 1}`);
+    dialog
+      .create({
+        title: "Audio Removed",
+        text: `Audio removed from Video ${videoIndex + 1}`,
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
   };
 
   // Function to set video volume
@@ -588,7 +725,18 @@ const TracklessVideoEditor = () => {
       });
 
       // Show loading dialog during processing
-      alert("Processing videos project with smart chunking...");
+      dialog
+        .create({
+          title: "Processing",
+          text: "Processing videos project with smart chunking...",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
 
       // Check if there are any selected videos to process
       if (!selectedVideos || selectedVideos.length === 0) {
@@ -734,7 +882,18 @@ const TracklessVideoEditor = () => {
         .substr(2, 9)}`;
 
       // Process chunks using the smart chunking system
-      alert("Analyzing videos and extracting chunks...");
+      dialog
+        .create({
+          title: "Processing",
+          text: "Analyzing videos and extracting chunks...",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
 
       // Update the progress callback function
       const onProgress = (message) => {
@@ -750,7 +909,18 @@ const TracklessVideoEditor = () => {
         "http://localhost" // Renderer API URL - using local by default for chunk processing
       );
 
-      alert("Creating Chillin project with chunked videos...");
+      dialog
+        .create({
+          title: "Processing",
+          text: "Creating Chillin project with chunked videos...",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
 
       // Create Chillin API request payload with chunk URLs
       const chillinApiPayload = {
@@ -784,17 +954,48 @@ const TracklessVideoEditor = () => {
       }
 
       // Make the actual API call to Chillin
-      alert("Sending project to Chillin renderer...");
+      dialog
+        .create({
+          title: "Processing",
+          text: "Sending project to Chillin renderer...",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
 
       // Show a 10-second simulation
-      alert(
-        "Preparing project for Chillin renderer (simulating 10s process)..."
-      );
+      dialog
+        .create({
+          title: "Processing",
+          text: "Preparing project for Chillin renderer (simulating 10s process)...",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
 
       // Separate function for the API call
       const handleSendToChillin = async () => {
         try {
-          alert("Sending project to Chillin renderer...");
+          dialog
+            .create({
+              title: "Processing",
+              text: "Sending project to Chillin renderer...",
+              buttons: [
+                {
+                  text: "OK",
+                  onClick: () => {},
+                },
+              ],
+            })
+            .open();
 
           const response = await fetch(
             "https://render-api.chillin.online/render/v1",
@@ -843,16 +1044,35 @@ const TracklessVideoEditor = () => {
           );
           setChillinRenders(sortedRenders);
 
-          alert(
-            `Video project created with smart chunking! Project ID: ${result.data.render_id}`,
-            "Success"
-          );
+          dialog
+            .create({
+              title: "Project Created",
+              text: `Video project created with smart chunking! Project ID: ${result.data.render_id}`,
+              buttons: [
+                {
+                  text: "OK",
+                  onClick: () => {},
+                },
+              ],
+            })
+            .open();
 
           // Note: We don't update selectedVideos here since we're using chunks and the user may want to keep their original videos
           return result;
         } catch (error) {
           console.error("Error sending project to Chillin renderer:", error);
-          alert(`Error: ${error.message}`, "API Error");
+          dialog
+            .create({
+              title: "API Error",
+              text: `Error: ${error.message}`,
+              buttons: [
+                {
+                  text: "OK",
+                  onClick: () => {},
+                },
+              ],
+            })
+            .open();
           throw error;
         }
       };
@@ -874,7 +1094,18 @@ const TracklessVideoEditor = () => {
     } catch (error) {
       console.error("Error in processVideoUploadAndCreateProject:", error);
       if (!error.userCancelled) {
-        alert(`Error: ${error.message}`, "Processing Error");
+        dialog
+          .create({
+            title: "Processing Error",
+            text: `Error: ${error.message}`,
+            buttons: [
+              {
+                text: "OK",
+                onClick: () => {},
+              },
+            ],
+          })
+          .open();
       }
       throw error; // Re-throw the error so calling code can handle it if needed
     }
@@ -904,7 +1135,18 @@ const TracklessVideoEditor = () => {
         return result;
       } catch (error) {
         if (!error.userCancelled) {
-          alert(`Error: ${error.message}`, "Processing Error");
+          dialog
+            .create({
+              title: "Processing Error",
+              text: `Error: ${error.message}`,
+              buttons: [
+                {
+                  text: "OK",
+                  onClick: () => {},
+                },
+              ],
+            })
+            .open();
         }
         throw error;
       }
@@ -946,15 +1188,34 @@ const TracklessVideoEditor = () => {
       const result = await response.json();
       console.log("Chillin render result:", result);
 
-      alert(
-        `Render result retrieved successfully! Render ID: ${renderId}`,
-        "Success"
-      );
+      dialog
+        .create({
+          title: "Success",
+          text: `Render result retrieved successfully! Render ID: ${renderId}`,
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
 
       return result;
     } catch (error) {
       console.error("Error getting render result:", error);
-      alert(`Error: ${error.message}`, "Render Result Error");
+      dialog
+        .create({
+          title: "Render Result Error",
+          text: `Error: ${error.message}`,
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
       throw error;
     }
   };
@@ -1199,18 +1460,62 @@ const TracklessVideoEditor = () => {
       if (data?.data?.render?.state == "success") {
         console.log({ data: data.data.render.video_url });
         setDownloadUrl(data.data.render.video_url);
-        alert(`Your video is ready! Video URL: ${data.data.render.video_url}`);
+        dialog
+          .create({
+            title: "Render Success",
+            text: `Your video is ready! Video URL: ${data.data.render.video_url}`,
+            buttons: [
+              {
+                text: "OK",
+                onClick: () => {},
+              },
+            ],
+          })
+          .open();
       }
       if (data?.data?.render?.state == "pending") {
         setDownloadUrl();
-        alert("Please try again later.");
+        dialog
+          .create({
+            title: "Pending",
+            text: "Please try again later.",
+            buttons: [
+              {
+                text: "OK",
+                onClick: () => {},
+              },
+            ],
+          })
+          .open();
       }
       if (data?.data?.render?.state == "failed") {
         setDownloadUrl();
-        alert("Render job failed.");
+        dialog
+          .create({
+            title: "Failed",
+            text: "Render job failed.",
+            buttons: [
+              {
+                text: "OK",
+                onClick: () => {},
+              },
+            ],
+          })
+          .open();
       }
     } catch (error) {
-      alert(`Error getting render result: ${error.message}`);
+      dialog
+        .create({
+          title: "Error",
+          text: `Error getting render result: ${error.message}`,
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
     }
   };
 
@@ -1240,7 +1545,18 @@ const TracklessVideoEditor = () => {
     } else if (video.src) {
       videoUrl = video.src;
     } else {
-      alert("Video source not available");
+      dialog
+        .create({
+          title: "Error",
+          text: "Video source not available",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
       return;
     }
 
@@ -1347,134 +1663,328 @@ const TracklessVideoEditor = () => {
 
           // Validate that inPoint is before outPoint
           if (currentTime >= currentOutPoint) {
-            alert(
-              `In point must be before out point (${currentOutPoint.toFixed(
+            dialog
+              .create({
+                title: "Invalid In Point",
+                text: `In point must be before out point (${currentOutPoint.toFixed(
+                  2
+                )}s)`,
+                buttons: [
+                  {
+                    text: "OK",
+                    onClick: () => {},
+                  },
+                ],
+              })
+              .open();
+            return;
+          }
+        };
+
+        currentInPoint = currentTime;
+        setInBtn.innerHTML = `In: ${currentInPoint.toFixed(2)}s`;
+
+        // Update audio duration if needed
+        updateAudioDuration(videoIndex);
+      }
+    };
+
+    if (setOutBtn) {
+      setOutBtn.onclick = () => {
+        const currentTime = videoPlayer.currentTime;
+
+        // Validate that outPoint is after inPoint
+        if (currentTime <= currentInPoint) {
+          dialog
+            .create({
+              title: "Invalid Out Point",
+              text: `Out point must be after in point (${currentInPoint.toFixed(
                 2
-              )}s)`
-            );
-            return;
-          }
+              )}s)`,
+              buttons: [
+                {
+                  text: "OK",
+                  onClick: () => {},
+                },
+              ],
+            })
+            .open();
+          return;
+        }
 
-          currentInPoint = currentTime;
-          setInBtn.innerHTML = `In: ${currentInPoint.toFixed(2)}s`;
+        currentOutPoint = currentTime;
+        setOutBtn.innerHTML = `Out: ${currentOutPoint.toFixed(2)}s`;
 
-          // Update audio duration if needed
-          updateAudioDuration(videoIndex);
-        };
-      }
+        // Update audio duration if needed
+        updateAudioDuration(videoIndex);
+      };
+    }
 
-      if (setOutBtn) {
-        setOutBtn.onclick = () => {
-          const currentTime = videoPlayer.currentTime;
+    if (savePointsBtn) {
+      savePointsBtn.onclick = () => {
+        // Set the in/out points in the state
+        setInOutPoints(videoIndex, currentInPoint, currentOutPoint);
 
-          // Validate that outPoint is after inPoint
-          if (currentTime <= currentInPoint) {
-            alert(
-              `Out point must be after in point (${currentInPoint.toFixed(2)}s)`
-            );
-            return;
-          }
+        // Update audio duration if this video has audio attached
+        updateAudioDuration(videoIndex);
 
-          currentOutPoint = currentTime;
-          setOutBtn.innerHTML = `Out: ${currentOutPoint.toFixed(2)}s`;
+        // Calculate new duration for the current video
+        const newVideoDuration = currentOutPoint - currentInPoint;
 
-          // Update audio duration if needed
-          updateAudioDuration(videoIndex);
-        };
-      }
+        // Get original duration to compare
+        const originalInPoint =
+          originalInOutPoints.inPoint !== undefined
+            ? originalInOutPoints.inPoint
+            : 0;
+        const originalOutPoint =
+          originalInOutPoints.outPoint !== undefined
+            ? originalInOutPoints.outPoint
+            : duration;
+        const originalVideoDuration = originalOutPoint - originalInPoint;
 
-      if (savePointsBtn) {
-        savePointsBtn.onclick = () => {
-          // Set the in/out points in the state
-          setInOutPoints(videoIndex, currentInPoint, currentOutPoint);
+        // Only adjust if the duration has actually changed
+        if (Math.abs(newVideoDuration - originalVideoDuration) > 0.001) {
+          // Account for floating point precision
+          // Calculate the change in duration
+          const durationChange = newVideoDuration - originalVideoDuration;
 
-          // Update audio duration if this video has audio attached
-          updateAudioDuration(videoIndex);
+          // Adjust the surrounding videos on the same track
+          adjustVideoPositions(videoIndex, durationChange);
+        }
 
-          // Calculate new duration for the current video
-          const newVideoDuration = currentOutPoint - currentInPoint;
+        // Remove modal
+        document.body.removeChild(modal);
 
-          // Get original duration to compare
-          const originalInPoint =
-            originalInOutPoints.inPoint !== undefined
-              ? originalInOutPoints.inPoint
-              : 0;
-          const originalOutPoint =
-            originalInOutPoints.outPoint !== undefined
-              ? originalInOutPoints.outPoint
-              : duration;
-          const originalVideoDuration = originalOutPoint - originalInPoint;
+        // Revoke the object URL to free memory
+        if (video.blob) {
+          URL.revokeObjectURL(videoUrl);
+        }
+      };
+    }
 
-          // Only adjust if the duration has actually changed
-          if (Math.abs(newVideoDuration - originalVideoDuration) > 0.001) {
-            // Account for floating point precision
-            // Calculate the change in duration
-            const durationChange = newVideoDuration - originalVideoDuration;
+    if (cancelBtn) {
+      cancelBtn.onclick = () => {
+        // Remove modal
+        document.body.removeChild(modal);
 
-            // Adjust the surrounding videos on the same track
-            adjustVideoPositions(videoIndex, durationChange);
-          }
-
-          // Remove modal
-          document.body.removeChild(modal);
-
-          // Revoke the object URL to free memory
-          if (video.blob) {
-            URL.revokeObjectURL(videoUrl);
-          }
-        };
-      }
-
-      if (cancelBtn) {
-        cancelBtn.onclick = () => {
-          // Remove modal
-          document.body.removeChild(modal);
-
-          // Revoke the object URL to free memory
-          if (video.blob) {
-            URL.revokeObjectURL(videoUrl);
-          }
-        };
-      }
-    };
-
-    videoElement.onerror = () => {
-      alert("Could not load video to get duration");
-      if (video.blob) {
-        URL.revokeObjectURL(videoUrl);
-      }
-    };
+        // Revoke the object URL to free memory
+        if (video.blob) {
+          URL.revokeObjectURL(videoUrl);
+        }
+      };
+    }
   };
 
-  // Function to prepare and show the Chillin project preview
-  const showChillinPreview = () => {
-    // Validate that we have the right number of videos for the selected template
-    let requiredVideos;
-    let totalDuration;
+  videoElement.onerror = () => {
+    dialog
+      .create({
+        title: "Error",
+        text: "Could not load video to get duration",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
+    if (video.blob) {
+      URL.revokeObjectURL(videoUrl);
+    }
+  };
+};
 
-    // Check if this is a custom template
-    const customTemplate = customTemplates.find((t) => t.id === template);
-    if (customTemplate) {
-      requiredVideos = customTemplate.requiredVideos;
-      // Total duration will be calculated after video layers are created based on actual positions and durations
+// Function to prepare and show the Chillin project preview
+const showChillinPreview = () => {
+  // Validate that we have the right number of videos for the selected template
+  let requiredVideos;
+  let totalDuration;
+
+  // Check if this is a custom template
+  const customTemplate = customTemplates.find((t) => t.id === template);
+  if (customTemplate) {
+    requiredVideos = customTemplate.requiredVideos;
+    // Total duration will be calculated after video layers are created based on actual positions and durations
+  } else {
+    requiredVideos = getRequiredVideos(template);
+    // Total duration will be calculated after video layers are created based on actual positions and durations
+  }
+
+  if (!selectedVideos || selectedVideos.length !== requiredVideos) {
+    dialog
+      .create({
+        title: "Add Videos",
+        text: `Template ${template} requires exactly ${requiredVideos} videos. You currently have ${selectedVideos.length} videos.`,
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
+    return;
+  }
+
+  // Create a chillin project JSON based on the selected template
+  let videoLayers = [];
+
+  // For custom templates, create a simple sequence where each video plays according to its in/out points
+  if (customTemplate) {
+    // Calculate start times sequentially based on actual durations
+    let currentTime = 0;
+    videoLayers = selectedVideos.map((video, index) => {
+      // Determine the video URL based on whether it's a blob or a src
+      const videoUrl = video.blob ? URL.createObjectURL(video.blob) : video.src;
+
+      // Get in/out points for this video if they exist
+      const inOutPoints = getInOutPoints(index);
+      const inPoint =
+        inOutPoints.inPoint !== undefined ? inOutPoints.inPoint : 0;
+
+      // Use the custom template's specified duration if no outPoint is set
+      let outPoint;
+      if (inOutPoints.outPoint !== undefined) {
+        outPoint = inOutPoints.outPoint;
+      } else if (
+        customTemplate.videoDurations &&
+        customTemplate.videoDurations[index] !== undefined
+      ) {
+        // Use the custom template's specified duration
+        outPoint = inPoint + customTemplate.videoDurations[index];
+      } else {
+        // Fallback to 3 seconds if no custom duration is specified
+        outPoint = inPoint + 3;
+      }
+
+      const sourceDuration = outPoint - inPoint;
+
+      const layer = {
+        id: video.id || `video-${index}`,
+        type: "Video",
+        start: currentTime, // Start after the previous video ends
+        duration: sourceDuration, // Duration based on actual video length after outpoint
+        trackIndex: 0,
+        x: 0,
+        y: 0,
+        width: 1280,
+        height: 720,
+        blendMode: "normal",
+        anchorX: 0,
+        anchorY: 0,
+        rotation: 0,
+        scaleX: 1,
+        scaleY: 1,
+        alpha: 1,
+        skewX: 0,
+        skewY: 0,
+        hidden: false,
+        locked: false,
+        keyframes: [],
+        externalUrl: videoUrl, // Use the user's video URL
+        ext: "mp4",
+        startInSource: inPoint,
+        volume: videoVolumes[index] !== undefined ? videoVolumes[index] : 1, // Use stored volume or default to 1
+        hasAudio: true,
+        playrate: 1,
+        isFrontTrimmed: false,
+        sourceDuration: sourceDuration,
+      };
+
+      // Update the current time for the next video
+      currentTime += sourceDuration;
+
+      return layer;
+    });
+  } else {
+    // For all other templates, use the template preview data to determine the structure
+    const templateData = createTemplatePreviewData(template);
+    if (
+      templateData &&
+      templateData.projectData &&
+      templateData.projectData.view
+    ) {
+      // Handle same-track sequential positioning - if videos are on same track,
+      // position them sequentially based on actual durations to allow proper shifting
+      videoLayers = [];
+      const trackStartTimes = {}; // Keep track of start times for each track
+
+      for (let index = 0; index < selectedVideos.length; index++) {
+        const video = selectedVideos[index];
+        // Determine the video URL based on whether it's a blob or a src
+        const videoUrl = video.blob
+          ? URL.createObjectURL(video.blob)
+          : video.src;
+
+        // Get the corresponding template video configuration
+        const templateVideoConfig = templateData.projectData.view[index];
+        const trackIndex = templateVideoConfig
+          ? templateVideoConfig.trackIndex
+          : 0;
+
+        // Get in/out points for this video if they exist
+        const inOutPoints = getInOutPoints(index);
+        console.log(
+          `debugvideo: showChillinPreview - inOutPoints for video ${index}`,
+          JSON.stringify(inOutPoints, null, 2)
+        );
+        const inPoint =
+          inOutPoints.inPoint !== undefined ? inOutPoints.inPoint : 0;
+        const outPoint =
+          inOutPoints.outPoint !== undefined
+            ? inOutPoints.outPoint
+            : templateVideoConfig
+            ? templateVideoConfig.duration
+            : 3; // Default to template duration or 3
+        const sourceDuration = outPoint - inPoint;
+
+        // Determine the start time based on the track's current position
+        const startTime = trackStartTimes[trackIndex] || 0;
+
+        // Use the template configuration as a base but adjust with user's video data
+        const layer = {
+          id: video.id || `video-${index}`,
+          type: "Video",
+          start: startTime, // Position sequentially within the track
+          duration: sourceDuration, // Duration based on actual video length after outpoint
+          trackIndex: trackIndex,
+          x: templateVideoConfig ? templateVideoConfig.x : 0,
+          y: templateVideoConfig ? templateVideoConfig.y : 0,
+          width: templateVideoConfig ? templateVideoConfig.width : 1280,
+          height: templateVideoConfig ? templateVideoConfig.height : 720,
+          blendMode: templateVideoConfig
+            ? templateVideoConfig.blendMode
+            : "normal",
+          anchorX: templateVideoConfig ? templateVideoConfig.anchorX : 0,
+          anchorY: templateVideoConfig ? templateVideoConfig.anchorY : 0,
+          rotation: templateVideoConfig ? templateVideoConfig.rotation : 0,
+          scaleX: templateVideoConfig ? templateVideoConfig.scaleX : 1,
+          scaleY: templateVideoConfig ? templateVideoConfig.scaleY : 1,
+          alpha: templateVideoConfig ? templateVideoConfig.alpha : 1,
+          skewX: templateVideoConfig ? templateVideoConfig.skewX : 0,
+          skewY: templateVideoConfig ? templateVideoConfig.skewY : 0,
+          hidden: templateVideoConfig ? templateVideoConfig.hidden : false,
+          locked: templateVideoConfig ? templateVideoConfig.locked : false,
+          keyframes: templateVideoConfig ? templateVideoConfig.keyframes : [],
+          externalUrl: videoUrl, // Use the user's video URL
+          ext: "mp4",
+          startInSource: inPoint,
+          volume: videoVolumes[index] !== undefined ? videoVolumes[index] : 1, // Use stored volume or default to 1
+          hasAudio: templateVideoConfig ? templateVideoConfig.hasAudio : true,
+          playrate: templateVideoConfig ? templateVideoConfig.playrate : 1,
+          isFrontTrimmed: templateVideoConfig
+            ? templateVideoConfig.isFrontTrimmed
+            : false,
+          sourceDuration: sourceDuration,
+        };
+
+        // Update the start time for this track
+        trackStartTimes[trackIndex] = startTime + sourceDuration;
+
+        videoLayers.push(layer);
+      }
     } else {
-      requiredVideos = getRequiredVideos(template);
-      // Total duration will be calculated after video layers are created based on actual positions and durations
-    }
-
-    if (!selectedVideos || selectedVideos.length !== requiredVideos) {
-      alert(
-        `Template ${template} requires exactly ${requiredVideos} videos. You currently have ${selectedVideos.length} videos.`
-      );
-      return;
-    }
-
-    // Create a chillin project JSON based on the selected template
-    let videoLayers = [];
-
-    // For custom templates, create a simple sequence where each video plays according to its in/out points
-    if (customTemplate) {
-      // Calculate start times sequentially based on actual durations
+      // Fallback for unknown templates: create simple sequence based on actual durations
       let currentTime = 0;
       videoLayers = selectedVideos.map((video, index) => {
         // Determine the video URL based on whether it's a blob or a src
@@ -1486,22 +1996,8 @@ const TracklessVideoEditor = () => {
         const inOutPoints = getInOutPoints(index);
         const inPoint =
           inOutPoints.inPoint !== undefined ? inOutPoints.inPoint : 0;
-
-        // Use the custom template's specified duration if no outPoint is set
-        let outPoint;
-        if (inOutPoints.outPoint !== undefined) {
-          outPoint = inOutPoints.outPoint;
-        } else if (
-          customTemplate.videoDurations &&
-          customTemplate.videoDurations[index] !== undefined
-        ) {
-          // Use the custom template's specified duration
-          outPoint = inPoint + customTemplate.videoDurations[index];
-        } else {
-          // Fallback to 3 seconds if no custom duration is specified
-          outPoint = inPoint + 3;
-        }
-
+        const outPoint =
+          inOutPoints.outPoint !== undefined ? inOutPoints.outPoint : 3; // Default to 3s
         const sourceDuration = outPoint - inPoint;
 
         const layer = {
@@ -1541,884 +2037,506 @@ const TracklessVideoEditor = () => {
 
         return layer;
       });
-    } else {
-      // For all other templates, use the template preview data to determine the structure
-      const templateData = createTemplatePreviewData(template);
-      if (
-        templateData &&
-        templateData.projectData &&
-        templateData.projectData.view
-      ) {
-        // Handle same-track sequential positioning - if videos are on same track,
-        // position them sequentially based on actual durations to allow proper shifting
-        videoLayers = [];
-        const trackStartTimes = {}; // Keep track of start times for each track
+    }
+  }
 
-        for (let index = 0; index < selectedVideos.length; index++) {
-          const video = selectedVideos[index];
-          // Determine the video URL based on whether it's a blob or a src
-          const videoUrl = video.blob
-            ? URL.createObjectURL(video.blob)
-            : video.src;
+  // Calculate total duration based on the end times of all video layers
+  // Total duration is the maximum end time across all video layers
+  totalDuration =
+    videoLayers.length > 0
+      ? Math.max(...videoLayers.map((layer) => layer.start + layer.duration))
+      : 0;
 
-          // Get the corresponding template video configuration
-          const templateVideoConfig = templateData.projectData.view[index];
-          const trackIndex = templateVideoConfig
-            ? templateVideoConfig.trackIndex
-            : 0;
+  // Create audio layers for videos that have audio tracks attached
+  const audioLayers = [];
+  selectedVideos.forEach((video, index) => {
+    if (videoAudioTracks[index]) {
+      const audioTrack = videoAudioTracks[index];
+      const videoInOutPoints = getInOutPoints(index);
+      const correspondingVideoLayer = videoLayers.find(
+        (layer) => layer.id === (video.id || `video-${index}`)
+      );
+      const videoStart = correspondingVideoLayer?.start || 0;
+      const videoInPoint =
+        videoInOutPoints.inPoint !== undefined ? videoInOutPoints.inPoint : 0;
+      const videoOutPoint =
+        videoInOutPoints.outPoint !== undefined ? videoInOutPoints.outPoint : 3; // Default to 3s
+      const videoDuration = videoOutPoint - videoInPoint;
 
-          // Get in/out points for this video if they exist
-          const inOutPoints = getInOutPoints(index);
-          console.log(
-            `debugvideo: showChillinPreview - inOutPoints for video ${index}`,
-            JSON.stringify(inOutPoints, null, 2)
-          );
-          const inPoint =
-            inOutPoints.inPoint !== undefined ? inOutPoints.inPoint : 0;
-          const outPoint =
-            inOutPoints.outPoint !== undefined
-              ? inOutPoints.outPoint
-              : templateVideoConfig
-              ? templateVideoConfig.duration
-              : 3; // Default to template duration or 3
-          const sourceDuration = outPoint - inPoint;
+      // Calculate the audio duration based on whether it should be trimmed
+      const audioDuration = videoAudioTracks[index].shouldTrim
+        ? Math.min(videoAudioTracks[index].duration, videoDuration)
+        : videoAudioTracks[index].duration;
 
-          // Determine the start time based on the track's current position
-          const startTime = trackStartTimes[trackIndex] || 0;
+      // Get the stored volume for this audio track or default to 1
+      const baseVolume =
+        audioVolumes[index] !== undefined ? audioVolumes[index] : 1;
 
-          // Use the template configuration as a base but adjust with user's video data
-          const layer = {
-            id: video.id || `video-${index}`,
-            type: "Video",
-            start: startTime, // Position sequentially within the track
-            duration: sourceDuration, // Duration based on actual video length after outpoint
-            trackIndex: trackIndex,
-            x: templateVideoConfig ? templateVideoConfig.x : 0,
-            y: templateVideoConfig ? templateVideoConfig.y : 0,
-            width: templateVideoConfig ? templateVideoConfig.width : 1280,
-            height: templateVideoConfig ? templateVideoConfig.height : 720,
-            blendMode: templateVideoConfig
-              ? templateVideoConfig.blendMode
-              : "normal",
-            anchorX: templateVideoConfig ? templateVideoConfig.anchorX : 0,
-            anchorY: templateVideoConfig ? templateVideoConfig.anchorY : 0,
-            rotation: templateVideoConfig ? templateVideoConfig.rotation : 0,
-            scaleX: templateVideoConfig ? templateVideoConfig.scaleX : 1,
-            scaleY: templateVideoConfig ? templateVideoConfig.scaleY : 1,
-            alpha: templateVideoConfig ? templateVideoConfig.alpha : 1,
-            skewX: templateVideoConfig ? templateVideoConfig.skewX : 0,
-            skewY: templateVideoConfig ? templateVideoConfig.skewY : 0,
-            hidden: templateVideoConfig ? templateVideoConfig.hidden : false,
-            locked: templateVideoConfig ? templateVideoConfig.locked : false,
-            keyframes: templateVideoConfig ? templateVideoConfig.keyframes : [],
-            externalUrl: videoUrl, // Use the user's video URL
-            ext: "mp4",
-            startInSource: inPoint,
-            volume: videoVolumes[index] !== undefined ? videoVolumes[index] : 1, // Use stored volume or default to 1
-            hasAudio: templateVideoConfig ? templateVideoConfig.hasAudio : true,
-            playrate: templateVideoConfig ? templateVideoConfig.playrate : 1,
-            isFrontTrimmed: templateVideoConfig
-              ? templateVideoConfig.isFrontTrimmed
-              : false,
-            sourceDuration: sourceDuration,
-          };
+      // Create keyframes for fade in/out effects (500ms = 0.5s)
+      const fadeDuration = 0.5; // 500ms in seconds
+      const keyframes = [];
 
-          // Update the start time for this track
-          trackStartTimes[trackIndex] = startTime + sourceDuration;
+      // Fade In: Start with 0 and increase to the base volume over 500ms
+      if (audioDuration > fadeDuration) {
+        // Add volume keyframes for fade in
+        keyframes.push({
+          property: "volume",
+          type: "number",
+          keyframeItems: [
+            { time: 0, value: 0 }, // Start at 0 volume at the beginning
+            { time: fadeDuration, value: baseVolume }, // Reach base volume after 500ms
+          ],
+        });
 
-          videoLayers.push(layer);
-        }
+        // Add volume keyframes for fade out
+        keyframes.push({
+          property: "volume",
+          type: "number",
+          keyframeItems: [
+            { time: audioDuration - fadeDuration, value: baseVolume }, // Base volume until 500ms before end
+            { time: audioDuration, value: 0 }, // Fade to 0 volume at the end
+          ],
+        });
       } else {
-        // Fallback for unknown templates: create simple sequence based on actual durations
-        let currentTime = 0;
-        videoLayers = selectedVideos.map((video, index) => {
-          // Determine the video URL based on whether it's a blob or a src
-          const videoUrl = video.blob
-            ? URL.createObjectURL(video.blob)
-            : video.src;
-
-          // Get in/out points for this video if they exist
-          const inOutPoints = getInOutPoints(index);
-          const inPoint =
-            inOutPoints.inPoint !== undefined ? inOutPoints.inPoint : 0;
-          const outPoint =
-            inOutPoints.outPoint !== undefined ? inOutPoints.outPoint : 3; // Default to 3s
-          const sourceDuration = outPoint - inPoint;
-
-          const layer = {
-            id: video.id || `video-${index}`,
-            type: "Video",
-            start: currentTime, // Start after the previous video ends
-            duration: sourceDuration, // Duration based on actual video length after outpoint
-            trackIndex: 0,
-            x: 0,
-            y: 0,
-            width: 1280,
-            height: 720,
-            blendMode: "normal",
-            anchorX: 0,
-            anchorY: 0,
-            rotation: 0,
-            scaleX: 1,
-            scaleY: 1,
-            alpha: 1,
-            skewX: 0,
-            skewY: 0,
-            hidden: false,
-            locked: false,
-            keyframes: [],
-            externalUrl: videoUrl, // Use the user's video URL
-            ext: "mp4",
-            startInSource: inPoint,
-            volume: videoVolumes[index] !== undefined ? videoVolumes[index] : 1, // Use stored volume or default to 1
-            hasAudio: true,
-            playrate: 1,
-            isFrontTrimmed: false,
-            sourceDuration: sourceDuration,
-          };
-
-          // Update the current time for the next video
-          currentTime += sourceDuration;
-
-          return layer;
+        // If audio is shorter than fade duration, do proportional fade
+        const halfDuration = audioDuration / 2;
+        keyframes.push({
+          property: "volume",
+          type: "number",
+          keyframeItems: [
+            { time: 0, value: 0 }, // Start at 0 volume
+            { time: halfDuration, value: baseVolume }, // Reach base volume at midpoint
+            { time: audioDuration, value: 0 }, // End at 0 volume
+          ],
         });
       }
+
+      audioLayers.push({
+        id: `audio-${video.id || index}`,
+        type: "Audio",
+        start: videoStart, // Start at the same time as the corresponding video
+        duration: audioDuration, // Duration of the audio clip
+        trackIndex: correspondingVideoLayer
+          ? correspondingVideoLayer.trackIndex
+          : index, // Use the same track index as the corresponding video
+        blendMode: "normal",
+        hidden: false,
+        locked: false,
+        keyframes: keyframes, // Include fade in/out keyframes
+        externalUrl: audioTrack.url, // Use the user's audio URL
+        ext: audioTrack.file.name.split(".").pop() || "mp3", // Get file extension
+        startInSource: 0, // Start from beginning of audio file
+        volume: baseVolume, // Use user-set volume
+        hasAudio: true,
+        playrate: 1,
+        isFrontTrimmed: false,
+        sourceDuration: audioDuration,
+      });
+    }
+  });
+
+  // Create a chillin project JSON with the user's videos
+  const chillinJson = {
+    compositeWidth: 1280,
+    compositeHeight: 720,
+    fps: 30,
+    projectData: {
+      type: "",
+      width: 1280,
+      height: 720,
+      fill: "#000000",
+      duration: totalDuration, // Total duration based on template
+      version: 0,
+      view: videoLayers,
+      audio: audioLayers, // Add the audio layers we created
+      effect: [],
+      transition: [],
+    },
+  };
+
+  // Set the data and add a small delay to ensure sheet is open before rendering
+  setChillinProjectJson(chillinJson);
+
+  dialog
+    .create({
+      title: "Preview Ready",
+      text: "Chillin preview data set! The preview would now be displayed.",
+      buttons: [
+        {
+          text: "OK",
+          onClick: () => {},
+        },
+      ],
+    })
+    .open();
+};
+
+// Function to send the Chillin project to the renderer
+const sendChillinProjectToRenderer = async () => {
+  try {
+    // Validate that we have videos to process
+    if (!selectedVideos || selectedVideos.length === 0) {
+      dialog
+        .create({
+          title: "No Videos Selected",
+          text: "No videos selected. Please add videos before sending to renderer.",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
+      return;
     }
 
-    // Calculate total duration based on the end times of all video layers
-    // Total duration is the maximum end time across all video layers
-    totalDuration =
-      videoLayers.length > 0
-        ? Math.max(...videoLayers.map((layer) => layer.start + layer.duration))
-        : 0;
+    // Use the createChillinProject function we defined above
+    await createChillinProject(
+      setSelectedVideos,
+      selectedVideos,
+      template,
+      customTemplates
+    );
 
-    // Create audio layers for videos that have audio tracks attached
-    const audioLayers = [];
-    selectedVideos.forEach((video, index) => {
-      if (videoAudioTracks[index]) {
-        const audioTrack = videoAudioTracks[index];
-        const videoInOutPoints = getInOutPoints(index);
-        const correspondingVideoLayer = videoLayers.find(
-          (layer) => layer.id === (video.id || `video-${index}`)
-        );
-        const videoStart = correspondingVideoLayer?.start || 0;
-        const videoInPoint =
-          videoInOutPoints.inPoint !== undefined ? videoInOutPoints.inPoint : 0;
-        const videoOutPoint =
-          videoInOutPoints.outPoint !== undefined
-            ? videoInOutPoints.outPoint
-            : 3; // Default to 3s
-        const videoDuration = videoOutPoint - videoInPoint;
+    dialog
+      .create({
+        title: "Success",
+        text: "Project sent to Chillin renderer successfully!",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
+  } catch (error) {
+    if (!error.userCancelled) {
+      dialog
+        .create({
+          title: "Error",
+          text: `Error sending project to renderer: ${error.message}`,
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
+    }
+  }
+};
 
-        // Calculate the audio duration based on whether it should be trimmed
-        const audioDuration = videoAudioTracks[index].shouldTrim
-          ? Math.min(videoAudioTracks[index].duration, videoDuration)
-          : videoAudioTracks[index].duration;
+// Function to send a test job to Chillin with two 3sec videos from specified URLs
+const sendTestJobToChillin = async () => {
+  const videoUrls = [
+    "https://vod.api.video/vod/vi1aD6KnBMa3Qdu6o1Pl5QEK/mp4/source.mp4",
+    "https://vod.api.video/vod/vi5DLuGzKHbEWXRRnRWalFii/mp4/source.mp4",
+  ];
 
-        // Get the stored volume for this audio track or default to 1
-        const baseVolume =
-          audioVolumes[index] !== undefined ? audioVolumes[index] : 1;
-
-        // Create keyframes for fade in/out effects (500ms = 0.5s)
-        const fadeDuration = 0.5; // 500ms in seconds
-        const keyframes = [];
-
-        // Fade In: Start with 0 and increase to the base volume over 500ms
-        if (audioDuration > fadeDuration) {
-          // Add volume keyframes for fade in
-          keyframes.push({
-            property: "volume",
-            type: "number",
-            keyframeItems: [
-              { time: 0, value: 0 }, // Start at 0 volume at the beginning
-              { time: fadeDuration, value: baseVolume }, // Reach base volume after 500ms
-            ],
-          });
-
-          // Add volume keyframes for fade out
-          keyframes.push({
-            property: "volume",
-            type: "number",
-            keyframeItems: [
-              { time: audioDuration - fadeDuration, value: baseVolume }, // Base volume until 500ms before end
-              { time: audioDuration, value: 0 }, // Fade to 0 volume at the end
-            ],
-          });
-        } else {
-          // If audio is shorter than fade duration, do proportional fade
-          const halfDuration = audioDuration / 2;
-          keyframes.push({
-            property: "volume",
-            type: "number",
-            keyframeItems: [
-              { time: 0, value: 0 }, // Start at 0 volume
-              { time: halfDuration, value: baseVolume }, // Reach base volume at midpoint
-              { time: audioDuration, value: 0 }, // End at 0 volume
-            ],
-          });
-        }
-
-        audioLayers.push({
-          id: `audio-${video.id || index}`,
-          type: "Audio",
-          start: videoStart, // Start at the same time as the corresponding video
-          duration: audioDuration, // Duration of the audio clip
-          trackIndex: correspondingVideoLayer
-            ? correspondingVideoLayer.trackIndex
-            : index, // Use the same track index as the corresponding video
+  // Create a Chillin project JSON with the test videos at lowest resolution (480x270)
+  const sampleChillinJson = {
+    compositeWidth: 480,
+    compositeHeight: 270,
+    fps: 30,
+    projectData: {
+      type: "",
+      width: 480,
+      height: 270,
+      fill: "#000000",
+      duration: 6, // 2 videos, 3 seconds each = 6 seconds total
+      version: 0,
+      view: [
+        // First video: 0-3 seconds
+        {
+          id: "test-video-1",
+          type: "Video",
+          start: 0,
+          duration: 3,
+          trackIndex: 0,
+          x: 0,
+          y: 0,
+          width: 480,
+          height: 270,
           blendMode: "normal",
+          anchorX: 240,
+          anchorY: 135,
+          rotation: 0,
+          scaleX: 1,
+          scaleY: 1,
+          alpha: 1,
+          skewX: 0,
+          skewY: 0,
           hidden: false,
           locked: false,
-          keyframes: keyframes, // Include fade in/out keyframes
-          externalUrl: audioTrack.url, // Use the user's audio URL
-          ext: audioTrack.file.name.split(".").pop() || "mp3", // Get file extension
-          startInSource: 0, // Start from beginning of audio file
-          volume: baseVolume, // Use user-set volume
+          keyframes: [],
+          externalUrl: videoUrls[0], // Use first test video URL
+          ext: "mp4",
+          startInSource: 0,
+          volume: 1,
           hasAudio: true,
           playrate: 1,
           isFrontTrimmed: false,
-          sourceDuration: audioDuration,
-        });
-      }
-    });
-
-    // Create a chillin project JSON with the user's videos
-    const chillinJson = {
-      compositeWidth: 1280,
-      compositeHeight: 720,
-      fps: 30,
-      projectData: {
-        type: "",
-        width: 1280,
-        height: 720,
-        fill: "#000000",
-        duration: totalDuration, // Total duration based on template
-        version: 0,
-        view: videoLayers,
-        audio: audioLayers, // Add the audio layers we created
-        effect: [],
-        transition: [],
-      },
-    };
-
-    // Set the data and add a small delay to ensure sheet is open before rendering
-    setChillinProjectJson(chillinJson);
-
-    alert("Chillin preview data set! The preview would now be displayed.");
+          sourceDuration: 3,
+        },
+        // Second video: 3-6 seconds
+        {
+          id: "test-video-2",
+          type: "Video",
+          start: 3,
+          duration: 3,
+          trackIndex: 0,
+          x: 0,
+          y: 0,
+          width: 480,
+          height: 270,
+          blendMode: "normal",
+          anchorX: 240,
+          anchorY: 135,
+          rotation: 0,
+          scaleX: 1,
+          scaleY: 1,
+          alpha: 1,
+          skewX: 0,
+          skewY: 0,
+          hidden: false,
+          locked: false,
+          keyframes: [],
+          externalUrl: videoUrls[1], // Use second test video URL
+          ext: "mp4",
+          startInSource: 0,
+          volume: 1,
+          hasAudio: true,
+          playrate: 1,
+          isFrontTrimmed: false,
+          sourceDuration: 3,
+        },
+      ],
+      audio: [], // No additional audio tracks for test
+      effect: [],
+      transition: [],
+    },
   };
 
-  // Function to send the Chillin project to the renderer
-  const sendChillinProjectToRenderer = async () => {
-    try {
-      // Validate that we have videos to process
-      if (!selectedVideos || selectedVideos.length === 0) {
-        alert(
-          "No videos selected. Please add videos before sending to renderer."
-        );
-        return;
-      }
-
-      // Use the createChillinProject function we defined above
-      await createChillinProject(
-        setSelectedVideos,
-        selectedVideos,
-        template,
-        customTemplates
-      );
-
-      alert("Project sent to Chillin renderer successfully!");
-    } catch (error) {
-      if (!error.userCancelled) {
-        alert(`Error sending project to renderer: ${error.message}`);
-      }
-    }
-  };
-
-  // Function to send a test job to Chillin with two 3sec videos from specified URLs
-  const sendTestJobToChillin = async () => {
-    const videoUrls = [
-      "https://vod.api.video/vod/vi1aD6KnBMa3Qdu6o1Pl5QEK/mp4/source.mp4",
-      "https://vod.api.video/vod/vi5DLuGzKHbEWXRRnRWalFii/mp4/source.mp4",
-    ];
-
-    // Create a Chillin project JSON with the test videos at lowest resolution (480x270)
-    const sampleChillinJson = {
-      compositeWidth: 480,
-      compositeHeight: 270,
-      fps: 30,
-      projectData: {
-        type: "",
-        width: 480,
-        height: 270,
-        fill: "#000000",
-        duration: 6, // 2 videos, 3 seconds each = 6 seconds total
-        version: 0,
-        view: [
-          // First video: 0-3 seconds
+  try {
+    // Show loading indicator
+    dialog
+      .create({
+        title: "Processing",
+        text: "Sending test job to Chillin...",
+        buttons: [
           {
-            id: "test-video-1",
-            type: "Video",
-            start: 0,
-            duration: 3,
-            trackIndex: 0,
-            x: 0,
-            y: 0,
-            width: 480,
-            height: 270,
-            blendMode: "normal",
-            anchorX: 240,
-            anchorY: 135,
-            rotation: 0,
-            scaleX: 1,
-            scaleY: 1,
-            alpha: 1,
-            skewX: 0,
-            skewY: 0,
-            hidden: false,
-            locked: false,
-            keyframes: [],
-            externalUrl: videoUrls[0], // Use first test video URL
-            ext: "mp4",
-            startInSource: 0,
-            volume: 1,
-            hasAudio: true,
-            playrate: 1,
-            isFrontTrimmed: false,
-            sourceDuration: 3,
-          },
-          // Second video: 3-6 seconds
-          {
-            id: "test-video-2",
-            type: "Video",
-            start: 3,
-            duration: 3,
-            trackIndex: 0,
-            x: 0,
-            y: 0,
-            width: 480,
-            height: 270,
-            blendMode: "normal",
-            anchorX: 240,
-            anchorY: 135,
-            rotation: 0,
-            scaleX: 1,
-            scaleY: 1,
-            alpha: 1,
-            skewX: 0,
-            skewY: 0,
-            hidden: false,
-            locked: false,
-            keyframes: [],
-            externalUrl: videoUrls[1], // Use second test video URL
-            ext: "mp4",
-            startInSource: 0,
-            volume: 1,
-            hasAudio: true,
-            playrate: 1,
-            isFrontTrimmed: false,
-            sourceDuration: 3,
+            text: "OK",
+            onClick: () => {},
           },
         ],
-        audio: [], // No additional audio tracks for test
-        effect: [],
-        transition: [],
-      },
-    };
+      })
+      .open();
 
-    try {
-      // Show loading indicator
-      alert("Sending test job to Chillin...");
-
-      // Send the job to the Chillin API using the same endpoint and auth as in useChillinAPI
-      const response = await fetch(
-        "https://render-api.chillin.online/render/v1",
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${chillinApiKey}`, // Use the same API key as in useChillinAPI
-          },
-          body: JSON.stringify(sampleChillinJson),
-        }
-      );
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Test job sent successfully:", result);
-
-        // Show success with the actual render ID from the API (same as in useChillinAPI)
-        alert(
-          `Test job sent successfully! Render ID: ${result.data.render_id}`
-        );
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          `${response.status} ${response.statusText}: ${
-            errorData.msg || "API request failed"
-          }`
-        );
+    // Send the job to the Chillin API using the same endpoint and auth as in useChillinAPI
+    const response = await fetch(
+      "https://render-api.chillin.online/render/v1",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${chillinApiKey}`, // Use the same API key as in useChillinAPI
+        },
+        body: JSON.stringify(sampleChillinJson),
       }
-    } catch (error) {
-      console.error("Error sending test job to Chillin:", error);
-      alert(`Error sending test job: ${error.message}`);
-    }
-  };
+    );
 
-  // Function to interact with api.video service
-  const getApiVideoBaseUrl = () => {
-    // For this implementation, we'll use the standard API, but you can customize based on environment
-    return "https://ws.api.video";
-  };
+    if (response.ok) {
+      const result = await response.json();
+      console.log("Test job sent successfully:", result);
 
-  // Function to upload video to api.video using the API key
-  const uploadVideoToApiVideo = async (file) => {
-    if (!apiVideoKey) {
+      // Show success with the actual render ID from the API (same as in useChillinAPI)
+      dialog
+        .create({
+          title: "Success",
+          text: `Test job sent successfully! Render ID: ${result.data.render_id}`,
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
+    } else {
+      const errorData = await response.json().catch(() => ({}));
       throw new Error(
-        "API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables."
+        `${response.status} ${response.statusText}: ${
+          errorData.msg || "API request failed"
+        }`
+      );
+    }
+  } catch (error) {
+    console.error("Error sending test job to Chillin:", error);
+    dialog
+      .create({
+        title: "Error",
+        text: `Error sending test job: ${error.message}`,
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
+  }
+};
+
+// Function to interact with api.video service
+const getApiVideoBaseUrl = () => {
+  // For this implementation, we'll use the standard API, but you can customize based on environment
+  return "https://ws.api.video";
+};
+
+// Function to upload video to api.video using the API key
+const uploadVideoToApiVideo = async (file) => {
+  if (!apiVideoKey) {
+    throw new Error(
+      "API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables."
+    );
+  }
+
+  try {
+    // First, create a new video entry
+    const createResponse = await fetch(`${getApiVideoBaseUrl()}/video`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiVideoKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: file.name || `TracklessVideo-${Date.now()}`,
+        description: `Uploaded via TracklessVideoEditor on ${new Date().toISOString()}`,
+      }),
+    });
+
+    if (!createResponse.ok) {
+      const error = await createResponse.json().catch(() => ({
+        message: `HTTP ${createResponse.status}: ${createResponse.statusText}`,
+      }));
+      throw new Error(
+        error.message ||
+          `Failed to create video entry: ${createResponse.statusText}`
       );
     }
 
-    try {
-      // First, create a new video entry
-      const createResponse = await fetch(`${getApiVideoBaseUrl()}/video`, {
+    const videoData = await createResponse.json();
+
+    // Then upload the actual file
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const uploadResponse = await fetch(
+      `${getApiVideoBaseUrl()}/video/${videoData.videoId}/source`,
+      {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiVideoKey}`,
-          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          title: file.name || `TracklessVideo-${Date.now()}`,
-          description: `Uploaded via TracklessVideoEditor on ${new Date().toISOString()}`,
-        }),
-      });
-
-      if (!createResponse.ok) {
-        const error = await createResponse.json().catch(() => ({
-          message: `HTTP ${createResponse.status}: ${createResponse.statusText}`,
-        }));
-        throw new Error(
-          error.message ||
-            `Failed to create video entry: ${createResponse.statusText}`
-        );
+        body: formData,
       }
+    );
 
-      const videoData = await createResponse.json();
-
-      // Then upload the actual file
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const uploadResponse = await fetch(
-        `${getApiVideoBaseUrl()}/video/${videoData.videoId}/source`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${apiVideoKey}`,
-          },
-          body: formData,
-        }
-      );
-
-      if (!uploadResponse.ok) {
-        const error = await uploadResponse.json().catch(() => ({
-          message: `HTTP ${uploadResponse.status}: ${uploadResponse.statusText}`,
-        }));
-        throw new Error(
-          error.message ||
-            `Failed to upload video: ${uploadResponse.statusText}`
-        );
-      }
-
-      const uploadedVideo = await uploadResponse.json();
-      console.log("Video uploaded successfully to api.video:", uploadedVideo);
-
-      return uploadedVideo;
-    } catch (error) {
-      console.error("Error uploading video to api.video:", error);
-      throw error;
-    }
-  };
-
-  // Function to get video status from api.video
-  const getApiVideoStatus = async (videoId) => {
-    if (!apiVideoKey) {
+    if (!uploadResponse.ok) {
+      const error = await uploadResponse.json().catch(() => ({
+        message: `HTTP ${uploadResponse.status}: ${uploadResponse.statusText}`,
+      }));
       throw new Error(
-        "API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables."
+        error.message || `Failed to upload video: ${uploadResponse.statusText}`
       );
     }
 
-    try {
-      const response = await fetch(`${getApiVideoBaseUrl()}/video/${videoId}`, {
-        headers: {
-          Authorization: `Bearer ${apiVideoKey}`,
-          Accept: "application/json",
-        },
-      });
+    const uploadedVideo = await uploadResponse.json();
+    console.log("Video uploaded successfully to api.video:", uploadedVideo);
 
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({
-          message: `HTTP ${response.status}: ${response.statusText}`,
-        }));
-        throw new Error(
-          error.message || `Failed to get video status: ${response.statusText}`
-        );
-      }
+    return uploadedVideo;
+  } catch (error) {
+    console.error("Error uploading video to api.video:", error);
+    throw error;
+  }
+};
 
-      const videoData = await response.json();
-      return videoData;
-    } catch (error) {
-      console.error("Error getting video status from api.video:", error);
-      throw error;
-    }
-  };
+// Function to get video status from api.video
+const getApiVideoStatus = async (videoId) => {
+  if (!apiVideoKey) {
+    throw new Error(
+      "API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables."
+    );
+  }
 
-  // Function to list videos from api.video
-  const listApiVideos = async () => {
-    if (!apiVideoKey) {
+  try {
+    const response = await fetch(`${getApiVideoBaseUrl()}/video/${videoId}`, {
+      headers: {
+        Authorization: `Bearer ${apiVideoKey}`,
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({
+        message: `HTTP ${response.status}: ${response.statusText}`,
+      }));
       throw new Error(
-        "API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables."
+        error.message || `Failed to get video status: ${response.statusText}`
       );
     }
 
-    try {
-      const response = await fetch(`${getApiVideoBaseUrl()}/videos`, {
-        headers: {
-          Authorization: `Bearer ${apiVideoKey}`,
-          Accept: "application/json",
-        },
-      });
+    const videoData = await response.json();
+    return videoData;
+  } catch (error) {
+    console.error("Error getting video status from api.video:", error);
+    throw error;
+  }
+};
 
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({
-          message: `HTTP ${response.status}: ${response.statusText}`,
-        }));
-        throw new Error(
-          error.message || `Failed to list videos: ${response.statusText}`
-        );
-      }
+// Function to list videos from api.video
+const listApiVideos = async () => {
+  if (!apiVideoKey) {
+    throw new Error(
+      "API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables."
+    );
+  }
 
-      const data = await response.json();
-      console.log("Retrieved videos from api.video:", data);
-      return data;
-    } catch (error) {
-      console.error("Error listing videos from api.video:", error);
-      throw error;
+  try {
+    const response = await fetch(`${getApiVideoBaseUrl()}/videos`, {
+      headers: {
+        Authorization: `Bearer ${apiVideoKey}`,
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({
+        message: `HTTP ${response.status}: ${response.statusText}`,
+      }));
+      throw new Error(
+        error.message || `Failed to list videos: ${response.statusText}`
+      );
     }
-  };
 
-  // Create template preview data for each template
-  const createTemplatePreviewData = (templateNum) => {
-    switch (templateNum) {
-      case 1: // Two videos: 3s + 3s
-        return {
-          compositeWidth: 1280,
-          compositeHeight: 720,
-          fps: 30,
-          projectData: {
-            type: "",
-            width: 1280,
-            height: 720,
-            fill: "#000000",
-            duration: 6, // 3 + 3 seconds
-            version: 0,
-            view: [
-              {
-                id: "template1-video1",
-                type: "Video",
-                description:
-                  "Ipsum consequat elit anim voluptate laborum quis tempor eu cillum dolore dolore ut elit.",
-                start: 0,
-                duration: 3,
-                trackIndex: 0,
-                x: 0,
-                y: 0,
-                width: 1280,
-                height: 720,
-                blendMode: "normal",
-                anchorX: 0,
-                anchorY: 0,
-                rotation: 0,
-                scaleX: 1,
-                scaleY: 1,
-                alpha: 1,
-                skewX: 0,
-                skewY: 0,
-                hidden: false,
-                locked: false,
-                keyframes: [],
-                externalUrl:
-                  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Placeholder video
-                ext: "mp4",
-                startInSource: 0,
-                volume: 1,
-                hasAudio: true,
-                playrate: 1,
-                isFrontTrimmed: false,
-                sourceDuration: 3,
-              },
-              {
-                id: "template1-video2",
-                type: "Video",
-                description: "Labore dolore reprehenderit commodo aliqua.",
-                start: 3,
-                duration: 3,
-                trackIndex: 0,
-                x: 0,
-                y: 0,
-                width: 1280,
-                height: 720,
-                blendMode: "normal",
-                anchorX: 0,
-                anchorY: 0,
-                rotation: 0,
-                scaleX: 1,
-                scaleY: 1,
-                alpha: 1,
-                skewX: 0,
-                skewY: 0,
-                hidden: false,
-                locked: false,
-                keyframes: [],
-                externalUrl:
-                  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", // Placeholder video
-                ext: "mp4",
-                startInSource: 0,
-                volume: 1,
-                hasAudio: true,
-                playrate: 1,
-                isFrontTrimmed: false,
-                sourceDuration: 3,
-              },
-            ],
-            audio: [],
-            effect: [],
-            transition: [],
-          },
-        };
+    const data = await response.json();
+    console.log("Retrieved videos from api.video:", data);
+    return data;
+  } catch (error) {
+    console.error("Error listing videos from api.video:", error);
+    throw error;
+  }
+};
 
-      case 2: // Three videos: 3s + 1s + 3s
-        return {
-          compositeWidth: 1280,
-          compositeHeight: 720,
-          fps: 30,
-          projectData: {
-            type: "",
-            width: 1280,
-            height: 720,
-            fill: "#000000",
-            duration: 7, // 3 + 1 + 3 seconds
-            version: 0,
-            view: [
-              {
-                id: "template2-video1",
-                type: "Video",
-                description:
-                  "Qui fugiat dolore cillum cillum est exercitation id officia.",
-                start: 0,
-                duration: 3,
-                trackIndex: 0,
-                x: 0,
-                y: 0,
-                width: 1280,
-                height: 720,
-                blendMode: "normal",
-                anchorX: 0,
-                anchorY: 0,
-                rotation: 0,
-                scaleX: 1,
-                scaleY: 1,
-                alpha: 1,
-                skewX: 0,
-                skewY: 0,
-                hidden: false,
-                locked: false,
-                keyframes: [],
-                externalUrl:
-                  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Placeholder video
-                ext: "mp4",
-                startInSource: 0,
-                volume: 1,
-                hasAudio: true,
-                playrate: 1,
-                isFrontTrimmed: false,
-                sourceDuration: 3,
-              },
-              {
-                id: "template2-video2",
-                type: "Video",
-                description:
-                  "Ipsum ullamco ex exercitation deserunt nulla exercitation est proident.",
-                start: 3,
-                duration: 1,
-                trackIndex: 0,
-                x: 0,
-                y: 0,
-                width: 1280,
-                height: 720,
-                blendMode: "normal",
-                anchorX: 0,
-                anchorY: 0,
-                rotation: 0,
-                scaleX: 1,
-                scaleY: 1,
-                alpha: 1,
-                skewX: 0,
-                skewY: 0,
-                hidden: false,
-                locked: false,
-                keyframes: [],
-                externalUrl:
-                  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", // Placeholder video
-                ext: "mp4",
-                startInSource: 0,
-                volume: 1,
-                hasAudio: true,
-                playrate: 1,
-                isFrontTrimmed: false,
-                sourceDuration: 1,
-              },
-              {
-                id: "template2-video3",
-                type: "Video",
-                description:
-                  "Elit officia aliquip pariatur tempor duis cillum et ipsum.",
-                start: 4,
-                duration: 3,
-                trackIndex: 0,
-                x: 0,
-                y: 0,
-                width: 1280,
-                height: 720,
-                blendMode: "normal",
-                anchorX: 0,
-                anchorY: 0,
-                rotation: 0,
-                scaleX: 1,
-                scaleY: 1,
-                alpha: 1,
-                skewX: 0,
-                skewY: 0,
-                hidden: false,
-                locked: false,
-                keyframes: [],
-                externalUrl:
-                  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", // Placeholder video
-                ext: "mp4",
-                startInSource: 0,
-                volume: 1,
-                hasAudio: true,
-                playrate: 1,
-                isFrontTrimmed: false,
-                sourceDuration: 3,
-              },
-            ],
-            audio: [],
-            effect: [],
-            transition: [],
-          },
-        };
-
-      case 3: // Two videos with overlay from 3-5s (7s total)
-        return {
-          compositeWidth: 1280,
-          compositeHeight: 720,
-          fps: 30,
-          projectData: {
-            type: "",
-            width: 1280,
-            height: 720,
-            fill: "#000000",
-            duration: 7, // 7 seconds total with overlay
-            version: 0,
-            view: [
-              {
-                id: "template3-video1",
-                type: "Video",
-                description:
-                  "Sint ea quis commodo aliqua dolor laborum culpa deserunt.",
-                start: 0,
-                duration: 7,
-                trackIndex: 0,
-                x: 0,
-                y: 0,
-                width: 1280,
-                height: 720,
-                blendMode: "normal",
-                anchorX: 0,
-                anchorY: 0,
-                rotation: 0,
-                scaleX: 1,
-                scaleY: 1,
-                alpha: 1,
-                skewX: 0,
-                skewY: 0,
-                hidden: false,
-                locked: false,
-                keyframes: [],
-                externalUrl:
-                  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Placeholder video for main
-                ext: "mp4",
-                startInSource: 0,
-                volume: 1,
-                hasAudio: true,
-                playrate: 1,
-                isFrontTrimmed: false,
-                sourceDuration: 7,
-              },
-              {
-                id: "template3-video2-overlay",
-                type: "Video",
-                description: "Laboris eiusmod eu laboris excepteur aliquip.",
-                start: 3, // Start at 3 seconds
-                duration: 2, // Duration of 2 seconds (end at 5s)
-                trackIndex: 1, // Overlay track
-                x: (1280 - 256) / 2, // Centered horizontally
-                y: (720 - 144) / 2, // Centered vertically
-                width: 256, // Smaller size for overlay
-                height: 144,
-                blendMode: "normal",
-                anchorX: 0,
-                anchorY: 0,
-                rotation: 0,
-                scaleX: 1,
-                scaleY: 1,
-                alpha: 1,
-                skewX: 0,
-                skewY: 0,
-                hidden: false,
-                locked: false,
-                keyframes: [],
-                externalUrl:
-                  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", // Placeholder video for overlay
-                ext: "mp4",
-                startInSource: 0,
-                volume: 1,
-                hasAudio: true,
-                playrate: 1,
-                isFrontTrimmed: false,
-                sourceDuration: 2,
-              },
-            ],
-            audio: [],
-            effect: [],
-            transition: [],
-          },
-        };
-
-      default:
-        return null;
-    }
-  };
-
-  // Function to prepare and show the template preview
-  const showTemplatePreview = (templateNum) => {
-    // Check if this is a custom template
-    const customTemplate = customTemplates.find((t) => t.id === templateNum);
-
-    if (customTemplate) {
-      // For custom templates, create a preview based on required videos
-      const previewData = {
+// Create template preview data for each template
+const createTemplatePreviewData = (templateNum) => {
+  switch (templateNum) {
+    case 1: // Two videos: 3s + 3s
+      return {
         compositeWidth: 1280,
         compositeHeight: 720,
         fps: 30,
@@ -2427,23 +2545,16 @@ const TracklessVideoEditor = () => {
           width: 1280,
           height: 720,
           fill: "#000000",
-          duration: customTemplate.videoDurations
-            ? customTemplate.videoDurations.reduce((a, b) => a + b, 0) || 6
-            : customTemplate.requiredVideos * 3, // Default to 3s per video
+          duration: 6, // 3 + 3 seconds
           version: 0,
-          view: Array.from(
-            { length: customTemplate.requiredVideos },
-            (_, i) => ({
-              id: `custom-template-video-${i}`,
+          view: [
+            {
+              id: "template1-video1",
               type: "Video",
               description:
-                customTemplate.videoDescriptions?.[i] || `Video ${i + 1}`,
-              start: customTemplate.videoDurations
-                ? customTemplate.videoDurations
-                    .slice(0, i)
-                    .reduce((a, b) => a + b, 0) || i * 3
-                : i * 3,
-              duration: customTemplate.videoDurations?.[i] || 3,
+                "Ipsum consequat elit anim voluptate laborum quis tempor eu cillum dolore dolore ut elit.",
+              start: 0,
+              duration: 3,
               trackIndex: 0,
               x: 0,
               y: 0,
@@ -2469,319 +2580,744 @@ const TracklessVideoEditor = () => {
               hasAudio: true,
               playrate: 1,
               isFrontTrimmed: false,
-              sourceDuration: customTemplate.videoDurations?.[i] || 3,
-            })
-          ),
+              sourceDuration: 3,
+            },
+            {
+              id: "template1-video2",
+              type: "Video",
+              description: "Labore dolore reprehenderit commodo aliqua.",
+              start: 3,
+              duration: 3,
+              trackIndex: 0,
+              x: 0,
+              y: 0,
+              width: 1280,
+              height: 720,
+              blendMode: "normal",
+              anchorX: 0,
+              anchorY: 0,
+              rotation: 0,
+              scaleX: 1,
+              scaleY: 1,
+              alpha: 1,
+              skewX: 0,
+              skewY: 0,
+              hidden: false,
+              locked: false,
+              keyframes: [],
+              externalUrl:
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", // Placeholder video
+              ext: "mp4",
+              startInSource: 0,
+              volume: 1,
+              hasAudio: true,
+              playrate: 1,
+              isFrontTrimmed: false,
+              sourceDuration: 3,
+            },
+          ],
           audio: [],
           effect: [],
           transition: [],
         },
       };
 
-      setTemplatePreviewJson(previewData);
-      setShowTemplatePreviewDialog(true);
-    } else {
-      const templatePreviewData = createTemplatePreviewData(templateNum);
-      if (!templatePreviewData) return;
-
-      setTemplatePreviewJson(templatePreviewData);
-      setShowTemplatePreviewDialog(true);
-    }
-  };
-
-  // Convert Chillin JSON to a format compatible with Remotion
-  const convertChillinToRemotion = (chillinJson) => {
-    // Convert Chillin project data to Remotion-compatible format
-    const duration = chillinJson.projectData.duration;
-    const fps = chillinJson.fps;
-    const width = chillinJson.compositeWidth;
-    const height = chillinJson.compositeHeight;
-
-    // Create Remotion tracks from Chillin view layers
-    const tracks = [];
-
-    // Create a main track for video layers
-    const videoTrack = {
-      id: "video-track",
-      name: "Video Track",
-      items: [],
-    };
-
-    // Process each layer in the Chillin project
-    chillinJson.projectData.view?.forEach((layer, index) => {
-      const item = {
-        id: layer.id || `layer-${index}`,
-        type: "video",
-        name: `Video Layer ${index + 1}`,
-        src: layer.externalUrl,
-        startTime: layer.start,
-        duration: layer.duration,
-        x: layer.x,
-        y: layer.y,
-        scale: layer.scaleX || 1,
-        rotation: layer.rotation || 0,
-        opacity: layer.alpha || 1,
-        volume: layer.volume || 1,
-        inPoint: layer.startInSource || 0,
-      };
-
-      videoTrack.items.push(item);
-    });
-
-    if (videoTrack.items.length > 0) {
-      tracks.push(videoTrack);
-    }
-
-    // Process audio layers if any
-    if (
-      chillinJson.projectData.audio &&
-      chillinJson.projectData.audio.length > 0
-    ) {
-      const audioTrack = {
-        id: "audio-track",
-        name: "Audio Track",
-        items: chillinJson.projectData.audio.map((audioLayer, index) => ({
-          id: audioLayer.id || `audio-${index}`,
-          type: "audio",
-          name: `Audio Layer ${index + 1}`,
-          src: audioLayer.externalUrl,
-          startTime: audioLayer.start,
-          duration: audioLayer.duration,
-          volume: audioLayer.volume || 1,
-          inPoint: audioLayer.startInSource || 0,
-        })),
-      };
-
-      tracks.push(audioTrack);
-    }
-
-    return {
-      tracks,
-      duration, // in seconds
-      fps,
-      width,
-      height,
-    };
-  };
-
-  // Handle creating a custom template from dialog
-  const handleCreateCustomTemplate = () => {
-    const name = videoName.trim();
-    if (!name) {
-      alert("Template name cannot be empty");
-      return;
-    }
-
-    // Check if template name already exists
-    if (customTemplates.some((t) => t.name === name)) {
-      alert("A template with this name already exists");
-      return;
-    }
-
-    const numVideos = parseInt(numVideosForTemplate);
-    if (isNaN(numVideos) || numVideos <= 0 || numVideos > 10) {
-      alert("Please enter a valid number between 1 and 10");
-      return;
-    }
-
-    // Create the new template
-    const newTemplate = {
-      id: `custom-${Date.now()}`,
-      name: name,
-      requiredVideos: numVideos,
-      videoDescriptions: [], // We'll collect these later
-      videoDurations: [], // We'll collect these later
-      type: "custom", // Mark as user-created template
-      settings: {
-        // Default settings for the custom template
+    case 2: // Three videos: 3s + 1s + 3s
+      return {
         compositeWidth: 1280,
         compositeHeight: 720,
         fps: 30,
+        projectData: {
+          type: "",
+          width: 1280,
+          height: 720,
+          fill: "#000000",
+          duration: 7, // 3 + 1 + 3 seconds
+          version: 0,
+          view: [
+            {
+              id: "template2-video1",
+              type: "Video",
+              description:
+                "Qui fugiat dolore cillum cillum est exercitation id officia.",
+              start: 0,
+              duration: 3,
+              trackIndex: 0,
+              x: 0,
+              y: 0,
+              width: 1280,
+              height: 720,
+              blendMode: "normal",
+              anchorX: 0,
+              anchorY: 0,
+              rotation: 0,
+              scaleX: 1,
+              scaleY: 1,
+              alpha: 1,
+              skewX: 0,
+              skewY: 0,
+              hidden: false,
+              locked: false,
+              keyframes: [],
+              externalUrl:
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Placeholder video
+              ext: "mp4",
+              startInSource: 0,
+              volume: 1,
+              hasAudio: true,
+              playrate: 1,
+              isFrontTrimmed: false,
+              sourceDuration: 3,
+            },
+            {
+              id: "template2-video2",
+              type: "Video",
+              description:
+                "Ipsum ullamco ex exercitation deserunt nulla exercitation est proident.",
+              start: 3,
+              duration: 1,
+              trackIndex: 0,
+              x: 0,
+              y: 0,
+              width: 1280,
+              height: 720,
+              blendMode: "normal",
+              anchorX: 0,
+              anchorY: 0,
+              rotation: 0,
+              scaleX: 1,
+              scaleY: 1,
+              alpha: 1,
+              skewX: 0,
+              skewY: 0,
+              hidden: false,
+              locked: false,
+              keyframes: [],
+              externalUrl:
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", // Placeholder video
+              ext: "mp4",
+              startInSource: 0,
+              volume: 1,
+              hasAudio: true,
+              playrate: 1,
+              isFrontTrimmed: false,
+              sourceDuration: 1,
+            },
+            {
+              id: "template2-video3",
+              type: "Video",
+              description:
+                "Elit officia aliquip pariatur tempor duis cillum et ipsum.",
+              start: 4,
+              duration: 3,
+              trackIndex: 0,
+              x: 0,
+              y: 0,
+              width: 1280,
+              height: 720,
+              blendMode: "normal",
+              anchorX: 0,
+              anchorY: 0,
+              rotation: 0,
+              scaleX: 1,
+              scaleY: 1,
+              alpha: 1,
+              skewX: 0,
+              skewY: 0,
+              hidden: false,
+              locked: false,
+              keyframes: [],
+              externalUrl:
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", // Placeholder video
+              ext: "mp4",
+              startInSource: 0,
+              volume: 1,
+              hasAudio: true,
+              playrate: 1,
+              isFrontTrimmed: false,
+              sourceDuration: 3,
+            },
+          ],
+          audio: [],
+          effect: [],
+          transition: [],
+        },
+      };
+
+    case 3: // Two videos with overlay from 3-5s (7s total)
+      return {
+        compositeWidth: 1280,
+        compositeHeight: 720,
+        fps: 30,
+        projectData: {
+          type: "",
+          width: 1280,
+          height: 720,
+          fill: "#000000",
+          duration: 7, // 7 seconds total with overlay
+          version: 0,
+          view: [
+            {
+              id: "template3-video1",
+              type: "Video",
+              description:
+                "Sint ea quis commodo aliqua dolor laborum culpa deserunt.",
+              start: 0,
+              duration: 7,
+              trackIndex: 0,
+              x: 0,
+              y: 0,
+              width: 1280,
+              height: 720,
+              blendMode: "normal",
+              anchorX: 0,
+              anchorY: 0,
+              rotation: 0,
+              scaleX: 1,
+              scaleY: 1,
+              alpha: 1,
+              skewX: 0,
+              skewY: 0,
+              hidden: false,
+              locked: false,
+              keyframes: [],
+              externalUrl:
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Placeholder video for main
+              ext: "mp4",
+              startInSource: 0,
+              volume: 1,
+              hasAudio: true,
+              playrate: 1,
+              isFrontTrimmed: false,
+              sourceDuration: 7,
+            },
+            {
+              id: "template3-video2-overlay",
+              type: "Video",
+              description: "Laboris eiusmod eu laboris excepteur aliquip.",
+              start: 3, // Start at 3 seconds
+              duration: 2, // Duration of 2 seconds (end at 5s)
+              trackIndex: 1, // Overlay track
+              x: (1280 - 256) / 2, // Centered horizontally
+              y: (720 - 144) / 2, // Centered vertically
+              width: 256, // Smaller size for overlay
+              height: 144,
+              blendMode: "normal",
+              anchorX: 0,
+              anchorY: 0,
+              rotation: 0,
+              scaleX: 1,
+              scaleY: 1,
+              alpha: 1,
+              skewX: 0,
+              skewY: 0,
+              hidden: false,
+              locked: false,
+              keyframes: [],
+              externalUrl:
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", // Placeholder video for overlay
+              ext: "mp4",
+              startInSource: 0,
+              volume: 1,
+              hasAudio: true,
+              playrate: 1,
+              isFrontTrimmed: false,
+              sourceDuration: 2,
+            },
+          ],
+          audio: [],
+          effect: [],
+          transition: [],
+        },
+      };
+
+    default:
+      return null;
+  }
+};
+
+// Function to prepare and show the template preview
+const showTemplatePreview = (templateNum) => {
+  // Check if this is a custom template
+  const customTemplate = customTemplates.find((t) => t.id === templateNum);
+
+  if (customTemplate) {
+    // For custom templates, create a preview based on required videos
+    const previewData = {
+      compositeWidth: 1280,
+      compositeHeight: 720,
+      fps: 30,
+      projectData: {
+        type: "",
+        width: 1280,
+        height: 720,
         fill: "#000000",
+        duration: customTemplate.videoDurations
+          ? customTemplate.videoDurations.reduce((a, b) => a + b, 0) || 6
+          : customTemplate.requiredVideos * 3, // Default to 3s per video
+        version: 0,
+        view: Array.from({ length: customTemplate.requiredVideos }, (_, i) => ({
+          id: `custom-template-video-${i}`,
+          type: "Video",
+          description:
+            customTemplate.videoDescriptions?.[i] || `Video ${i + 1}`,
+          start: customTemplate.videoDurations
+            ? customTemplate.videoDurations
+                .slice(0, i)
+                .reduce((a, b) => a + b, 0) || i * 3
+            : i * 3,
+          duration: customTemplate.videoDurations?.[i] || 3,
+          trackIndex: 0,
+          x: 0,
+          y: 0,
+          width: 1280,
+          height: 720,
+          blendMode: "normal",
+          anchorX: 0,
+          anchorY: 0,
+          rotation: 0,
+          scaleX: 1,
+          scaleY: 1,
+          alpha: 1,
+          skewX: 0,
+          skewY: 0,
+          hidden: false,
+          locked: false,
+          keyframes: [],
+          externalUrl:
+            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Placeholder video
+          ext: "mp4",
+          startInSource: 0,
+          volume: 1,
+          hasAudio: true,
+          playrate: 1,
+          isFrontTrimmed: false,
+          sourceDuration: customTemplate.videoDurations?.[i] || 3,
+        })),
+        audio: [],
+        effect: [],
+        transition: [],
       },
     };
 
-    const updatedTemplates = [...customTemplates, newTemplate];
-    saveCustomTemplates(updatedTemplates);
+    setTemplatePreviewJson(previewData);
+    setShowTemplatePreviewDialog(true);
+  } else {
+    const templatePreviewData = createTemplatePreviewData(templateNum);
+    if (!templatePreviewData) return;
 
-    alert(
-      `Custom template "${name}" has been created! Now select it to configure.`
-    );
-    setCreateTemplateDialogOpen(false);
-    setVideoName("");
-    setNumVideosForTemplate(2); // Reset to default
+    setTemplatePreviewJson(templatePreviewData);
+    setShowTemplatePreviewDialog(true);
+  }
+};
+
+// Convert Chillin JSON to a format compatible with Remotion
+const convertChillinToRemotion = (chillinJson) => {
+  // Convert Chillin project data to Remotion-compatible format
+  const duration = chillinJson.projectData.duration;
+  const fps = chillinJson.fps;
+  const width = chillinJson.compositeWidth;
+  const height = chillinJson.compositeHeight;
+
+  // Create Remotion tracks from Chillin view layers
+  const tracks = [];
+
+  // Create a main track for video layers
+  const videoTrack = {
+    id: "video-track",
+    name: "Video Track",
+    items: [],
   };
 
-  // Handle creating template from current selection
-  const handleCreateTemplateFromCurrent = () => {
-    const name = videoName.trim();
-    if (!name) {
-      alert("Template name cannot be empty");
-      return;
-    }
-
-    // Check if template name already exists
-    if (customTemplates.some((t) => t.name === name)) {
-      alert("A template with this name already exists");
-      return;
-    }
-
-    // Create the new custom template object from current selection
-    const newTemplate = {
-      id: `custom-${Date.now()}`,
-      name: name.trim(),
-      originalTemplateId: template,
-      requiredVideos: getRequiredVideos(template),
-      videoDescriptions: [], // Store descriptions for each video
-      videos: selectedVideos.map((video) => ({ ...video })),
-      videoAudioTracks: { ...videoAudioTracks },
-      videoVolumes: { ...videoVolumes },
-      audioVolumes: { ...audioVolumes },
-      type: "from-current", // Mark as template from current selection
+  // Process each layer in the Chillin project
+  chillinJson.projectData.view?.forEach((layer, index) => {
+    const item = {
+      id: layer.id || `layer-${index}`,
+      type: "video",
+      name: `Video Layer ${index + 1}`,
+      src: layer.externalUrl,
+      startTime: layer.start,
+      duration: layer.duration,
+      x: layer.x,
+      y: layer.y,
+      scale: layer.scaleX || 1,
+      rotation: layer.rotation || 0,
+      opacity: layer.alpha || 1,
+      volume: layer.volume || 1,
+      inPoint: layer.startInSource || 0,
     };
 
-    const updatedTemplates = [...customTemplates, newTemplate];
-    saveCustomTemplates(updatedTemplates);
+    videoTrack.items.push(item);
+  });
 
-    alert(`Custom template "${name.trim()}" has been created!`);
-    setCreateFromCurrentDialogOpen(false);
-    setVideoName("");
+  if (videoTrack.items.length > 0) {
+    tracks.push(videoTrack);
+  }
+
+  // Process audio layers if any
+  if (
+    chillinJson.projectData.audio &&
+    chillinJson.projectData.audio.length > 0
+  ) {
+    const audioTrack = {
+      id: "audio-track",
+      name: "Audio Track",
+      items: chillinJson.projectData.audio.map((audioLayer, index) => ({
+        id: audioLayer.id || `audio-${index}`,
+        type: "audio",
+        name: `Audio Layer ${index + 1}`,
+        src: audioLayer.externalUrl,
+        startTime: audioLayer.start,
+        duration: audioLayer.duration,
+        volume: audioLayer.volume || 1,
+        inPoint: audioLayer.startInSource || 0,
+      })),
+    };
+
+    tracks.push(audioTrack);
+  }
+
+  return {
+    tracks,
+    duration, // in seconds
+    fps,
+    width,
+    height,
   };
+};
 
-  // Handle deleting a template
-  const handleDeleteTemplate = () => {
-    if (deleteTemplateId) {
-      const updatedTemplates = customTemplates.filter(
-        (t) => t.id !== deleteTemplateId
-      );
-      saveCustomTemplates(updatedTemplates);
-      alert("Template deleted successfully");
-    }
-    setDeleteTemplateDialogOpen(false);
-    setDeleteTemplateId(null);
-  };
+// Handle creating a custom template from dialog
+const handleCreateCustomTemplate = () => {
+  const name = videoName.trim();
+  if (!name) {
+    dialog
+      .create({
+        title: "Invalid Name",
+        text: "Template name cannot be empty",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
+    return;
+  }
 
-  // Handle video selection functionality with improved flow
-  const handleVideoSelectionFlow = useCallback(
-    async (targetIndex = null) => {
-      if (!template) {
-        alert("Please select a template first");
-        return;
-      }
+  // Check if template name already exists
+  if (customTemplates.some((t) => t.name === name)) {
+    dialog
+      .create({
+        title: "Duplicate Name",
+        text: "A template with this name already exists",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
+    return;
+  }
 
-      const requiredVideos = getRequiredVideos(template);
+  const numVideos = parseInt(numVideosForTemplate);
+  if (isNaN(numVideos) || numVideos <= 0 || numVideos > 10) {
+    dialog
+      .create({
+        title: "Invalid Number",
+        text: "Please enter a valid number between 1 and 10",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
+    return;
+  }
 
-      // If targetIndex is specified, we're replacing a specific video
-      if (targetIndex !== null && targetIndex < selectedVideos.length) {
-        // For framework7 based app, we show a confirmation dialog
-        const shouldReplace = window.confirm(
-          `Replace video ${targetIndex + 1}?`
-        );
-        if (shouldReplace) {
-          handlePickFromDevice(requiredVideos, template, targetIndex).catch(
-            (error) => console.error("Error picking from device:", error)
-          );
-        }
-        return;
-      }
-
-      const videosNeeded = requiredVideos - selectedVideos.length;
-      if (videosNeeded <= 0) {
-        alert(
-          `Template ${template} already has the required ${requiredVideos} videos. Remove some videos before adding more.`
-        );
-        return;
-      }
-
-      // Show progress to indicate how many videos are needed vs selected
-      alert(
-        `Add videos for Template ${template}. Selected: ${selectedVideos.length}/${requiredVideos} videos`
-      );
-
-      // Call the function to pick from device
-      handlePickFromDevice(requiredVideos, template).catch((error) =>
-        console.error("Error picking from device:", error)
-      );
+  // Create the new template
+  const newTemplate = {
+    id: `custom-${Date.now()}`,
+    name: name,
+    requiredVideos: numVideos,
+    videoDescriptions: [], // We'll collect these later
+    videoDurations: [], // We'll collect these later
+    type: "custom", // Mark as user-created template
+    settings: {
+      // Default settings for the custom template
+      compositeWidth: 1280,
+      compositeHeight: 720,
+      fps: 30,
+      fill: "#000000",
     },
-    [template, selectedVideos, handlePickFromDevice, customTemplates]
-  );
+  };
 
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Navbar */}
-      <div className="bg-[#0F1A21] text-white p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-bold">Trackless Video</h1>
-          </div>
-          <div className="flex space-x-2">
-            <Button
-              variant={activeTab === "templates" ? "default" : "outline"}
-              onClick={() => setActiveTab("templates")}
-              className={
-                activeTab === "templates"
-                  ? "bg-[#1E97A0] hover:bg-[#157a82]"
-                  : "bg-white text-[#0F1A21]"
-              }
-            >
-              Templates
-            </Button>
-            <Button
-              variant={activeTab === "sequence" ? "default" : "outline"}
-              onClick={() => setActiveTab("sequence")}
-              className={
-                activeTab === "sequence"
-                  ? "bg-[#1E97A0] hover:bg-[#157a82]"
-                  : "bg-white text-[#0F1A21]"
-              }
-            >
-              Sequence
-            </Button>
-            <Button
-              variant={activeTab === "render" ? "default" : "outline"}
-              onClick={() => {
-                setActiveTab("render");
-                // Load renders when the tab is clicked
-                const storedRenders = JSON.parse(
-                  localStorage.getItem("chillinRenders") || "[]"
-                );
-                // Sort renders by timestamp, latest first (newest timestamp first)
-                const sortedRenders = storedRenders.sort(
-                  (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-                );
-                setChillinRenders(sortedRenders);
-              }}
-              className={
-                activeTab === "render"
-                  ? "bg-[#1E97A0] hover:bg-[#157a82]"
-                  : "bg-white text-[#0F1A21]"
-              }
-            >
-              Render Jobs
-            </Button>
-            <Button
-              variant={activeTab === "management" ? "default" : "outline"}
-              onClick={() => setActiveTab("management")}
-              className={
-                activeTab === "management"
-                  ? "bg-[#1E97A0] hover:bg-[#157a82]"
-                  : "bg-white text-[#0F1A21]"
-              }
-            >
-              Management
-            </Button>
-          </div>
+  const updatedTemplates = [...customTemplates, newTemplate];
+  saveCustomTemplates(updatedTemplates);
+
+  dialog
+    .create({
+      title: "Template Created",
+      text: `Custom template "${name}" has been created! Now select it to configure.`,
+      buttons: [
+        {
+          text: "OK",
+          onClick: () => {},
+        },
+      ],
+    })
+    .open();
+  setCreateTemplateDialogOpen(false);
+  setVideoName("");
+  setNumVideosForTemplate(2); // Reset to default
+};
+
+// Handle creating template from current selection
+const handleCreateTemplateFromCurrent = () => {
+  const name = videoName.trim();
+  if (!name) {
+    dialog
+      .create({
+        title: "Invalid Name",
+        text: "Template name cannot be empty",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
+    return;
+  }
+
+  // Check if template name already exists
+  if (customTemplates.some((t) => t.name === name)) {
+    dialog
+      .create({
+        title: "Duplicate Name",
+        text: "A template with this name already exists",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
+    return;
+  }
+
+  // Create the new custom template object from current selection
+  const newTemplate = {
+    id: `custom-${Date.now()}`,
+    name: name.trim(),
+    originalTemplateId: template,
+    requiredVideos: getRequiredVideos(template),
+    videoDescriptions: [], // Store descriptions for each video
+    videos: selectedVideos.map((video) => ({ ...video })),
+    videoAudioTracks: { ...videoAudioTracks },
+    videoVolumes: { ...videoVolumes },
+    audioVolumes: { ...audioVolumes },
+    type: "from-current", // Mark as template from current selection
+  };
+
+  const updatedTemplates = [...customTemplates, newTemplate];
+  saveCustomTemplates(updatedTemplates);
+
+  dialog
+    .create({
+      title: "Template Created",
+      text: `Custom template "${name.trim()}" has been created!`,
+      buttons: [
+        {
+          text: "OK",
+          onClick: () => {},
+        },
+      ],
+    })
+    .open();
+  setCreateFromCurrentDialogOpen(false);
+  setVideoName("");
+};
+
+// Handle deleting a template
+const handleDeleteTemplate = () => {
+  if (deleteTemplateId) {
+    const updatedTemplates = customTemplates.filter(
+      (t) => t.id !== deleteTemplateId
+    );
+    saveCustomTemplates(updatedTemplates);
+    dialog
+      .create({
+        title: "Deleted",
+        text: "Template deleted successfully",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
+  }
+  setDeleteTemplateDialogOpen(false);
+  setDeleteTemplateId(null);
+};
+
+// Handle video selection functionality with improved flow
+const handleVideoSelectionFlow = useCallback(
+  async (targetIndex = null) => {
+    if (!template) {
+      dialog
+        .create({
+          title: "No Template Selected",
+          text: "Please select a template first",
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
+      return;
+    }
+
+    const requiredVideos = getRequiredVideos(template);
+
+    // If targetIndex is specified, we're replacing a specific video
+    if (targetIndex !== null && targetIndex < selectedVideos.length) {
+      // For framework7 based app, we show a confirmation dialog
+      const shouldReplace = window.confirm(`Replace video ${targetIndex + 1}?`);
+      if (shouldReplace) {
+        handlePickFromDevice(requiredVideos, template, targetIndex).catch(
+          (error) => console.error("Error picking from device:", error)
+        );
+      }
+      return;
+    }
+
+    const videosNeeded = requiredVideos - selectedVideos.length;
+    if (videosNeeded <= 0) {
+      dialog
+        .create({
+          title: "Too Many Videos",
+          text: `Template ${template} already has the required ${requiredVideos} videos. Remove some videos before adding more.`,
+          buttons: [
+            {
+              text: "OK",
+              onClick: () => {},
+            },
+          ],
+        })
+        .open();
+      return;
+    }
+
+    // Show progress to indicate how many videos are needed vs selected
+    dialog
+      .create({
+        title: "Add Videos",
+        text: `Add videos for Template ${template}. Selected: ${selectedVideos.length}/${requiredVideos} videos`,
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {},
+          },
+        ],
+      })
+      .open();
+
+    // Call the function to pick from device
+    handlePickFromDevice(requiredVideos, template).catch((error) =>
+      console.error("Error picking from device:", error)
+    );
+  },
+  [template, selectedVideos, handlePickFromDevice, customTemplates]
+);
+
+return (
+  <div className="min-h-screen bg-white">
+    {/* Navbar */}
+    <div className="bg-[#0F1A21] text-white p-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <h1 className="text-xl font-bold">Trackless Video</h1>
+        </div>
+        <div className="flex space-x-2">
+          <Button
+            variant={activeTab === "templates" ? "default" : "outline"}
+            onClick={() => setActiveTab("templates")}
+            className={
+              activeTab === "templates"
+                ? "bg-[#1E97A0] hover:bg-[#157a82]"
+                : "bg-white text-[#0F1A21]"
+            }
+          >
+            Templates
+          </Button>
+          <Button
+            variant={activeTab === "sequence" ? "default" : "outline"}
+            onClick={() => setActiveTab("sequence")}
+            className={
+              activeTab === "sequence"
+                ? "bg-[#1E97A0] hover:bg-[#157a82]"
+                : "bg-white text-[#0F1A21]"
+            }
+          >
+            Sequence
+          </Button>
+          <Button
+            variant={activeTab === "render" ? "default" : "outline"}
+            onClick={() => {
+              setActiveTab("render");
+              // Load renders when the tab is clicked
+              const storedRenders = JSON.parse(
+                localStorage.getItem("chillinRenders") || "[]"
+              );
+              // Sort renders by timestamp, latest first (newest timestamp first)
+              const sortedRenders = storedRenders.sort(
+                (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+              );
+              setChillinRenders(sortedRenders);
+            }}
+            className={
+              activeTab === "render"
+                ? "bg-[#1E97A0] hover:bg-[#157a82]"
+                : "bg-white text-[#0F1A21]"
+            }
+          >
+            Render Jobs
+          </Button>
+          <Button
+            variant={activeTab === "management" ? "default" : "outline"}
+            onClick={() => setActiveTab("management")}
+            className={
+              activeTab === "management"
+                ? "bg-[#1E97A0] hover:bg-[#157a82]"
+                : "bg-white text-[#0F1A21]"
+            }
+          >
+            Management
+          </Button>
         </div>
       </div>
+    </div>
 
-      {/* Main Content Area */}
-      <div className="p-6">
-        {/* Templates Tab */}
-        {activeTab === "templates" && (
-          <div className="space-y-6">
-            <a
-              onClick={() => {
-                dialog.create({
+    {/* Main Content Area */}
+    <div className="p-6">
+      {/* Templates Tab */}
+      {activeTab === "templates" && (
+        <div className="space-y-6">
+          <a
+            onClick={() => {
+              dialog
+                .create({
                   title: "Demo Dialog",
                   text: "This is a demo of the Radix dialog component with the requested API!",
                   buttons: [
@@ -2790,858 +3326,861 @@ const TracklessVideoEditor = () => {
                       onClick: (dialogRef) => {
                         console.log("Download button clicked", dialogRef);
                         // Add your download logic here
-                        alert("Download action triggered!");
-                      }
+                        dialog
+                          .create({
+                            title: "Download",
+                            text: "Download action triggered!",
+                            buttons: [
+                              {
+                                text: "OK",
+                                onClick: () => {},
+                              },
+                            ],
+                          })
+                          .open();
+                      },
                     },
                     {
                       text: "Close",
                       onClick: () => {
                         console.log("Close button clicked");
-                      }
-                    }
-                  ]
-                }).open();
-              }}
-            >
-              Open Dialog
-            </a>
+                      },
+                    },
+                  ],
+                })
+                .open();
+            }}
+          >
+            Open Dialog
+          </a>
 
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h2 className="text-xl font-bold mb-4">
-                Custom Template Manager
-              </h2>
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <h2 className="text-xl font-bold mb-4">Custom Template Manager</h2>
 
-              <div className="flex space-x-4 mb-6">
-                <Button
-                  className="bg-[#1E97A0] hover:bg-[#157a82]"
-                  onClick={createCustomTemplate}
+            <div className="flex space-x-4 mb-6">
+              <Button
+                className="bg-[#1E97A0] hover:bg-[#157a82]"
+                onClick={createCustomTemplate}
+              >
+                Create Custom Template
+              </Button>
+              <Button
+                variant="outline"
+                className="border-[#1E97A0] text-[#1E97A0]"
+                onClick={createTemplateFromCurrent}
+              >
+                Create from Current
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {customTemplates.map((customTemplate) => (
+                <Card
+                  key={customTemplate.id}
+                  className={`border rounded-lg p-4 bg-white shadow-sm ${
+                    template === customTemplate.id
+                      ? "border-blue-500 border-2"
+                      : ""
+                  } cursor-pointer`}
+                  onClick={() => loadCustomTemplate(customTemplate)}
                 >
-                  Create Custom Template
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-[#1E97A0] text-[#1E97A0]"
-                  onClick={createTemplateFromCurrent}
-                >
-                  Create from Current
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {customTemplates.map((customTemplate) => (
-                  <Card
-                    key={customTemplate.id}
-                    className={`border rounded-lg p-4 bg-white shadow-sm ${
-                      template === customTemplate.id
-                        ? "border-blue-500 border-2"
-                        : ""
-                    } cursor-pointer`}
-                    onClick={() => loadCustomTemplate(customTemplate)}
-                  >
-                    <CardHeader>
-                      <CardTitle>{customTemplate.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-600">
-                        Videos required: {customTemplate.requiredVideos}
-                      </p>
-                      {template === customTemplate.id && (
-                        <div className="mt-4 flex space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              showTemplatePreview(customTemplate.id);
-                            }}
-                          >
-                            Preview
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveTab("sequence");
-                            }}
-                          >
-                            Add Videos
-                          </Button>
-                        </div>
-                      )}
-                      <div className="flex space-x-2 mt-4">
+                  <CardHeader>
+                    <CardTitle>{customTemplate.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600">
+                      Videos required: {customTemplate.requiredVideos}
+                    </p>
+                    {template === customTemplate.id && (
+                      <div className="mt-4 flex space-x-2">
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={(e) => {
                             e.stopPropagation();
-                            loadCustomTemplate(customTemplate);
+                            showTemplatePreview(customTemplate.id);
                           }}
                         >
-                          Load
+                          Preview
                         </Button>
                         <Button
                           size="sm"
-                          variant="outline"
                           onClick={(e) => {
                             e.stopPropagation();
-                            editCustomTemplate(customTemplate.id);
+                            setActiveTab("sequence");
                           }}
                         >
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteCustomTemplate(customTemplate.id);
-                          }}
-                        >
-                          Delete
+                          Add Videos
                         </Button>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h2 className="text-xl font-bold mb-4">Template Selection</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card
-                  className={`border rounded-lg p-4 bg-white shadow-sm cursor-pointer ${
-                    template === 1 ? "border-blue-500 border-2" : ""
-                  }`}
-                  onClick={() => {
-                    setTemplate(1);
-                  }}
-                >
-                  <CardHeader>
-                    <CardTitle>Template 1</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600">Two videos: 3s + 3s</p>
-                  </CardContent>
-                  {template === 1 && (
-                    <div className="mt-4 flex space-x-2">
+                    )}
+                    <div className="flex space-x-2 mt-4">
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={(e) => {
                           e.stopPropagation();
-                          showTemplatePreview(1);
+                          loadCustomTemplate(customTemplate);
                         }}
                       >
-                        Preview
+                        Load
                       </Button>
-                      <Button
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveTab("sequence");
-                          setTimeout(() => handleVideoSelectionFlow(), 100); // Small delay to ensure tab has switched
-                        }}
-                      >
-                        Add Videos
-                      </Button>
-                    </div>
-                  )}
-                </Card>
-                <Card
-                  className={`border rounded-lg p-4 bg-white shadow-sm cursor-pointer ${
-                    template === 2 ? "border-blue-500 border-2" : ""
-                  }`}
-                  onClick={() => {
-                    setTemplate(2);
-                  }}
-                >
-                  <CardHeader>
-                    <CardTitle>Template 2</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600">
-                      Three videos: 3s + 1s + 3s
-                    </p>
-                  </CardContent>
-                  {template === 2 && (
-                    <div className="mt-4 flex space-x-2">
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={(e) => {
                           e.stopPropagation();
-                          showTemplatePreview(2);
+                          editCustomTemplate(customTemplate.id);
                         }}
                       >
-                        Preview
+                        Edit
                       </Button>
-                      <Button
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveTab("sequence");
-                          setTimeout(() => handleVideoSelectionFlow(), 100); // Small delay to ensure tab has switched
-                        }}
-                      >
-                        Add Videos
-                      </Button>
-                    </div>
-                  )}
-                </Card>
-                <Card
-                  className={`border rounded-lg p-4 bg-white shadow-sm cursor-pointer ${
-                    template === 3 ? "border-blue-500 border-2" : ""
-                  }`}
-                  onClick={() => {
-                    setTemplate(3);
-                  }}
-                >
-                  <CardHeader>
-                    <CardTitle>Template 3</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600">
-                      Two videos with overlay
-                    </p>
-                  </CardContent>
-                  {template === 3 && (
-                    <div className="mt-4 flex space-x-2">
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={(e) => {
                           e.stopPropagation();
-                          showTemplatePreview(3);
+                          deleteCustomTemplate(customTemplate.id);
                         }}
                       >
-                        Preview
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveTab("sequence");
-                          setTimeout(() => handleVideoSelectionFlow(), 100); // Small delay to ensure tab has switched
-                        }}
-                      >
-                        Add Videos
+                        Delete
                       </Button>
                     </div>
-                  )}
+                  </CardContent>
                 </Card>
-              </div>
+              ))}
             </div>
           </div>
-        )}
 
-        {/* Sequence Tab */}
-        {activeTab === "sequence" && (
-          <div className="space-y-6">
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h2 className="text-xl font-bold mb-4">Video Sequence Display</h2>
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <h2 className="text-xl font-bold mb-4">Template Selection</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card
+                className={`border rounded-lg p-4 bg-white shadow-sm cursor-pointer ${
+                  template === 1 ? "border-blue-500 border-2" : ""
+                }`}
+                onClick={() => {
+                  setTemplate(1);
+                }}
+              >
+                <CardHeader>
+                  <CardTitle>Template 1</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600">Two videos: 3s + 3s</p>
+                </CardContent>
+                {template === 1 && (
+                  <div className="mt-4 flex space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        showTemplatePreview(1);
+                      }}
+                    >
+                      Preview
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveTab("sequence");
+                        setTimeout(() => handleVideoSelectionFlow(), 100); // Small delay to ensure tab has switched
+                      }}
+                    >
+                      Add Videos
+                    </Button>
+                  </div>
+                )}
+              </Card>
+              <Card
+                className={`border rounded-lg p-4 bg-white shadow-sm cursor-pointer ${
+                  template === 2 ? "border-blue-500 border-2" : ""
+                }`}
+                onClick={() => {
+                  setTemplate(2);
+                }}
+              >
+                <CardHeader>
+                  <CardTitle>Template 2</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600">
+                    Three videos: 3s + 1s + 3s
+                  </p>
+                </CardContent>
+                {template === 2 && (
+                  <div className="mt-4 flex space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        showTemplatePreview(2);
+                      }}
+                    >
+                      Preview
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveTab("sequence");
+                        setTimeout(() => handleVideoSelectionFlow(), 100); // Small delay to ensure tab has switched
+                      }}
+                    >
+                      Add Videos
+                    </Button>
+                  </div>
+                )}
+              </Card>
+              <Card
+                className={`border rounded-lg p-4 bg-white shadow-sm cursor-pointer ${
+                  template === 3 ? "border-blue-500 border-2" : ""
+                }`}
+                onClick={() => {
+                  setTemplate(3);
+                }}
+              >
+                <CardHeader>
+                  <CardTitle>Template 3</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600">
+                    Two videos with overlay
+                  </p>
+                </CardContent>
+                {template === 3 && (
+                  <div className="mt-4 flex space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        showTemplatePreview(3);
+                      }}
+                    >
+                      Preview
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveTab("sequence");
+                        setTimeout(() => handleVideoSelectionFlow(), 100); // Small delay to ensure tab has switched
+                      }}
+                    >
+                      Add Videos
+                    </Button>
+                  </div>
+                )}
+              </Card>
+            </div>
+          </div>
+        </div>
+      )}
 
-              <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button
-                  variant="outline"
-                  className="w-full border-dashed border-2 border-gray-300"
-                  onClick={() => handleVideoSelectionFlow()}
-                >
-                  + Add Videos
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full border-dashed border-2 border-gray-300 bg-blue-50 text-blue-700"
-                  onClick={() => sendTestJobToChillin()}
-                >
-                  Send Test Job to Chillin
-                </Button>
-                <Button
-                  className="w-full bg-[#A01E25] hover:bg-[#80171e] text-white"
-                  onClick={() =>
-                    createChillinProject(
-                      setSelectedVideos,
-                      selectedVideos,
-                      template,
-                      customTemplates
-                    )
-                  }
-                >
-                  Start Render
-                </Button>
-              </div>
+      {/* Sequence Tab */}
+      {activeTab === "sequence" && (
+        <div className="space-y-6">
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <h2 className="text-xl font-bold mb-4">Video Sequence Display</h2>
 
-              {/* Video Preview Player */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">Preview</h3>
-                <div className="w-full h-64 bg-black rounded-lg overflow-hidden">
-                  {selectedVideos && selectedVideos.length > 0 ? (
-                    <Player
-                      component={VideoComposition}
-                      durationInFrames={selectedVideos.reduce((acc, video) => {
+            <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Button
+                variant="outline"
+                className="w-full border-dashed border-2 border-gray-300"
+                onClick={() => handleVideoSelectionFlow()}
+              >
+                + Add Videos
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full border-dashed border-2 border-gray-300 bg-blue-50 text-blue-700"
+                onClick={() => sendTestJobToChillin()}
+              >
+                Send Test Job to Chillin
+              </Button>
+              <Button
+                className="w-full bg-[#A01E25] hover:bg-[#80171e] text-white"
+                onClick={() =>
+                  createChillinProject(
+                    setSelectedVideos,
+                    selectedVideos,
+                    template,
+                    customTemplates
+                  )
+                }
+              >
+                Start Render
+              </Button>
+            </div>
+
+            {/* Video Preview Player */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2">Preview</h3>
+              <div className="w-full h-64 bg-black rounded-lg overflow-hidden">
+                {selectedVideos && selectedVideos.length > 0 ? (
+                  <Player
+                    component={VideoComposition}
+                    durationInFrames={selectedVideos.reduce((acc, video) => {
+                      const inPoint = video.inOutPoints?.inPoint || 0;
+                      const outPoint =
+                        video.inOutPoints?.outPoint || video.duration || 10;
+                      return acc + Math.round((outPoint - inPoint) * 30); // 30fps
+                    }, 0)}
+                    fps={30}
+                    compositionWidth={1280}
+                    compositionHeight={720}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                    }}
+                    inputProps={{
+                      layers: selectedVideos.map((video, index) => {
                         const inPoint = video.inOutPoints?.inPoint || 0;
                         const outPoint =
                           video.inOutPoints?.outPoint || video.duration || 10;
-                        return acc + Math.round((outPoint - inPoint) * 30); // 30fps
-                      }, 0)}
-                      fps={30}
-                      compositionWidth={1280}
-                      compositionHeight={720}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                      }}
-                      inputProps={{
-                        layers: selectedVideos.map((video, index) => {
-                          const inPoint = video.inOutPoints?.inPoint || 0;
-                          const outPoint =
-                            video.inOutPoints?.outPoint || video.duration || 10;
-                          const startTime =
-                            index === 0
-                              ? 0
-                              : selectedVideos
-                                  .slice(0, index)
-                                  .reduce((acc, v) => {
-                                    const vIn = v.inOutPoints?.inPoint || 0;
-                                    const vOut =
-                                      v.inOutPoints?.outPoint ||
-                                      v.duration ||
-                                      10;
-                                    return acc + (vOut - vIn);
-                                  }, 0);
+                        const startTime =
+                          index === 0
+                            ? 0
+                            : selectedVideos
+                                .slice(0, index)
+                                .reduce((acc, v) => {
+                                  const vIn = v.inOutPoints?.inPoint || 0;
+                                  const vOut =
+                                    v.inOutPoints?.outPoint || v.duration || 10;
+                                  return acc + (vOut - vIn);
+                                }, 0);
 
-                          return {
-                            id: video.id || `video-${index}`,
-                            type: "Video",
-                            start: startTime,
-                            duration: outPoint - inPoint,
-                            trackIndex: 0,
-                            x: 0,
-                            y: 0,
-                            width: 1280,
-                            height: 720,
-                            blendMode: "normal",
-                            anchorX: 640,
-                            anchorY: 360,
-                            rotation: 0,
-                            scaleX: 1,
-                            scaleY: 1,
-                            alpha: 1,
-                            skewX: 0,
-                            skewY: 0,
-                            hidden: false,
-                            locked: false,
-                            keyframes: [],
-                            externalUrl:
-                              video.src || URL.createObjectURL(video.blob),
-                            ext: "mp4",
-                            startInSource: inPoint,
-                            sourceDuration: outPoint - inPoint,
-                            volume: 1,
-                            hasAudio: true,
-                            playrate: 1,
-                            isFrontTrimmed: false,
-                          };
-                        }),
-                      }}
-                      controls
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      Add videos to see preview
-                    </div>
-                  )}
-                </div>
+                        return {
+                          id: video.id || `video-${index}`,
+                          type: "Video",
+                          start: startTime,
+                          duration: outPoint - inPoint,
+                          trackIndex: 0,
+                          x: 0,
+                          y: 0,
+                          width: 1280,
+                          height: 720,
+                          blendMode: "normal",
+                          anchorX: 640,
+                          anchorY: 360,
+                          rotation: 0,
+                          scaleX: 1,
+                          scaleY: 1,
+                          alpha: 1,
+                          skewX: 0,
+                          skewY: 0,
+                          hidden: false,
+                          locked: false,
+                          keyframes: [],
+                          externalUrl:
+                            video.src || URL.createObjectURL(video.blob),
+                          ext: "mp4",
+                          startInSource: inPoint,
+                          sourceDuration: outPoint - inPoint,
+                          volume: 1,
+                          hasAudio: true,
+                          playrate: 1,
+                          isFrontTrimmed: false,
+                        };
+                      }),
+                    }}
+                    controls
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    Add videos to see preview
+                  </div>
+                )}
               </div>
+            </div>
 
-              <div className="space-y-4">
-                {selectedVideos.map((video, index) => (
+            <div className="space-y-4">
+              {selectedVideos.map((video, index) => (
+                <Card
+                  key={video.id || index}
+                  className="border rounded-lg p-4 bg-white"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold">
+                        {video.name || `Video ${index + 1}`}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Duration:{" "}
+                        {video.inOutPoints
+                          ? `${
+                              video.inOutPoints.outPoint -
+                              video.inOutPoints.inPoint
+                            }s`
+                          : `${video.duration || 10}s`}
+                      </p>
+                      {videoAudioTracks[index] && (
+                        <p className="text-sm text-green-600">Audio attached</p>
+                      )}
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openInOutDialog(index)}
+                      >
+                        In/Out
+                      </Button>
+                      {videoAudioTracks[index] ? (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openVolumeDialog(index, true)}
+                          >
+                            Audio Vol
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => removeAudioFromVideo(index)}
+                          >
+                            Remove Audio
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleAddAudioToVideo(index)}
+                        >
+                          Add Audio
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openVolumeDialog(index, false)}
+                      >
+                        Video Vol
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeVideo(index)}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => moveVideoBack(index)}
+                      disabled={index === 0}
+                    >
+                      ← Move Back
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => moveVideoForward(index)}
+                      disabled={index === selectedVideos.length - 1}
+                    >
+                      Move Forward →
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+
+              {selectedVideos.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  No videos added yet. Click "Add Videos" to get started.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Render Jobs Tab */}
+      {activeTab === "render" && (
+        <div className="space-y-6">
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <h2 className="text-xl font-bold mb-4">Render Jobs</h2>
+
+            <div className="mb-4">
+              <Button
+                className="bg-[#A01E25] hover:bg-[#80171e]"
+                onClick={() =>
+                  createChillinProject(
+                    setSelectedVideos,
+                    selectedVideos,
+                    template,
+                    customTemplates
+                  )
+                }
+              >
+                Start New Render
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {chillinRenders.length > 0 ? (
+                chillinRenders.map((render, index) => (
                   <Card
-                    key={video.id || index}
+                    key={render.render_id}
                     className="border rounded-lg p-4 bg-white"
                   >
-                    <div className="flex items-center space-x-4">
-                      <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
-                      <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <div>
                         <h3 className="font-semibold">
-                          {video.name || `Video ${index + 1}`}
+                          Render Job #{index + 1}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          Duration:{" "}
-                          {video.inOutPoints
-                            ? `${
-                                video.inOutPoints.outPoint -
-                                video.inOutPoints.inPoint
-                              }s`
-                            : `${video.duration || 10}s`}
+                          ID: {render.render_id}
                         </p>
-                        {videoAudioTracks[index] && (
-                          <p className="text-sm text-green-600">
-                            Audio attached
-                          </p>
-                        )}
+                        <p className="text-sm text-gray-600">
+                          Status: {render.status}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Created: {render.timestamp}
+                        </p>
                       </div>
                       <div className="flex space-x-2">
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => openInOutDialog(index)}
+                          onClick={() =>
+                            handleGetRenderResult(render.render_id)
+                          }
                         >
-                          In/Out
-                        </Button>
-                        {videoAudioTracks[index] ? (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => openVolumeDialog(index, true)}
-                            >
-                              Audio Vol
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => removeAudioFromVideo(index)}
-                            >
-                              Remove Audio
-                            </Button>
-                          </>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleAddAudioToVideo(index)}
-                          >
-                            Add Audio
-                          </Button>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openVolumeDialog(index, false)}
-                        >
-                          Video Vol
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => removeVideo(index)}
-                        >
-                          Remove
+                          Check Status
                         </Button>
                       </div>
-                    </div>
-                    <div className="mt-3 flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => moveVideoBack(index)}
-                        disabled={index === 0}
-                      >
-                        ← Move Back
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => moveVideoForward(index)}
-                        disabled={index === selectedVideos.length - 1}
-                      >
-                        Move Forward →
-                      </Button>
                     </div>
                   </Card>
-                ))}
-
-                {selectedVideos.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    No videos added yet. Click "Add Videos" to get started.
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Render Jobs Tab */}
-        {activeTab === "render" && (
-          <div className="space-y-6">
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h2 className="text-xl font-bold mb-4">Render Jobs</h2>
-
-              <div className="mb-4">
-                <Button
-                  className="bg-[#A01E25] hover:bg-[#80171e]"
-                  onClick={() =>
-                    createChillinProject(
-                      setSelectedVideos,
-                      selectedVideos,
-                      template,
-                      customTemplates
-                    )
-                  }
-                >
-                  Start New Render
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                {chillinRenders.length > 0 ? (
-                  chillinRenders.map((render, index) => (
-                    <Card
-                      key={render.render_id}
-                      className="border rounded-lg p-4 bg-white"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-semibold">
-                            Render Job #{index + 1}
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            ID: {render.render_id}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Status: {render.status}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Created: {render.timestamp}
-                          </p>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() =>
-                              handleGetRenderResult(render.render_id)
-                            }
-                          >
-                            Check Status
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  ))
-                ) : (
-                  <div className="text-center py-4 text-gray-500">
-                    No render jobs yet. Create a project and start a render.
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Management Tab */}
-        {activeTab === "management" && (
-          <div className="space-y-6">
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h2 className="text-xl font-bold mb-4">Video Management</h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold mb-3">Saved Projects</h3>
-                  <div className="space-y-2">
-                    <Card className="border rounded-lg p-3 bg-white">
-                      <h4 className="font-medium">Project 1</h4>
-                      <p className="text-sm text-gray-600">
-                        Last modified: Today
-                      </p>
-                    </Card>
-                    <Card className="border rounded-lg p-3 bg-white">
-                      <h4 className="font-medium">Project 2</h4>
-                      <p className="text-sm text-gray-600">
-                        Last modified: 2 days ago
-                      </p>
-                    </Card>
-                    <Card className="border rounded-lg p-3 bg-white">
-                      <h4 className="font-medium">Project 3</h4>
-                      <p className="text-sm text-gray-600">
-                        Last modified: 1 week ago
-                      </p>
-                    </Card>
-                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-500">
+                  No render jobs yet. Create a project and start a render.
                 </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
-                <div>
-                  <h3 className="font-semibold mb-3">Export Options</h3>
-                  <div className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start">
-                      Export Project JSON
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      Export Template
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      Share Project
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      Download Final Video
-                    </Button>
-                  </div>
+      {/* Management Tab */}
+      {activeTab === "management" && (
+        <div className="space-y-6">
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <h2 className="text-xl font-bold mb-4">Video Management</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-semibold mb-3">Saved Projects</h3>
+                <div className="space-y-2">
+                  <Card className="border rounded-lg p-3 bg-white">
+                    <h4 className="font-medium">Project 1</h4>
+                    <p className="text-sm text-gray-600">
+                      Last modified: Today
+                    </p>
+                  </Card>
+                  <Card className="border rounded-lg p-3 bg-white">
+                    <h4 className="font-medium">Project 2</h4>
+                    <p className="text-sm text-gray-600">
+                      Last modified: 2 days ago
+                    </p>
+                  </Card>
+                  <Card className="border rounded-lg p-3 bg-white">
+                    <h4 className="font-medium">Project 3</h4>
+                    <p className="text-sm text-gray-600">
+                      Last modified: 1 week ago
+                    </p>
+                  </Card>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-3">Export Options</h3>
+                <div className="space-y-3">
+                  <Button variant="outline" className="w-full justify-start">
+                    Export Project JSON
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    Export Template
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    Share Project
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    Download Final Video
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
-        )}
-      </div>
-
-      {/* Create Custom Template Dialog */}
-      <Dialog
-        open={createTemplateDialogOpen}
-        onOpenChange={setCreateTemplateDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create Custom Template</DialogTitle>
-            <DialogDescription>
-              Enter a name for your custom template and specify how many videos
-              it requires.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="templateName">Template Name</Label>
-              <Input
-                id="templateName"
-                value={videoName}
-                onChange={(e) => setVideoName(e.target.value)}
-                placeholder="Enter template name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="numVideos">Number of Required Videos</Label>
-              <Input
-                id="numVideos"
-                type="number"
-                value={numVideosForTemplate}
-                onChange={(e) =>
-                  setNumVideosForTemplate(Number(e.target.value))
-                }
-                min="1"
-                max="10"
-                placeholder="Enter number of videos (1-10)"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setCreateTemplateDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleCreateCustomTemplate}>Create</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Create Template from Current Dialog */}
-      <Dialog
-        open={createFromCurrentDialogOpen}
-        onOpenChange={setCreateFromCurrentDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create Custom Template from Current</DialogTitle>
-            <DialogDescription>
-              Enter a name for your custom template based on the current
-              selection.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="currentTemplateName">Template Name</Label>
-              <Input
-                id="currentTemplateName"
-                value={videoName}
-                onChange={(e) => setVideoName(e.target.value)}
-                placeholder="Enter template name"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setCreateFromCurrentDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleCreateTemplateFromCurrent}>Create</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Custom Template Dialog */}
-      <Dialog
-        open={editTemplateDialogOpen}
-        onOpenChange={setEditTemplateDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Custom Template</DialogTitle>
-            <DialogDescription>
-              Update the name of your custom template.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="editTemplateName">Template Name</Label>
-              <Input
-                id="editTemplateName"
-                value={videoName}
-                onChange={(e) => setVideoName(e.target.value)}
-                placeholder="Enter new template name"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setEditTemplateDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleEditTemplate}>Save</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Template Confirmation Dialog */}
-      <Dialog
-        open={deleteTemplateDialogOpen}
-        onOpenChange={setDeleteTemplateDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Template</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this custom template? This action
-              cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteTemplateDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDeleteTemplate}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* In/Out Points Dialog */}
-      <Dialog open={inOutDialogOpen} onOpenChange={setInOutDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Set In/Out Points</DialogTitle>
-            <DialogDescription>
-              Set the in and out points for the video clip.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="inPoint">In Point (seconds)</Label>
-              <Slider
-                id="inPoint"
-                min={0}
-                max={outPoint}
-                step={0.1}
-                value={[inPoint]}
-                onValueChange={(value) => setInPoint(value[0])}
-                className="w-full"
-              />
-              <Input
-                type="number"
-                value={inPoint}
-                onChange={(e) => setInPoint(Number(e.target.value))}
-                min="0"
-                max={outPoint}
-                step="0.1"
-                className="w-full"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="outPoint">Out Point (seconds)</Label>
-              <Slider
-                id="outPoint"
-                min={inPoint}
-                max={30}
-                step={0.1}
-                value={[outPoint]}
-                onValueChange={(value) => setOutPoint(value[0])}
-                className="w-full"
-              />
-              <Input
-                type="number"
-                value={outPoint}
-                onChange={(e) => setOutPoint(Number(e.target.value))}
-                min={inPoint}
-                max="30"
-                step="0.1"
-                className="w-full"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setInOutDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSetInOutPoints}>Set</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Template Preview Dialog */}
-      <Dialog
-        open={showTemplatePreviewDialog}
-        onOpenChange={setShowTemplatePreviewDialog}
-      >
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Template Preview</DialogTitle>
-            <DialogDescription>
-              Preview of the selected template
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            {templatePreviewJson ? (
-              <div className="w-full h-64 bg-black rounded-lg overflow-hidden">
-                <Player
-                  component={VideoComposition}
-                  durationInFrames={Math.round(
-                    templatePreviewJson.projectData.duration * 30
-                  )}
-                  fps={30}
-                  compositionWidth={1280}
-                  compositionHeight={720}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                  }}
-                  inputProps={{
-                    layers: templatePreviewJson.projectData.view,
-                  }}
-                  controls
-                />
-              </div>
-            ) : (
-              <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-64 mt-4 flex items-center justify-center">
-                Preview Area
-              </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button onClick={() => setShowTemplatePreviewDialog(false)}>
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
     </div>
-  );
-};
+
+    {/* Create Custom Template Dialog */}
+    <Dialog
+      open={createTemplateDialogOpen}
+      onOpenChange={setCreateTemplateDialogOpen}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create Custom Template</DialogTitle>
+          <DialogDescription>
+            Enter a name for your custom template and specify how many videos it
+            requires.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="templateName">Template Name</Label>
+            <Input
+              id="templateName"
+              value={videoName}
+              onChange={(e) => setVideoName(e.target.value)}
+              placeholder="Enter template name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="numVideos">Number of Required Videos</Label>
+            <Input
+              id="numVideos"
+              type="number"
+              value={numVideosForTemplate}
+              onChange={(e) => setNumVideosForTemplate(Number(e.target.value))}
+              min="1"
+              max="10"
+              placeholder="Enter number of videos (1-10)"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setCreateTemplateDialogOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleCreateCustomTemplate}>Create</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    {/* Create Template from Current Dialog */}
+    <Dialog
+      open={createFromCurrentDialogOpen}
+      onOpenChange={setCreateFromCurrentDialogOpen}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create Custom Template from Current</DialogTitle>
+          <DialogDescription>
+            Enter a name for your custom template based on the current
+            selection.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="currentTemplateName">Template Name</Label>
+            <Input
+              id="currentTemplateName"
+              value={videoName}
+              onChange={(e) => setVideoName(e.target.value)}
+              placeholder="Enter template name"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setCreateFromCurrentDialogOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleCreateTemplateFromCurrent}>Create</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    {/* Edit Custom Template Dialog */}
+    <Dialog
+      open={editTemplateDialogOpen}
+      onOpenChange={setEditTemplateDialogOpen}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Custom Template</DialogTitle>
+          <DialogDescription>
+            Update the name of your custom template.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="editTemplateName">Template Name</Label>
+            <Input
+              id="editTemplateName"
+              value={videoName}
+              onChange={(e) => setVideoName(e.target.value)}
+              placeholder="Enter new template name"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setEditTemplateDialogOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleEditTemplate}>Save</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    {/* Delete Template Confirmation Dialog */}
+    <Dialog
+      open={deleteTemplateDialogOpen}
+      onOpenChange={setDeleteTemplateDialogOpen}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete Template</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this custom template? This action
+            cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setDeleteTemplateDialogOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={handleDeleteTemplate}>
+            Delete
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    {/* In/Out Points Dialog */}
+    <Dialog open={inOutDialogOpen} onOpenChange={setInOutDialogOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Set In/Out Points</DialogTitle>
+          <DialogDescription>
+            Set the in and out points for the video clip.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="inPoint">In Point (seconds)</Label>
+            <Slider
+              id="inPoint"
+              min={0}
+              max={outPoint}
+              step={0.1}
+              value={[inPoint]}
+              onValueChange={(value) => setInPoint(value[0])}
+              className="w-full"
+            />
+            <Input
+              type="number"
+              value={inPoint}
+              onChange={(e) => setInPoint(Number(e.target.value))}
+              min="0"
+              max={outPoint}
+              step="0.1"
+              className="w-full"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="outPoint">Out Point (seconds)</Label>
+            <Slider
+              id="outPoint"
+              min={inPoint}
+              max={30}
+              step={0.1}
+              value={[outPoint]}
+              onValueChange={(value) => setOutPoint(value[0])}
+              className="w-full"
+            />
+            <Input
+              type="number"
+              value={outPoint}
+              onChange={(e) => setOutPoint(Number(e.target.value))}
+              min={inPoint}
+              max="30"
+              step="0.1"
+              className="w-full"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setInOutDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleSetInOutPoints}>Set</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    {/* Template Preview Dialog */}
+    <Dialog
+      open={showTemplatePreviewDialog}
+      onOpenChange={setShowTemplatePreviewDialog}
+    >
+      <DialogContent className="max-w-4xl">
+        <DialogHeader>
+          <DialogTitle>Template Preview</DialogTitle>
+          <DialogDescription>
+            Preview of the selected template
+          </DialogDescription>
+        </DialogHeader>
+        <div className="py-4">
+          {templatePreviewJson ? (
+            <div className="w-full h-64 bg-black rounded-lg overflow-hidden">
+              <Player
+                component={VideoComposition}
+                durationInFrames={Math.round(
+                  templatePreviewJson.projectData.duration * 30
+                )}
+                fps={30}
+                compositionWidth={1280}
+                compositionHeight={720}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                }}
+                inputProps={{
+                  layers: templatePreviewJson.projectData.view,
+                }}
+                controls
+              />
+            </div>
+          ) : (
+            <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-64 mt-4 flex items-center justify-center">
+              Preview Area
+            </div>
+          )}
+        </div>
+        <DialogFooter>
+          <Button onClick={() => setShowTemplatePreviewDialog(false)}>
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  </div>
+);
 
 export default TracklessVideoEditor;
