@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 import LandingPage from "./components/LandingPage";
 import TracklessVideoEditor from "./components/TracklessVideoEditor";
+import TestDialogComponent from "./components/TestDialogComponent";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -32,6 +33,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/trackless-video-editor" element={<TracklessVideoEditor />} />
+          <Route path="/test-dialog" element={<TestDialogComponent />} />
         </Routes>
       </BrowserRouter>
     </div>

@@ -1,15 +1,23 @@
-import React, { useState, useCallback } from 'react';
-import { Button } from './ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Slider } from './ui/slider';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Player } from '@remotion/player';
-import VideoComposition from '../remotion/VideoComposition';
+import React, { useState, useCallback } from "react";
+import { Button } from "./ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Slider } from "./ui/slider";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Player } from "@remotion/player";
+import VideoComposition from "../remotion/VideoComposition";
 
 // Import Chillin API functionality
-import { processTimelineChunks } from '../services/chunkProcessingService'; // Assuming this needs to be available
+import { processTimelineChunks } from "../services/chunkProcessingService"; // Assuming this needs to be available
+import dialog from "../lib/dialog";
 
 const TracklessVideoEditor = () => {
   const [activeTab, setActiveTab] = useState("templates");
@@ -20,7 +28,7 @@ const TracklessVideoEditor = () => {
   // Helper function to get required videos for a template
   const getRequiredVideos = (templateId) => {
     // Check if this is a custom template
-    const customTemplate = customTemplates.find(t => t.id === templateId);
+    const customTemplate = customTemplates.find((t) => t.id === templateId);
     if (customTemplate) {
       return customTemplate.requiredVideos;
     }
@@ -48,24 +56,27 @@ const TracklessVideoEditor = () => {
   const [template, setTemplate] = useState(1);
   const [chillinProjectJson, setChillinProjectJson] = useState(null);
   const [templatePreviewJson, setTemplatePreviewJson] = useState(null);
-  const [showTemplatePreviewDialog, setShowTemplatePreviewDialog] = useState(false);
+  const [showTemplatePreviewDialog, setShowTemplatePreviewDialog] =
+    useState(false);
 
   // State for dialogs
-  const [createTemplateDialogOpen, setCreateTemplateDialogOpen] = useState(false);
-  const [createFromCurrentDialogOpen, setCreateFromCurrentDialogOpen] = useState(false);
+  const [createTemplateDialogOpen, setCreateTemplateDialogOpen] =
+    useState(false);
+  const [createFromCurrentDialogOpen, setCreateFromCurrentDialogOpen] =
+    useState(false);
   const [editTemplateDialogOpen, setEditTemplateDialogOpen] = useState(false);
   const [editTemplateId, setEditTemplateId] = useState(null);
-  const [deleteTemplateDialogOpen, setDeleteTemplateDialogOpen] = useState(false);
+  const [deleteTemplateDialogOpen, setDeleteTemplateDialogOpen] =
+    useState(false);
   const [deleteTemplateId, setDeleteTemplateId] = useState(null);
   const [videoDialogOpen, setVideoDialogOpen] = useState(false);
   const [inOutDialogOpen, setInOutDialogOpen] = useState(false);
   const [inPoint, setInPoint] = useState(0);
   const [outPoint, setOutPoint] = useState(10);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(null);
-  const [videoName, setVideoName] = useState('');
+  const [videoName, setVideoName] = useState("");
   const [videoDuration, setVideoDuration] = useState(10);
   const [numVideosForTemplate, setNumVideosForTemplate] = useState(2); // Number of videos required in custom template
-
 
   // Get the environment variables
   const apiVideoKey = process.env.REACT_APP_API_VIDEO_KEY;
@@ -74,8 +85,8 @@ const TracklessVideoEditor = () => {
   // Clean up object URLs when videos change
   React.useEffect(() => {
     return () => {
-      selectedVideos.forEach(video => {
-        if (video.blob && video.src && video.src.startsWith('blob:')) {
+      selectedVideos.forEach((video) => {
+        if (video.blob && video.src && video.src.startsWith("blob:")) {
           URL.revokeObjectURL(video.src);
         }
       });
@@ -89,7 +100,10 @@ const TracklessVideoEditor = () => {
       try {
         setCustomTemplates(JSON.parse(savedTemplates));
       } catch (error) {
-        console.error("Error parsing custom templates from localStorage:", error);
+        console.error(
+          "Error parsing custom templates from localStorage:",
+          error
+        );
         setCustomTemplates([]);
       }
     }
@@ -125,7 +139,9 @@ const TracklessVideoEditor = () => {
   // Function to create a custom template based on current selection
   const createTemplateFromCurrent = () => {
     if (!template || selectedVideos.length === 0) {
-      alert("Please select a template and add videos before creating a custom template");
+      alert(
+        "Please select a template and add videos before creating a custom template"
+      );
       return;
     }
     setCreateFromCurrentDialogOpen(true);
@@ -152,7 +168,7 @@ const TracklessVideoEditor = () => {
 
   // Function to edit a custom template
   const editCustomTemplate = (templateId) => {
-    const templateToEdit = customTemplates.find(t => t.id === templateId);
+    const templateToEdit = customTemplates.find((t) => t.id === templateId);
     if (!templateToEdit) {
       alert("Template not found");
       return;
@@ -167,7 +183,7 @@ const TracklessVideoEditor = () => {
   const handleEditTemplate = () => {
     if (!editTemplateId) return;
 
-    const templateToEdit = customTemplates.find(t => t.id === editTemplateId);
+    const templateToEdit = customTemplates.find((t) => t.id === editTemplateId);
     if (!templateToEdit) {
       alert("Template not found");
       return;
@@ -181,9 +197,7 @@ const TracklessVideoEditor = () => {
 
     // Check if another template exists with the same name (excluding the current template)
     if (
-      customTemplates.some(
-        (t) => t.id !== editTemplateId && t.name === newName
-      )
+      customTemplates.some((t) => t.id !== editTemplateId && t.name === newName)
     ) {
       alert("A template with this name already exists");
       return;
@@ -192,14 +206,17 @@ const TracklessVideoEditor = () => {
     // Handle templates based on their type
     if (templateToEdit.type === "from-current") {
       // For templates created from current selection, we can only edit the name
-      const updatedTemplates = customTemplates.map(t =>
+      const updatedTemplates = customTemplates.map((t) =>
         t.id === editTemplateId ? { ...t, name: newName } : t
       );
       saveCustomTemplates(updatedTemplates);
       alert("Template name updated successfully");
     } else {
       // For templates created from scratch, we can edit name, required videos, and descriptions
-      const numVideosStr = prompt(`How many videos does this template require? (Current: ${templateToEdit.requiredVideos})`, templateToEdit.requiredVideos);
+      const numVideosStr = prompt(
+        `How many videos does this template require? (Current: ${templateToEdit.requiredVideos})`,
+        templateToEdit.requiredVideos
+      );
       const num = parseInt(numVideosStr);
       if (isNaN(num) || num <= 0 || num > 10) {
         alert("Please enter a valid number between 1 and 10");
@@ -212,17 +229,27 @@ const TracklessVideoEditor = () => {
       const newVideoDurations = []; // New array for durations
       const collectNewDescriptionsAndDurations = () => {
         if (descriptionIndex < num) {
-          const currentDescription = templateToEdit.videoDescriptions?.[descriptionIndex] || "";
-          const currentDuration = templateToEdit.videoDurations?.[descriptionIndex] !== undefined
-            ? templateToEdit.videoDurations[descriptionIndex]
-            : 3; // Default to 3 seconds if not set
+          const currentDescription =
+            templateToEdit.videoDescriptions?.[descriptionIndex] || "";
+          const currentDuration =
+            templateToEdit.videoDurations?.[descriptionIndex] !== undefined
+              ? templateToEdit.videoDurations[descriptionIndex]
+              : 3; // Default to 3 seconds if not set
 
-          const description = prompt(`Enter description for video ${descriptionIndex + 1} (optional):`, currentDescription);
+          const description = prompt(
+            `Enter description for video ${descriptionIndex + 1} (optional):`,
+            currentDescription
+          );
 
           if (description !== null) {
             newDescriptions.push(description || "");
 
-            const durationInput = prompt(`Enter duration for video ${descriptionIndex + 1} in seconds (e.g., 5 for 5 seconds):`, currentDuration.toString());
+            const durationInput = prompt(
+              `Enter duration for video ${
+                descriptionIndex + 1
+              } in seconds (e.g., 5 for 5 seconds):`,
+              currentDuration.toString()
+            );
             const duration = parseFloat(durationInput);
             if (isNaN(duration) || duration <= 0) {
               alert("Please enter a valid positive number for duration.");
@@ -236,7 +263,7 @@ const TracklessVideoEditor = () => {
           }
         } else {
           // All descriptions and durations collected, update the template
-          const updatedTemplates = customTemplates.map(t =>
+          const updatedTemplates = customTemplates.map((t) =>
             t.id === editTemplateId
               ? {
                   ...t,
@@ -258,7 +285,7 @@ const TracklessVideoEditor = () => {
 
     setEditTemplateDialogOpen(false);
     setEditTemplateId(null);
-    setVideoName('');
+    setVideoName("");
   };
 
   // Function to delete a custom template
@@ -268,10 +295,16 @@ const TracklessVideoEditor = () => {
   };
 
   // Handle picking video from device
-  const handlePickFromDevice = async (requiredVideos, currentTemplate, targetIndex = null) => {
+  const handlePickFromDevice = async (
+    requiredVideos,
+    currentTemplate,
+    targetIndex = null
+  ) => {
     // Check if videos have already been added for Template 1 or 3 but we need 2, or Template 2 but we need 3
     if (targetIndex === null && selectedVideos.length >= requiredVideos) {
-      alert(`Template ${currentTemplate} requires exactly ${requiredVideos} videos. Remove current videos before adding more.`);
+      alert(
+        `Template ${currentTemplate} requires exactly ${requiredVideos} videos. Remove current videos before adding more.`
+      );
       return;
     }
 
@@ -294,7 +327,7 @@ const TracklessVideoEditor = () => {
           timestamp: Date.now(),
           size: file.size,
           duration: videoDuration, // Duration specified by the user
-          inOutPoints: { inPoint: 0, outPoint: videoDuration }
+          inOutPoints: { inPoint: 0, outPoint: videoDuration },
         };
 
         if (targetIndex !== null) {
@@ -307,7 +340,9 @@ const TracklessVideoEditor = () => {
         } else {
           // Check if we've reached the limit for current template
           if (selectedVideos.length >= requiredVideos) {
-            alert(`Template ${currentTemplate} requires exactly ${requiredVideos} videos.`);
+            alert(
+              `Template ${currentTemplate} requires exactly ${requiredVideos} videos.`
+            );
             return;
           }
 
@@ -343,7 +378,12 @@ const TracklessVideoEditor = () => {
   // Function to get in/out points for a video
   const getInOutPoints = (index) => {
     if (index >= 0 && index < selectedVideos.length) {
-      return selectedVideos[index].inOutPoints || { inPoint: 0, outPoint: selectedVideos[index].duration || 10 };
+      return (
+        selectedVideos[index].inOutPoints || {
+          inPoint: 0,
+          outPoint: selectedVideos[index].duration || 10,
+        }
+      );
     }
     return { inPoint: 0, outPoint: 10 };
   };
@@ -430,20 +470,10 @@ const TracklessVideoEditor = () => {
 
             if (shouldTrim) {
               // User wants to trim audio, store audio reference with video
-              addAudioToVideo(
-                videoIndex,
-                file,
-                true,
-                videoDuration
-              );
+              addAudioToVideo(videoIndex, file, true, videoDuration);
             } else {
               // User doesn't want to trim, use full audio
-              addAudioToVideo(
-                videoIndex,
-                file,
-                false,
-                audioDuration
-              );
+              addAudioToVideo(videoIndex, file, false, audioDuration);
             }
           } else {
             // Video is longer than or equal to audio, no need to trim
@@ -757,7 +787,9 @@ const TracklessVideoEditor = () => {
       alert("Sending project to Chillin renderer...");
 
       // Show a 10-second simulation
-      alert("Preparing project for Chillin renderer (simulating 10s process)...");
+      alert(
+        "Preparing project for Chillin renderer (simulating 10s process)..."
+      );
 
       // Separate function for the API call
       const handleSendToChillin = async () => {
@@ -826,7 +858,9 @@ const TracklessVideoEditor = () => {
       };
 
       // Simulate the confirmation dialog behavior with a simple confirmation
-      const confirmSend = window.confirm("Click OK to send your project to the Chillin renderer?");
+      const confirmSend = window.confirm(
+        "Click OK to send your project to the Chillin renderer?"
+      );
       if (confirmSend) {
         return handleSendToChillin();
       } else {
@@ -876,9 +910,7 @@ const TracklessVideoEditor = () => {
       }
     } else {
       // Cancel callback
-      const cancellationError = new Error(
-        "User cancelled video processing"
-      );
+      const cancellationError = new Error("User cancelled video processing");
       cancellationError.userCancelled = true;
       throw cancellationError;
     }
@@ -940,19 +972,19 @@ const TracklessVideoEditor = () => {
     const trackType = isAudioTrack ? "Audio" : "Video";
 
     // Create a custom modal dialog with a slider for volume adjustment
-    const modal = document.createElement('div');
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
-    modal.style.display = 'flex';
-    modal.style.justifyContent = 'center';
-    modal.style.alignItems = 'center';
-    modal.style.zIndex = '1000';
-    modal.style.flexDirection = 'column';
-    modal.style.padding = '20px';
+    const modal = document.createElement("div");
+    modal.style.position = "fixed";
+    modal.style.top = "0";
+    modal.style.left = "0";
+    modal.style.width = "100%";
+    modal.style.height = "100%";
+    modal.style.backgroundColor = "rgba(0,0,0,0.8)";
+    modal.style.display = "flex";
+    modal.style.justifyContent = "center";
+    modal.style.alignItems = "center";
+    modal.style.zIndex = "1000";
+    modal.style.flexDirection = "column";
+    modal.style.padding = "20px";
 
     modal.innerHTML = `
       <div style="width: 80%; max-width: 500px; background: white; padding: 30px; border-radius: 8px; position: relative; text-align: center;">
@@ -962,9 +994,7 @@ const TracklessVideoEditor = () => {
     }">${(currentVolume * 100).toFixed(0)}%</span></p>
         <input
           type="range"
-          id="volume-slider-${videoIndex}-${
-      isAudioTrack ? "audio" : "video"
-    }"
+          id="volume-slider-${videoIndex}-${isAudioTrack ? "audio" : "video"}"
           min="0"
           max="1"
           step="0.01"
@@ -977,8 +1007,12 @@ const TracklessVideoEditor = () => {
           <span>100%</span>
         </div>
         <div style="margin-top: 30px; display: flex; justify-content: space-between;">
-          <button id="ok-btn-${videoIndex}-${isAudioTrack ? "audio" : "video"}" style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px;">OK</button>
-          <button id="cancel-btn-${videoIndex}-${isAudioTrack ? "audio" : "video"}" style="background-color: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px;">Cancel</button>
+          <button id="ok-btn-${videoIndex}-${
+      isAudioTrack ? "audio" : "video"
+    }" style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px;">OK</button>
+          <button id="cancel-btn-${videoIndex}-${
+      isAudioTrack ? "audio" : "video"
+    }" style="background-color: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px;">Cancel</button>
         </div>
       </div>
     `;
@@ -986,14 +1020,24 @@ const TracklessVideoEditor = () => {
     document.body.appendChild(modal);
 
     // Get references to the slider, value display, and buttons
-    const slider = document.getElementById(`volume-slider-${videoIndex}-${isAudioTrack ? "audio" : "video"}`);
-    const valueDisplay = document.getElementById(`volume-value-${videoIndex}-${isAudioTrack ? "audio" : "video"}`);
-    const okBtn = document.getElementById(`ok-btn-${videoIndex}-${isAudioTrack ? "audio" : "video"}`);
-    const cancelBtn = document.getElementById(`cancel-btn-${videoIndex}-${isAudioTrack ? "audio" : "video"}`);
+    const slider = document.getElementById(
+      `volume-slider-${videoIndex}-${isAudioTrack ? "audio" : "video"}`
+    );
+    const valueDisplay = document.getElementById(
+      `volume-value-${videoIndex}-${isAudioTrack ? "audio" : "video"}`
+    );
+    const okBtn = document.getElementById(
+      `ok-btn-${videoIndex}-${isAudioTrack ? "audio" : "video"}`
+    );
+    const cancelBtn = document.getElementById(
+      `cancel-btn-${videoIndex}-${isAudioTrack ? "audio" : "video"}`
+    );
 
     // Update the volume display as the slider moves
     slider.addEventListener("input", () => {
-      valueDisplay.textContent = `${(parseFloat(slider.value) * 100).toFixed(0)}%`;
+      valueDisplay.textContent = `${(parseFloat(slider.value) * 100).toFixed(
+        0
+      )}%`;
     });
 
     // Handle OK button click
@@ -1217,19 +1261,19 @@ const TracklessVideoEditor = () => {
           : duration;
 
       // Create a simple modal for the video player
-      const modal = document.createElement('div');
-      modal.style.position = 'fixed';
-      modal.style.top = '0';
-      modal.style.left = '0';
-      modal.style.width = '100%';
-      modal.style.height = '100%';
-      modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
-      modal.style.display = 'flex';
-      modal.style.justifyContent = 'center';
-      modal.style.alignItems = 'center';
-      modal.style.zIndex = '1000';
-      modal.style.flexDirection = 'column';
-      modal.style.padding = '20px';
+      const modal = document.createElement("div");
+      modal.style.position = "fixed";
+      modal.style.top = "0";
+      modal.style.left = "0";
+      modal.style.width = "100%";
+      modal.style.height = "100%";
+      modal.style.backgroundColor = "rgba(0,0,0,0.8)";
+      modal.style.display = "flex";
+      modal.style.justifyContent = "center";
+      modal.style.alignItems = "center";
+      modal.style.zIndex = "1000";
+      modal.style.flexDirection = "column";
+      modal.style.padding = "20px";
 
       modal.innerHTML = `
         <div style="width: 80%; max-width: 800px; background: white; padding: 20px; border-radius: 8px; position: relative;">
@@ -1269,8 +1313,12 @@ const TracklessVideoEditor = () => {
       const setInBtn = document.getElementById(`set-in-btn-${videoIndex}`);
       const setOutBtn = document.getElementById(`set-out-btn-${videoIndex}`);
       const videoPlayer = document.getElementById(`inout-video-${videoIndex}`);
-      const currentTimeDisplay = document.getElementById(`current-time-display-${videoIndex}`);
-      const savePointsBtn = document.getElementById(`save-points-btn-${videoIndex}`);
+      const currentTimeDisplay = document.getElementById(
+        `current-time-display-${videoIndex}`
+      );
+      const savePointsBtn = document.getElementById(
+        `save-points-btn-${videoIndex}`
+      );
       const cancelBtn = document.getElementById(`cancel-btn-${videoIndex}`);
 
       let currentInPoint = inPoint;
@@ -1279,7 +1327,9 @@ const TracklessVideoEditor = () => {
       // Update the current time display
       const updateCurrentTimeDisplay = () => {
         if (currentTimeDisplay && videoPlayer) {
-          currentTimeDisplay.innerHTML = `Current: ${videoPlayer.currentTime.toFixed(2)}s`;
+          currentTimeDisplay.innerHTML = `Current: ${videoPlayer.currentTime.toFixed(
+            2
+          )}s`;
         }
       };
 
@@ -1297,7 +1347,11 @@ const TracklessVideoEditor = () => {
 
           // Validate that inPoint is before outPoint
           if (currentTime >= currentOutPoint) {
-            alert(`In point must be before out point (${currentOutPoint.toFixed(2)}s)`);
+            alert(
+              `In point must be before out point (${currentOutPoint.toFixed(
+                2
+              )}s)`
+            );
             return;
           }
 
@@ -1315,7 +1369,9 @@ const TracklessVideoEditor = () => {
 
           // Validate that outPoint is after inPoint
           if (currentTime <= currentInPoint) {
-            alert(`Out point must be after in point (${currentInPoint.toFixed(2)}s)`);
+            alert(
+              `Out point must be after in point (${currentInPoint.toFixed(2)}s)`
+            );
             return;
           }
 
@@ -1407,7 +1463,9 @@ const TracklessVideoEditor = () => {
     }
 
     if (!selectedVideos || selectedVideos.length !== requiredVideos) {
-      alert(`Template ${template} requires exactly ${requiredVideos} videos. You currently have ${selectedVideos.length} videos.`);
+      alert(
+        `Template ${template} requires exactly ${requiredVideos} videos. You currently have ${selectedVideos.length} videos.`
+      );
       return;
     }
 
@@ -1754,7 +1812,9 @@ const TracklessVideoEditor = () => {
     try {
       // Validate that we have videos to process
       if (!selectedVideos || selectedVideos.length === 0) {
-        alert("No videos selected. Please add videos before sending to renderer.");
+        alert(
+          "No videos selected. Please add videos before sending to renderer."
+        );
         return;
       }
 
@@ -1888,7 +1948,9 @@ const TracklessVideoEditor = () => {
         console.log("Test job sent successfully:", result);
 
         // Show success with the actual render ID from the API (same as in useChillinAPI)
-        alert(`Test job sent successfully! Render ID: ${result.data.render_id}`);
+        alert(
+          `Test job sent successfully! Render ID: ${result.data.render_id}`
+        );
       } else {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
@@ -1912,7 +1974,9 @@ const TracklessVideoEditor = () => {
   // Function to upload video to api.video using the API key
   const uploadVideoToApiVideo = async (file) => {
     if (!apiVideoKey) {
-      throw new Error("API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables.");
+      throw new Error(
+        "API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables."
+      );
     }
 
     try {
@@ -1920,40 +1984,50 @@ const TracklessVideoEditor = () => {
       const createResponse = await fetch(`${getApiVideoBaseUrl()}/video`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${apiVideoKey}`,
-          "Content-Type": "application/json"
+          Authorization: `Bearer ${apiVideoKey}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           title: file.name || `TracklessVideo-${Date.now()}`,
-          description: `Uploaded via TracklessVideoEditor on ${new Date().toISOString()}`
-        })
+          description: `Uploaded via TracklessVideoEditor on ${new Date().toISOString()}`,
+        }),
       });
 
       if (!createResponse.ok) {
-        const error = await createResponse.json().catch(() => ({ message: `HTTP ${createResponse.status}: ${createResponse.statusText}` }));
-        throw new Error(error.message || `Failed to create video entry: ${createResponse.statusText}`);
+        const error = await createResponse.json().catch(() => ({
+          message: `HTTP ${createResponse.status}: ${createResponse.statusText}`,
+        }));
+        throw new Error(
+          error.message ||
+            `Failed to create video entry: ${createResponse.statusText}`
+        );
       }
 
       const videoData = await createResponse.json();
 
       // Then upload the actual file
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
       const uploadResponse = await fetch(
         `${getApiVideoBaseUrl()}/video/${videoData.videoId}/source`,
         {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${apiVideoKey}`
+            Authorization: `Bearer ${apiVideoKey}`,
           },
-          body: formData
+          body: formData,
         }
       );
 
       if (!uploadResponse.ok) {
-        const error = await uploadResponse.json().catch(() => ({ message: `HTTP ${uploadResponse.status}: ${uploadResponse.statusText}` }));
-        throw new Error(error.message || `Failed to upload video: ${uploadResponse.statusText}`);
+        const error = await uploadResponse.json().catch(() => ({
+          message: `HTTP ${uploadResponse.status}: ${uploadResponse.statusText}`,
+        }));
+        throw new Error(
+          error.message ||
+            `Failed to upload video: ${uploadResponse.statusText}`
+        );
       }
 
       const uploadedVideo = await uploadResponse.json();
@@ -1969,20 +2043,26 @@ const TracklessVideoEditor = () => {
   // Function to get video status from api.video
   const getApiVideoStatus = async (videoId) => {
     if (!apiVideoKey) {
-      throw new Error("API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables.");
+      throw new Error(
+        "API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables."
+      );
     }
 
     try {
       const response = await fetch(`${getApiVideoBaseUrl()}/video/${videoId}`, {
         headers: {
-          "Authorization": `Bearer ${apiVideoKey}`,
-          "Accept": "application/json"
-        }
+          Authorization: `Bearer ${apiVideoKey}`,
+          Accept: "application/json",
+        },
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: `HTTP ${response.status}: ${response.statusText}` }));
-        throw new Error(error.message || `Failed to get video status: ${response.statusText}`);
+        const error = await response.json().catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
+        throw new Error(
+          error.message || `Failed to get video status: ${response.statusText}`
+        );
       }
 
       const videoData = await response.json();
@@ -1996,20 +2076,26 @@ const TracklessVideoEditor = () => {
   // Function to list videos from api.video
   const listApiVideos = async () => {
     if (!apiVideoKey) {
-      throw new Error("API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables.");
+      throw new Error(
+        "API Video key not found. Please set REACT_APP_API_VIDEO_KEY in your environment variables."
+      );
     }
 
     try {
       const response = await fetch(`${getApiVideoBaseUrl()}/videos`, {
         headers: {
-          "Authorization": `Bearer ${apiVideoKey}`,
-          "Accept": "application/json"
-        }
+          Authorization: `Bearer ${apiVideoKey}`,
+          Accept: "application/json",
+        },
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: `HTTP ${response.status}: ${response.statusText}` }));
-        throw new Error(error.message || `Failed to list videos: ${response.statusText}`);
+        const error = await response.json().catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
+        throw new Error(
+          error.message || `Failed to list videos: ${response.statusText}`
+        );
       }
 
       const data = await response.json();
@@ -2020,7 +2106,6 @@ const TracklessVideoEditor = () => {
       throw error;
     }
   };
-
 
   // Create template preview data for each template
   const createTemplatePreviewData = (templateNum) => {
@@ -2041,7 +2126,8 @@ const TracklessVideoEditor = () => {
               {
                 id: "template1-video1",
                 type: "Video",
-                description: "Ipsum consequat elit anim voluptate laborum quis tempor eu cillum dolore dolore ut elit.",
+                description:
+                  "Ipsum consequat elit anim voluptate laborum quis tempor eu cillum dolore dolore ut elit.",
                 start: 0,
                 duration: 3,
                 trackIndex: 0,
@@ -2127,7 +2213,8 @@ const TracklessVideoEditor = () => {
               {
                 id: "template2-video1",
                 type: "Video",
-                description: "Qui fugiat dolore cillum cillum est exercitation id officia.",
+                description:
+                  "Qui fugiat dolore cillum cillum est exercitation id officia.",
                 start: 0,
                 duration: 3,
                 trackIndex: 0,
@@ -2160,7 +2247,8 @@ const TracklessVideoEditor = () => {
               {
                 id: "template2-video2",
                 type: "Video",
-                description: "Ipsum ullamco ex exercitation deserunt nulla exercitation est proident.",
+                description:
+                  "Ipsum ullamco ex exercitation deserunt nulla exercitation est proident.",
                 start: 3,
                 duration: 1,
                 trackIndex: 0,
@@ -2193,7 +2281,8 @@ const TracklessVideoEditor = () => {
               {
                 id: "template2-video3",
                 type: "Video",
-                description: "Elit officia aliquip pariatur tempor duis cillum et ipsum.",
+                description:
+                  "Elit officia aliquip pariatur tempor duis cillum et ipsum.",
                 start: 4,
                 duration: 3,
                 trackIndex: 0,
@@ -2246,7 +2335,8 @@ const TracklessVideoEditor = () => {
               {
                 id: "template3-video1",
                 type: "Video",
-                description: "Sint ea quis commodo aliqua dolor laborum culpa deserunt.",
+                description:
+                  "Sint ea quis commodo aliqua dolor laborum culpa deserunt.",
                 start: 0,
                 duration: 7,
                 trackIndex: 0,
@@ -2324,7 +2414,7 @@ const TracklessVideoEditor = () => {
   // Function to prepare and show the template preview
   const showTemplatePreview = (templateNum) => {
     // Check if this is a custom template
-    const customTemplate = customTemplates.find(t => t.id === templateNum);
+    const customTemplate = customTemplates.find((t) => t.id === templateNum);
 
     if (customTemplate) {
       // For custom templates, create a preview based on required videos
@@ -2337,44 +2427,51 @@ const TracklessVideoEditor = () => {
           width: 1280,
           height: 720,
           fill: "#000000",
-          duration: customTemplate.videoDurations ?
-            customTemplate.videoDurations.reduce((a, b) => a + b, 0) || 6 :
-            customTemplate.requiredVideos * 3, // Default to 3s per video
+          duration: customTemplate.videoDurations
+            ? customTemplate.videoDurations.reduce((a, b) => a + b, 0) || 6
+            : customTemplate.requiredVideos * 3, // Default to 3s per video
           version: 0,
-          view: Array.from({ length: customTemplate.requiredVideos }, (_, i) => ({
-            id: `custom-template-video-${i}`,
-            type: "Video",
-            description: customTemplate.videoDescriptions?.[i] || `Video ${i + 1}`,
-            start: customTemplate.videoDurations ?
-              customTemplate.videoDurations.slice(0, i).reduce((a, b) => a + b, 0) || (i * 3) :
-              i * 3,
-            duration: customTemplate.videoDurations?.[i] || 3,
-            trackIndex: 0,
-            x: 0,
-            y: 0,
-            width: 1280,
-            height: 720,
-            blendMode: "normal",
-            anchorX: 0,
-            anchorY: 0,
-            rotation: 0,
-            scaleX: 1,
-            scaleY: 1,
-            alpha: 1,
-            skewX: 0,
-            skewY: 0,
-            hidden: false,
-            locked: false,
-            keyframes: [],
-            externalUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Placeholder video
-            ext: "mp4",
-            startInSource: 0,
-            volume: 1,
-            hasAudio: true,
-            playrate: 1,
-            isFrontTrimmed: false,
-            sourceDuration: customTemplate.videoDurations?.[i] || 3,
-          })),
+          view: Array.from(
+            { length: customTemplate.requiredVideos },
+            (_, i) => ({
+              id: `custom-template-video-${i}`,
+              type: "Video",
+              description:
+                customTemplate.videoDescriptions?.[i] || `Video ${i + 1}`,
+              start: customTemplate.videoDurations
+                ? customTemplate.videoDurations
+                    .slice(0, i)
+                    .reduce((a, b) => a + b, 0) || i * 3
+                : i * 3,
+              duration: customTemplate.videoDurations?.[i] || 3,
+              trackIndex: 0,
+              x: 0,
+              y: 0,
+              width: 1280,
+              height: 720,
+              blendMode: "normal",
+              anchorX: 0,
+              anchorY: 0,
+              rotation: 0,
+              scaleX: 1,
+              scaleY: 1,
+              alpha: 1,
+              skewX: 0,
+              skewY: 0,
+              hidden: false,
+              locked: false,
+              keyframes: [],
+              externalUrl:
+                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Placeholder video
+              ext: "mp4",
+              startInSource: 0,
+              volume: 1,
+              hasAudio: true,
+              playrate: 1,
+              isFrontTrimmed: false,
+              sourceDuration: customTemplate.videoDurations?.[i] || 3,
+            })
+          ),
           audio: [],
           effect: [],
           transition: [],
@@ -2507,9 +2604,11 @@ const TracklessVideoEditor = () => {
     const updatedTemplates = [...customTemplates, newTemplate];
     saveCustomTemplates(updatedTemplates);
 
-    alert(`Custom template "${name}" has been created! Now select it to configure.`);
+    alert(
+      `Custom template "${name}" has been created! Now select it to configure.`
+    );
     setCreateTemplateDialogOpen(false);
-    setVideoName('');
+    setVideoName("");
     setNumVideosForTemplate(2); // Reset to default
   };
 
@@ -2546,7 +2645,7 @@ const TracklessVideoEditor = () => {
 
     alert(`Custom template "${name.trim()}" has been created!`);
     setCreateFromCurrentDialogOpen(false);
-    setVideoName('');
+    setVideoName("");
   };
 
   // Handle deleting a template
@@ -2575,10 +2674,12 @@ const TracklessVideoEditor = () => {
       // If targetIndex is specified, we're replacing a specific video
       if (targetIndex !== null && targetIndex < selectedVideos.length) {
         // For framework7 based app, we show a confirmation dialog
-        const shouldReplace = window.confirm(`Replace video ${targetIndex + 1}?`);
+        const shouldReplace = window.confirm(
+          `Replace video ${targetIndex + 1}?`
+        );
         if (shouldReplace) {
-          handlePickFromDevice(requiredVideos, template, targetIndex).catch((error) =>
-            console.error("Error picking from device:", error)
+          handlePickFromDevice(requiredVideos, template, targetIndex).catch(
+            (error) => console.error("Error picking from device:", error)
           );
         }
         return;
@@ -2586,24 +2687,23 @@ const TracklessVideoEditor = () => {
 
       const videosNeeded = requiredVideos - selectedVideos.length;
       if (videosNeeded <= 0) {
-        alert(`Template ${template} already has the required ${requiredVideos} videos. Remove some videos before adding more.`);
+        alert(
+          `Template ${template} already has the required ${requiredVideos} videos. Remove some videos before adding more.`
+        );
         return;
       }
 
       // Show progress to indicate how many videos are needed vs selected
-      alert(`Add videos for Template ${template}. Selected: ${selectedVideos.length}/${requiredVideos} videos`);
+      alert(
+        `Add videos for Template ${template}. Selected: ${selectedVideos.length}/${requiredVideos} videos`
+      );
 
       // Call the function to pick from device
       handlePickFromDevice(requiredVideos, template).catch((error) =>
         console.error("Error picking from device:", error)
       );
     },
-    [
-      template,
-      selectedVideos,
-      handlePickFromDevice,
-      customTemplates,
-    ]
+    [template, selectedVideos, handlePickFromDevice, customTemplates]
   );
 
   return (
@@ -2618,14 +2718,22 @@ const TracklessVideoEditor = () => {
             <Button
               variant={activeTab === "templates" ? "default" : "outline"}
               onClick={() => setActiveTab("templates")}
-              className={activeTab === "templates" ? "bg-[#1E97A0] hover:bg-[#157a82]" : "bg-white text-[#0F1A21]"}
+              className={
+                activeTab === "templates"
+                  ? "bg-[#1E97A0] hover:bg-[#157a82]"
+                  : "bg-white text-[#0F1A21]"
+              }
             >
               Templates
             </Button>
             <Button
               variant={activeTab === "sequence" ? "default" : "outline"}
               onClick={() => setActiveTab("sequence")}
-              className={activeTab === "sequence" ? "bg-[#1E97A0] hover:bg-[#157a82]" : "bg-white text-[#0F1A21]"}
+              className={
+                activeTab === "sequence"
+                  ? "bg-[#1E97A0] hover:bg-[#157a82]"
+                  : "bg-white text-[#0F1A21]"
+              }
             >
               Sequence
             </Button>
@@ -2643,14 +2751,22 @@ const TracklessVideoEditor = () => {
                 );
                 setChillinRenders(sortedRenders);
               }}
-              className={activeTab === "render" ? "bg-[#1E97A0] hover:bg-[#157a82]" : "bg-white text-[#0F1A21]"}
+              className={
+                activeTab === "render"
+                  ? "bg-[#1E97A0] hover:bg-[#157a82]"
+                  : "bg-white text-[#0F1A21]"
+              }
             >
               Render Jobs
             </Button>
             <Button
               variant={activeTab === "management" ? "default" : "outline"}
               onClick={() => setActiveTab("management")}
-              className={activeTab === "management" ? "bg-[#1E97A0] hover:bg-[#157a82]" : "bg-white text-[#0F1A21]"}
+              className={
+                activeTab === "management"
+                  ? "bg-[#1E97A0] hover:bg-[#157a82]"
+                  : "bg-white text-[#0F1A21]"
+              }
             >
               Management
             </Button>
@@ -2663,8 +2779,37 @@ const TracklessVideoEditor = () => {
         {/* Templates Tab */}
         {activeTab === "templates" && (
           <div className="space-y-6">
+            <a
+              onClick={() => {
+                dialog.create({
+                  title: "Demo Dialog",
+                  text: "This is a demo of the Radix dialog component with the requested API!",
+                  buttons: [
+                    {
+                      text: "Download",
+                      onClick: (dialogRef) => {
+                        console.log("Download button clicked", dialogRef);
+                        // Add your download logic here
+                        alert("Download action triggered!");
+                      }
+                    },
+                    {
+                      text: "Close",
+                      onClick: () => {
+                        console.log("Close button clicked");
+                      }
+                    }
+                  ]
+                }).open();
+              }}
+            >
+              Open Dialog
+            </a>
+
             <div className="bg-gray-50 p-6 rounded-lg">
-              <h2 className="text-xl font-bold mb-4">Custom Template Manager</h2>
+              <h2 className="text-xl font-bold mb-4">
+                Custom Template Manager
+              </h2>
 
               <div className="flex space-x-4 mb-6">
                 <Button
@@ -2684,8 +2829,15 @@ const TracklessVideoEditor = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {customTemplates.map((customTemplate) => (
-                  <Card key={customTemplate.id} className={`border rounded-lg p-4 bg-white shadow-sm ${template === customTemplate.id ? 'border-blue-500 border-2' : ''} cursor-pointer`}
-                        onClick={() => loadCustomTemplate(customTemplate)}>
+                  <Card
+                    key={customTemplate.id}
+                    className={`border rounded-lg p-4 bg-white shadow-sm ${
+                      template === customTemplate.id
+                        ? "border-blue-500 border-2"
+                        : ""
+                    } cursor-pointer`}
+                    onClick={() => loadCustomTemplate(customTemplate)}
+                  >
                     <CardHeader>
                       <CardTitle>{customTemplate.name}</CardTitle>
                     </CardHeader>
@@ -2757,8 +2909,14 @@ const TracklessVideoEditor = () => {
             <div className="bg-gray-50 p-6 rounded-lg">
               <h2 className="text-xl font-bold mb-4">Template Selection</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className={`border rounded-lg p-4 bg-white shadow-sm cursor-pointer ${template === 1 ? 'border-blue-500 border-2' : ''}`}
-                      onClick={() => {setTemplate(1);}}>
+                <Card
+                  className={`border rounded-lg p-4 bg-white shadow-sm cursor-pointer ${
+                    template === 1 ? "border-blue-500 border-2" : ""
+                  }`}
+                  onClick={() => {
+                    setTemplate(1);
+                  }}
+                >
                   <CardHeader>
                     <CardTitle>Template 1</CardTitle>
                   </CardHeader>
@@ -2790,13 +2948,21 @@ const TracklessVideoEditor = () => {
                     </div>
                   )}
                 </Card>
-                <Card className={`border rounded-lg p-4 bg-white shadow-sm cursor-pointer ${template === 2 ? 'border-blue-500 border-2' : ''}`}
-                      onClick={() => {setTemplate(2);}}>
+                <Card
+                  className={`border rounded-lg p-4 bg-white shadow-sm cursor-pointer ${
+                    template === 2 ? "border-blue-500 border-2" : ""
+                  }`}
+                  onClick={() => {
+                    setTemplate(2);
+                  }}
+                >
                   <CardHeader>
                     <CardTitle>Template 2</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-gray-600">Three videos: 3s + 1s + 3s</p>
+                    <p className="text-sm text-gray-600">
+                      Three videos: 3s + 1s + 3s
+                    </p>
                   </CardContent>
                   {template === 2 && (
                     <div className="mt-4 flex space-x-2">
@@ -2823,13 +2989,21 @@ const TracklessVideoEditor = () => {
                     </div>
                   )}
                 </Card>
-                <Card className={`border rounded-lg p-4 bg-white shadow-sm cursor-pointer ${template === 3 ? 'border-blue-500 border-2' : ''}`}
-                      onClick={() => {setTemplate(3);}}>
+                <Card
+                  className={`border rounded-lg p-4 bg-white shadow-sm cursor-pointer ${
+                    template === 3 ? "border-blue-500 border-2" : ""
+                  }`}
+                  onClick={() => {
+                    setTemplate(3);
+                  }}
+                >
                   <CardHeader>
                     <CardTitle>Template 3</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-gray-600">Two videos with overlay</p>
+                    <p className="text-sm text-gray-600">
+                      Two videos with overlay
+                    </p>
                   </CardContent>
                   {template === 3 && (
                     <div className="mt-4 flex space-x-2">
@@ -2884,7 +3058,14 @@ const TracklessVideoEditor = () => {
                 </Button>
                 <Button
                   className="w-full bg-[#A01E25] hover:bg-[#80171e] text-white"
-                  onClick={() => createChillinProject(setSelectedVideos, selectedVideos, template, customTemplates)}
+                  onClick={() =>
+                    createChillinProject(
+                      setSelectedVideos,
+                      selectedVideos,
+                      template,
+                      customTemplates
+                    )
+                  }
                 >
                   Start Render
                 </Button>
@@ -2899,25 +3080,35 @@ const TracklessVideoEditor = () => {
                       component={VideoComposition}
                       durationInFrames={selectedVideos.reduce((acc, video) => {
                         const inPoint = video.inOutPoints?.inPoint || 0;
-                        const outPoint = video.inOutPoints?.outPoint || video.duration || 10;
+                        const outPoint =
+                          video.inOutPoints?.outPoint || video.duration || 10;
                         return acc + Math.round((outPoint - inPoint) * 30); // 30fps
                       }, 0)}
                       fps={30}
                       compositionWidth={1280}
                       compositionHeight={720}
                       style={{
-                        width: '100%',
-                        height: '100%',
+                        width: "100%",
+                        height: "100%",
                       }}
                       inputProps={{
                         layers: selectedVideos.map((video, index) => {
                           const inPoint = video.inOutPoints?.inPoint || 0;
-                          const outPoint = video.inOutPoints?.outPoint || video.duration || 10;
-                          const startTime = index === 0 ? 0 : selectedVideos.slice(0, index).reduce((acc, v) => {
-                            const vIn = v.inOutPoints?.inPoint || 0;
-                            const vOut = v.inOutPoints?.outPoint || v.duration || 10;
-                            return acc + (vOut - vIn);
-                          }, 0);
+                          const outPoint =
+                            video.inOutPoints?.outPoint || video.duration || 10;
+                          const startTime =
+                            index === 0
+                              ? 0
+                              : selectedVideos
+                                  .slice(0, index)
+                                  .reduce((acc, v) => {
+                                    const vIn = v.inOutPoints?.inPoint || 0;
+                                    const vOut =
+                                      v.inOutPoints?.outPoint ||
+                                      v.duration ||
+                                      10;
+                                    return acc + (vOut - vIn);
+                                  }, 0);
 
                           return {
                             id: video.id || `video-${index}`,
@@ -2941,7 +3132,8 @@ const TracklessVideoEditor = () => {
                             hidden: false,
                             locked: false,
                             keyframes: [],
-                            externalUrl: video.src || URL.createObjectURL(video.blob),
+                            externalUrl:
+                              video.src || URL.createObjectURL(video.blob),
                             ext: "mp4",
                             startInSource: inPoint,
                             sourceDuration: outPoint - inPoint,
@@ -2950,7 +3142,7 @@ const TracklessVideoEditor = () => {
                             playrate: 1,
                             isFrontTrimmed: false,
                           };
-                        })
+                        }),
                       }}
                       controls
                     />
@@ -2964,53 +3156,96 @@ const TracklessVideoEditor = () => {
 
               <div className="space-y-4">
                 {selectedVideos.map((video, index) => (
-                  <Card key={video.id || index} className="border rounded-lg p-4 bg-white">
+                  <Card
+                    key={video.id || index}
+                    className="border rounded-lg p-4 bg-white"
+                  >
                     <div className="flex items-center space-x-4">
                       <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
                       <div className="flex-1">
-                        <h3 className="font-semibold">{video.name || `Video ${index + 1}`}</h3>
+                        <h3 className="font-semibold">
+                          {video.name || `Video ${index + 1}`}
+                        </h3>
                         <p className="text-sm text-gray-600">
-                          Duration: {video.inOutPoints ?
-                            `${video.inOutPoints.outPoint - video.inOutPoints.inPoint}s` :
-                            `${video.duration || 10}s`}
+                          Duration:{" "}
+                          {video.inOutPoints
+                            ? `${
+                                video.inOutPoints.outPoint -
+                                video.inOutPoints.inPoint
+                              }s`
+                            : `${video.duration || 10}s`}
                         </p>
                         {videoAudioTracks[index] && (
-                          <p className="text-sm text-green-600">Audio attached</p>
+                          <p className="text-sm text-green-600">
+                            Audio attached
+                          </p>
                         )}
                       </div>
                       <div className="flex space-x-2">
-                        <Button size="sm" variant="outline" onClick={() => openInOutDialog(index)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => openInOutDialog(index)}
+                        >
                           In/Out
                         </Button>
                         {videoAudioTracks[index] ? (
                           <>
-                            <Button size="sm" variant="outline" onClick={() => openVolumeDialog(index, true)}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openVolumeDialog(index, true)}
+                            >
                               Audio Vol
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => removeAudioFromVideo(index)}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => removeAudioFromVideo(index)}
+                            >
                               Remove Audio
                             </Button>
                           </>
                         ) : (
-                          <Button size="sm" variant="outline" onClick={() => handleAddAudioToVideo(index)}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleAddAudioToVideo(index)}
+                          >
                             Add Audio
                           </Button>
                         )}
-                        <Button size="sm" variant="outline" onClick={() => openVolumeDialog(index, false)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => openVolumeDialog(index, false)}
+                        >
                           Video Vol
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => removeVideo(index)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => removeVideo(index)}
+                        >
                           Remove
                         </Button>
                       </div>
                     </div>
                     <div className="mt-3 flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => moveVideoBack(index)}
-                        disabled={index === 0}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => moveVideoBack(index)}
+                        disabled={index === 0}
+                      >
                         ← Move Back
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => moveVideoForward(index)}
-                        disabled={index === selectedVideos.length - 1}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => moveVideoForward(index)}
+                        disabled={index === selectedVideos.length - 1}
+                      >
                         Move Forward →
                       </Button>
                     </div>
@@ -3036,7 +3271,14 @@ const TracklessVideoEditor = () => {
               <div className="mb-4">
                 <Button
                   className="bg-[#A01E25] hover:bg-[#80171e]"
-                  onClick={() => createChillinProject(setSelectedVideos, selectedVideos, template, customTemplates)}
+                  onClick={() =>
+                    createChillinProject(
+                      setSelectedVideos,
+                      selectedVideos,
+                      template,
+                      customTemplates
+                    )
+                  }
                 >
                   Start New Render
                 </Button>
@@ -3045,16 +3287,33 @@ const TracklessVideoEditor = () => {
               <div className="space-y-4">
                 {chillinRenders.length > 0 ? (
                   chillinRenders.map((render, index) => (
-                    <Card key={render.render_id} className="border rounded-lg p-4 bg-white">
+                    <Card
+                      key={render.render_id}
+                      className="border rounded-lg p-4 bg-white"
+                    >
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-semibold">Render Job #{index + 1}</h3>
-                          <p className="text-sm text-gray-600">ID: {render.render_id}</p>
-                          <p className="text-sm text-gray-600">Status: {render.status}</p>
-                          <p className="text-sm text-gray-600">Created: {render.timestamp}</p>
+                          <h3 className="font-semibold">
+                            Render Job #{index + 1}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            ID: {render.render_id}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Status: {render.status}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Created: {render.timestamp}
+                          </p>
                         </div>
                         <div className="flex space-x-2">
-                          <Button size="sm" variant="outline" onClick={() => handleGetRenderResult(render.render_id)}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              handleGetRenderResult(render.render_id)
+                            }
+                          >
                             Check Status
                           </Button>
                         </div>
@@ -3083,15 +3342,21 @@ const TracklessVideoEditor = () => {
                   <div className="space-y-2">
                     <Card className="border rounded-lg p-3 bg-white">
                       <h4 className="font-medium">Project 1</h4>
-                      <p className="text-sm text-gray-600">Last modified: Today</p>
+                      <p className="text-sm text-gray-600">
+                        Last modified: Today
+                      </p>
                     </Card>
                     <Card className="border rounded-lg p-3 bg-white">
                       <h4 className="font-medium">Project 2</h4>
-                      <p className="text-sm text-gray-600">Last modified: 2 days ago</p>
+                      <p className="text-sm text-gray-600">
+                        Last modified: 2 days ago
+                      </p>
                     </Card>
                     <Card className="border rounded-lg p-3 bg-white">
                       <h4 className="font-medium">Project 3</h4>
-                      <p className="text-sm text-gray-600">Last modified: 1 week ago</p>
+                      <p className="text-sm text-gray-600">
+                        Last modified: 1 week ago
+                      </p>
                     </Card>
                   </div>
                 </div>
@@ -3120,12 +3385,16 @@ const TracklessVideoEditor = () => {
       </div>
 
       {/* Create Custom Template Dialog */}
-      <Dialog open={createTemplateDialogOpen} onOpenChange={setCreateTemplateDialogOpen}>
+      <Dialog
+        open={createTemplateDialogOpen}
+        onOpenChange={setCreateTemplateDialogOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create Custom Template</DialogTitle>
             <DialogDescription>
-              Enter a name for your custom template and specify how many videos it requires.
+              Enter a name for your custom template and specify how many videos
+              it requires.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -3144,7 +3413,9 @@ const TracklessVideoEditor = () => {
                 id="numVideos"
                 type="number"
                 value={numVideosForTemplate}
-                onChange={(e) => setNumVideosForTemplate(Number(e.target.value))}
+                onChange={(e) =>
+                  setNumVideosForTemplate(Number(e.target.value))
+                }
                 min="1"
                 max="10"
                 placeholder="Enter number of videos (1-10)"
@@ -3152,19 +3423,28 @@ const TracklessVideoEditor = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateTemplateDialogOpen(false)}>Cancel</Button>
+            <Button
+              variant="outline"
+              onClick={() => setCreateTemplateDialogOpen(false)}
+            >
+              Cancel
+            </Button>
             <Button onClick={handleCreateCustomTemplate}>Create</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Create Template from Current Dialog */}
-      <Dialog open={createFromCurrentDialogOpen} onOpenChange={setCreateFromCurrentDialogOpen}>
+      <Dialog
+        open={createFromCurrentDialogOpen}
+        onOpenChange={setCreateFromCurrentDialogOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create Custom Template from Current</DialogTitle>
             <DialogDescription>
-              Enter a name for your custom template based on the current selection.
+              Enter a name for your custom template based on the current
+              selection.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -3179,14 +3459,22 @@ const TracklessVideoEditor = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateFromCurrentDialogOpen(false)}>Cancel</Button>
+            <Button
+              variant="outline"
+              onClick={() => setCreateFromCurrentDialogOpen(false)}
+            >
+              Cancel
+            </Button>
             <Button onClick={handleCreateTemplateFromCurrent}>Create</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Edit Custom Template Dialog */}
-      <Dialog open={editTemplateDialogOpen} onOpenChange={setEditTemplateDialogOpen}>
+      <Dialog
+        open={editTemplateDialogOpen}
+        onOpenChange={setEditTemplateDialogOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Custom Template</DialogTitle>
@@ -3206,24 +3494,40 @@ const TracklessVideoEditor = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditTemplateDialogOpen(false)}>Cancel</Button>
+            <Button
+              variant="outline"
+              onClick={() => setEditTemplateDialogOpen(false)}
+            >
+              Cancel
+            </Button>
             <Button onClick={handleEditTemplate}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Delete Template Confirmation Dialog */}
-      <Dialog open={deleteTemplateDialogOpen} onOpenChange={setDeleteTemplateDialogOpen}>
+      <Dialog
+        open={deleteTemplateDialogOpen}
+        onOpenChange={setDeleteTemplateDialogOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Template</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this custom template? This action cannot be undone.
+              Are you sure you want to delete this custom template? This action
+              cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteTemplateDialogOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleDeleteTemplate}>Delete</Button>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteTemplateDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteTemplate}>
+              Delete
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -3282,14 +3586,19 @@ const TracklessVideoEditor = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setInOutDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setInOutDialogOpen(false)}>
+              Cancel
+            </Button>
             <Button onClick={handleSetInOutPoints}>Set</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Template Preview Dialog */}
-      <Dialog open={showTemplatePreviewDialog} onOpenChange={setShowTemplatePreviewDialog}>
+      <Dialog
+        open={showTemplatePreviewDialog}
+        onOpenChange={setShowTemplatePreviewDialog}
+      >
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>Template Preview</DialogTitle>
@@ -3302,16 +3611,18 @@ const TracklessVideoEditor = () => {
               <div className="w-full h-64 bg-black rounded-lg overflow-hidden">
                 <Player
                   component={VideoComposition}
-                  durationInFrames={Math.round(templatePreviewJson.projectData.duration * 30)}
+                  durationInFrames={Math.round(
+                    templatePreviewJson.projectData.duration * 30
+                  )}
                   fps={30}
                   compositionWidth={1280}
                   compositionHeight={720}
                   style={{
-                    width: '100%',
-                    height: '100%',
+                    width: "100%",
+                    height: "100%",
                   }}
                   inputProps={{
-                    layers: templatePreviewJson.projectData.view
+                    layers: templatePreviewJson.projectData.view,
                   }}
                   controls
                 />
@@ -3323,11 +3634,12 @@ const TracklessVideoEditor = () => {
             )}
           </div>
           <DialogFooter>
-            <Button onClick={() => setShowTemplatePreviewDialog(false)}>Close</Button>
+            <Button onClick={() => setShowTemplatePreviewDialog(false)}>
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 };
