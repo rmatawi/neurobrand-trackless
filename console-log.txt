@@ -1,81 +1,220 @@
-$ npm start
-
-> frontend@0.1.0 start
-> craco start
-
-Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
-  npx update-browserslist-db@latest
-  Why you should do it regularly: https://github.com/browserslist/update-db#readme
-
-
-Failed to compile.
-
-SyntaxError: D:\Projects\trackless-video\neurobrand-trackless\src\components\TracklessVideoEditor.js: 'return' outside of function. (3244:0)
-  3242 | );
-  3243 |
-> 3244 | return (
-       | ^
-  3245 |   <div className="min-h-screen bg-white">
-  3246 |     {/* Navbar */}
-  3247 |     <div className="bg-[#0F1A21] text-white p-4">
-    at parser.next (<anonymous>)
-    at normalizeFile.next (<anonymous>)
-    at run.next (<anonymous>)
-    at transform.next (<anonymous>)
-ERROR in ./src/components/TracklessVideoEditor.js
-Module build failed (from ./node_modules/babel-loader/lib/index.js):
-SyntaxError: D:\Projects\trackless-video\neurobrand-trackless\src\components\TracklessVideoEditor.js: 'return' outside of function. (3244:0)
-
-  3242 | );
-  3243 |
-> 3244 | return (
-       | ^
-  3245 |   <div className="min-h-screen bg-white">
-  3246 |     {/* Navbar */}
-  3247 |     <div className="bg-[#0F1A21] text-white p-4">
-    at constructor (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:359:19)
-    at FlowParserMixin.raise (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:3266:19)        
-    at FlowParserMixin.parseReturnStatement (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:12634:12)
-    at FlowParserMixin.parseStatementContent (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:12292:21)
-    at FlowParserMixin.parseStatementLike (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:12261:17)
-    at FlowParserMixin.parseStatementLike (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:5054:24)
-    at FlowParserMixin.parseModuleItem (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:12238:17)
-    at FlowParserMixin.parseBlockOrModuleBlockBody (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:12814:36)
-    at FlowParserMixin.parseBlockBody (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:12807:10)
-    at FlowParserMixin.parseProgram (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:12135:10)    at FlowParserMixin.parseTopLevel (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:12125:25)
-    at FlowParserMixin.parseTopLevel (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:5821:28)    at FlowParserMixin.parse (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:13933:10)       
-    at parse (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\parser\lib\index.js:13967:38)
-    at parser (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\core\lib\parser\index.js:41:34)
-    at parser.next (<anonymous>)
-    at normalizeFile (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\core\lib\transformation\normalize-file.js:64:37)
-    at normalizeFile.next (<anonymous>)
-    at run (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\core\lib\transformation\index.js:22:50)
-    at run.next (<anonymous>)
-    at transform (D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\core\lib\transform.js:22:33)
-    at transform.next (<anonymous>)
-    at step (D:\Projects\trackless-video\neurobrand-trackless\node_modules\gensync\index.js:261:32)
-    at D:\Projects\trackless-video\neurobrand-trackless\node_modules\gensync\index.js:273:13
-    at async.call.result.err.err (D:\Projects\trackless-video\neurobrand-trackless\node_modules\gensync\index.js:223:11)
-    at D:\Projects\trackless-video\neurobrand-trackless\node_modules\gensync\index.js:189:28
-    at D:\Projects\trackless-video\neurobrand-trackless\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
-    at D:\Projects\trackless-video\neurobrand-trackless\node_modules\gensync\index.js:113:33
-    at step (D:\Projects\trackless-video\neurobrand-trackless\node_modules\gensync\index.js:287:14)
-    at D:\Projects\trackless-video\neurobrand-trackless\node_modules\gensync\index.js:273:13
-    at async.call.result.err.err (D:\Projects\trackless-video\neurobrand-trackless\node_modules\gensync\index.js:223:11)
-
-ERROR in [eslint]
-src\components\TracklessVideoEditor.js
-  Line 3244:  Parsing error: 'return' outside of function. (3244:0)
-
-webpack compiled with 2 errors
-One of your dependencies, babel-preset-react-app, is importing the
-"@babel/plugin-proposal-private-property-in-object" package without
-declaring it in its dependencies. This is currently working because
-"@babel/plugin-proposal-private-property-in-object" is already in your
-node_modules folder for unrelated reasons, but it may break at any time.
-
-babel-preset-react-app is part of the create-react-app project, which
-is not maintianed anymore. It is thus unlikely that this bug will
-ever be fixed. Add "@babel/plugin-proposal-private-property-in-object" to
-your devDependencies to work around this error. This will make this message
-go away.
+content.js:6 DEFAULT
+array.js:1 [Violation] 'load' handler took 866ms
+WebSocketClient.js:13  WebSocket connection to 'ws://localhost:443/ws' failed: 
+WebSocketClient @ WebSocketClient.js:13
+initSocket @ socket.js:27
+./node_modules/webpack-dev-server/client/index.js?protocol=ws%3A&hostname=0.0.0.0&port=443&pathname=%2Fws&logging=none&overlay=%7B%22errors%22%3Atrue%2C%22warnings%22%3Afalse%7D&reconnect=10&hot=true&live-reload=true @ index.js:320
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+(anonymous) @ startup:5
+(anonymous) @ startup:7
+rrweb-plugin-console-record.js:2447 Dialog instance created: {open: ƒ}
+rrweb-plugin-console-record.js:2447 Has open method: true
+WebSocketClient.js:13  WebSocket connection to 'ws://localhost:443/ws' failed: 
+WebSocketClient @ WebSocketClient.js:13
+initSocket @ socket.js:27
+(anonymous) @ socket.js:51
+rrweb-plugin-console-record.js:2447 Dialog instance created: {open: ƒ}
+rrweb-plugin-console-record.js:2447 Has open method: true
+WebSocketClient.js:13  WebSocket connection to 'ws://localhost:443/ws' failed: 
+WebSocketClient @ WebSocketClient.js:13
+initSocket @ socket.js:27
+(anonymous) @ socket.js:51
+rrweb-plugin-console-record.js:2447 Dialog instance created: {open: ƒ}
+rrweb-plugin-console-record.js:2447 Has open method: true
+rrweb-plugin-console-record.js:2447 [CHILLIN_CHUNKING]    Video 1: hotel-parbo.mp4 (0.00s → 10.00s, duration: 10.00s)
+rrweb-plugin-console-record.js:2447 [CHILLIN_CHUNKING]    Video 2: SampleVideo_1280x720_5mb.mp4 (0.00s → 10.00s, duration: 10.00s)
+rrweb-plugin-console-record.js:2447 Dialog instance created: {open: ƒ}
+rrweb-plugin-console-record.js:2447 Has open method: true
+rrweb-plugin-console-record.js:2447 [CHILLIN_CHUNKING] Final composite duration: 20.00s
+rrweb-plugin-console-record.js:2447 [CHILLIN_CHUNKING] Total videos in sequence: 2
+rrweb-plugin-console-record.js:2447 Dialog instance created: {open: ƒ}
+rrweb-plugin-console-record.js:2447 Has open method: true
+rrweb-plugin-console-record.js:2447 ========== CHUNK PROCESSING PIPELINE STARTED ==========
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🚀 STARTING TIMELINE CHUNK PROCESSING PIPELINE
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📋 Job ID: chillin_1764451511518_odu9sz118
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🌐 Renderer API URL: http://localhost
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📍 Timeline has 1 tracks
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Track 1: Video Track (2 items)
+rrweb-plugin-console-record.js:2447 Analyzing timeline...
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Starting timeline analysis...
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Input tracks: [{…}]
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Processing track 0: Video Track, items: (2) [{…}, {…}]
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Processing item 0: {id: 'device-1764451504427', name: 'hotel-parbo.mp4', type: 'video', src: 'blob:http://localhost:3001/d65273b0-88ea-4e6f-b433-4e32216b47c5', externalUrl: undefined, …}
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Processing item 1: {id: 'device-1764451508576', name: 'SampleVideo_1280x720_5mb.mp4', type: 'video', src: 'blob:http://localhost:3001/6bd6fc78-53cc-4315-b265-7cc559a38b6a', externalUrl: undefined, …}
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Timeline analysis complete:
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Found 2 unique video sources
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Source 1: blob:http://localhost:3001/d65273b0-88ea-4e6f-b433-4e32216b47c5 (name: hotel-parbo.mp4) used 1 times
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Usage 1: inPoint 0s → outPoint 10s (duration: 10s)
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Source 2: blob:http://localhost:3001/6bd6fc78-53cc-4315-b265-7cc559a38b6a (name: SampleVideo_1280x720_5mb.mp4) used 1 times
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Usage 1: inPoint 0s → outPoint 10s (duration: 10s)
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🔧 PROCESSING VIDEO SOURCE 1/2: hotel-parbo.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Source path: blob:http://localhost:3001/d65273b0-88ea-4e6f-b433-4e32216b47c5
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Media duration: 10
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Has original item: true
+rrweb-plugin-console-record.js:2447 Finding video: hotel-parbo.mp4...
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Looking for video blob for: blob:http://localhost:3001/d65273b0-88ea-4e6f-b433-4e32216b47c5
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Looking with videoName: hotel-parbo.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Original item data: {id: 'device-1764451504427', name: 'hotel-parbo.mp4', hasBlob: true}
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Using blob from original item
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Video blob size: 102305937 bytes
+rrweb-plugin-console-record.js:2447 ========== CHUNK PROCESSING STARTED ==========
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🎬 STARTING CHUNK EXTRACTION FOR VIDEO: hotel-parbo.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📦 Input video size: 97.57 MB
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📍 Video source has 1 usages/segments
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Segment 1: 0.00s → 10.00s (duration: 10.00s)
+rrweb-plugin-console-record.js:2447 Processing hotel-parbo.mp4...
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Video written to FFmpeg: 97.57 MB
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] ====== DIRECT EXTRACTION DEBUG ======
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Usage: 0s → 10s (duration: 10s)
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] FFmpeg extract command: -i input.mp4 -ss 0 -t 10 -c copy -avoid_negative_ts make_zero usage_device-1764451504427.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] DIRECT EXTRACTION RESULT:
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Extracted: 0s → 10s
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Chunk starts at: 0s (direct extraction)
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Chunk adjustment: 0s (no adjustment needed)
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Renderer will play: 0s → 10s from chunk
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Extracted chunk for usage device-1764451504427: 8.01 MB
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] =====================================
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🎉 CHUNK EXTRACTION COMPLETE FOR hotel-parbo.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Extracted 1 segments
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Total extracted size: 8.01 MB
+rrweb-plugin-console-record.js:2447 ========== CHUNK PROCESSING FINISHED ==========
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Uploading chunks to api.video
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🌐 STARTING API.VIDEO CHUNK PROCESSING FOR: hotel-parbo.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📦 Processing 1 chunks
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📍 Job ID: chillin_1764451511518_odu9sz118
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📋 Chunk details:
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Chunk 1: usage_device-1764451504427.mp4 (8.01 MB)
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📤 Uploading chunk 1/1: usage_device-1764451504427.mp4 (8.01 MB)
+WebSocketClient.js:13  WebSocket connection to 'ws://localhost:443/ws' failed: 
+WebSocketClient @ WebSocketClient.js:13
+initSocket @ socket.js:27
+(anonymous) @ socket.js:51
+WebSocketClient.js:13  WebSocket connection to 'ws://localhost:443/ws' failed: 
+WebSocketClient @ WebSocketClient.js:13
+initSocket @ socket.js:27
+(anonymous) @ socket.js:51
+rrweb-plugin-console-record.js:2447 {publicUrl: 'https://vod.api.video/vod/vi4MmRBwWPVXkztMrSVj2D96/mp4/source.mp4'}
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] ✅ Chunk uploaded successfully: usage_device-1764451504427.mp4 → https://vod.api.video/vod/vi4MmRBwWPVXkztMrSVj2D96/mp4/source.mp4
+rrweb-plugin-console-record.js:2447 🌐 Uploaded 1/1 chunks to api.video
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🎉 API.VIDEO CHUNK PROCESSING COMPLETE FOR hotel-parbo.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Successfully processed 1 chunks
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    1 chunks uploaded to api.video
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    0 chunks using blob URLs
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Updating render job for hotel-parbo.mp4 with 1 chunks
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Updating item hotel-parbo.mp4:
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Original: src=blob:http://localhost:3001/d65273b0-88ea-4e6f-b433-4e32216b47c5, inPoint=0, outPoint=10
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Updated: public_url=https://vod.api.video/vod/vi4MmRBwWPVXkztMrSVj2D96/mp4/source.mp4, chunkAdjustment=0
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Timing: Updated inPoint/outPoint to match extracted chunk file
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   BEFORE: inPoint=0, outPoint=10
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   AFTER: inPoint=0, outPoint=10
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🔧 PROCESSING VIDEO SOURCE 2/2: SampleVideo_1280x720_5mb.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Source path: blob:http://localhost:3001/6bd6fc78-53cc-4315-b265-7cc559a38b6a
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Media duration: 10
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Has original item: true
+rrweb-plugin-console-record.js:2447 Finding video: SampleVideo_1280x720_5mb.mp4...
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Looking for video blob for: blob:http://localhost:3001/6bd6fc78-53cc-4315-b265-7cc559a38b6a
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Looking with videoName: SampleVideo_1280x720_5mb.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Original item data: {id: 'device-1764451508576', name: 'SampleVideo_1280x720_5mb.mp4', hasBlob: true}
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Using blob from original item
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Video blob size: 5253880 bytes
+rrweb-plugin-console-record.js:2447 ========== CHUNK PROCESSING STARTED ==========
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🎬 STARTING CHUNK EXTRACTION FOR VIDEO: SampleVideo_1280x720_5mb.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📦 Input video size: 5.01 MB
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📍 Video source has 1 usages/segments
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Segment 1: 0.00s → 10.00s (duration: 10.00s)
+rrweb-plugin-console-record.js:2447 Processing SampleVideo_1280x720_5mb.mp4...
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Video written to FFmpeg: 5.01 MB
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] ====== DIRECT EXTRACTION DEBUG ======
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Usage: 0s → 10s (duration: 10s)
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] FFmpeg extract command: -i input.mp4 -ss 0 -t 10 -c copy -avoid_negative_ts make_zero usage_device-1764451508576.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] DIRECT EXTRACTION RESULT:
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Extracted: 0s → 10s
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Chunk starts at: 0s (direct extraction)
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Chunk adjustment: 0s (no adjustment needed)
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Renderer will play: 0s → 10s from chunk
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Extracted chunk for usage device-1764451508576: 1.68 MB
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] =====================================
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🎉 CHUNK EXTRACTION COMPLETE FOR SampleVideo_1280x720_5mb.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Extracted 1 segments
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Total extracted size: 1.68 MB
+rrweb-plugin-console-record.js:2447 ========== CHUNK PROCESSING FINISHED ==========
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Uploading chunks to api.video
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🌐 STARTING API.VIDEO CHUNK PROCESSING FOR: SampleVideo_1280x720_5mb.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📦 Processing 1 chunks
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📍 Job ID: chillin_1764451511518_odu9sz118
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📋 Chunk details:
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Chunk 1: usage_device-1764451508576.mp4 (1.68 MB)
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 📤 Uploading chunk 1/1: usage_device-1764451508576.mp4 (1.68 MB)
+rrweb-plugin-console-record.js:2447 {publicUrl: 'https://vod.api.video/vod/vi1LSrKAgcjw71pQwZdpsYVI/mp4/source.mp4'}
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] ✅ Chunk uploaded successfully: usage_device-1764451508576.mp4 → https://vod.api.video/vod/vi1LSrKAgcjw71pQwZdpsYVI/mp4/source.mp4
+rrweb-plugin-console-record.js:2447 🌐 Uploaded 1/1 chunks to api.video
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🎉 API.VIDEO CHUNK PROCESSING COMPLETE FOR SampleVideo_1280x720_5mb.mp4
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    Successfully processed 1 chunks
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    1 chunks uploaded to api.video
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]    0 chunks using blob URLs
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Updating render job for SampleVideo_1280x720_5mb.mp4 with 1 chunks
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] Updating item SampleVideo_1280x720_5mb.mp4:
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Original: src=blob:http://localhost:3001/6bd6fc78-53cc-4315-b265-7cc559a38b6a, inPoint=0, outPoint=10
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Updated: public_url=https://vod.api.video/vod/vi1LSrKAgcjw71pQwZdpsYVI/mp4/source.mp4, chunkAdjustment=0
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   Timing: Updated inPoint/outPoint to match extracted chunk file
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   BEFORE: inPoint=0, outPoint=10
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING]   AFTER: inPoint=0, outPoint=10
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] ========================================
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] 🎉 CHUNK PROCESSING PIPELINE COMPLETE! 🎉
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] ========================================
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] ✅ RESULT: Processed CHUNKS, NOT entire videos
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] ✅ Total sources processed: 2
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] ✅ Render job updated with chunk URLs and timing adjustments
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] ✅ Storage mode: api.video URLs
+rrweb-plugin-console-record.js:2447 [CHUNK_TRACKING] ========================================
+rrweb-plugin-console-record.js:2447 ========== CHUNK PROCESSING PIPELINE FINISHED ==========
+rrweb-plugin-console-record.js:2447 Dialog instance created: {open: ƒ}
+rrweb-plugin-console-record.js:2447 Has open method: true
+rrweb-plugin-console-record.js:2447 Dialog instance created: {open: ƒ}
+rrweb-plugin-console-record.js:2447 Has open method: true
+rrweb-plugin-console-record.js:2447 Dialog instance created: {open: ƒ}
+rrweb-plugin-console-record.js:2447 Has open method: true
+WebSocketClient.js:13  WebSocket connection to 'ws://localhost:443/ws' failed: 
+WebSocketClient @ WebSocketClient.js:13
+initSocket @ socket.js:27
+(anonymous) @ socket.js:51
+rrweb-plugin-console-record.js:2447 Dialog instance created: {open: ƒ}
+rrweb-plugin-console-record.js:2447 Has open method: true
+rrweb-plugin-console-record.js:2447 Dialog instance created: {open: ƒ}
+rrweb-plugin-console-record.js:2447 Has open method: true
+rrweb-plugin-console-record.js:2447  Error sending project to Chillin renderer: TypeError: Cannot read properties of undefined (reading 'render_id')
+    at handleSendToChillin (useChillinAPI.js:362:1)
+    at async Object.onClick (useChillinAPI.js:423:1)
+overrideMethod @ installHook.js:1
+(anonymous) @ rrweb-plugin-console-record.js:2447
+handleSendToChillin @ useChillinAPI.js:387
+await in handleSendToChillin
+onClick @ useChillinAPI.js:423
+handleButtonClick @ dialog.js:39
+onClick @ dialog.js:113
+processDispatchQueue @ react-dom-client.development.js:16122
+(anonymous) @ react-dom-client.development.js:16725
+batchedUpdates$1 @ react-dom-client.development.js:3129
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:16281
+dispatchEvent @ react-dom-client.development.js:20352
+dispatchDiscreteEvent @ react-dom-client.development.js:20320
+rrweb-plugin-console-record.js:2447 Dialog instance created: {open: ƒ}
+rrweb-plugin-console-record.js:2447 Has open method: true
+rrweb-plugin-console-record.js:2447 Dialog instance created: {open: ƒ}
+rrweb-plugin-console-record.js:2447 Has open method: true
+overlay.js:261 [Violation] 'unhandledrejection' handler took 368ms
+useChillinAPI.js:362  Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'render_id')
+    at handleSendToChillin (useChillinAPI.js:362:1)
+    at async Object.onClick (useChillinAPI.js:423:1)
+handleSendToChillin @ useChillinAPI.js:362
+await in handleSendToChillin
+onClick @ useChillinAPI.js:423
+handleButtonClick @ dialog.js:39
+onClick @ dialog.js:113
+processDispatchQueue @ react-dom-client.development.js:16122
+(anonymous) @ react-dom-client.development.js:16725
+batchedUpdates$1 @ react-dom-client.development.js:3129
+dispatchEventForPluginEventSystem @ react-dom-client.development.js:16281
+dispatchEvent @ react-dom-client.development.js:20352
+dispatchDiscreteEvent @ react-dom-client.development.js:20320

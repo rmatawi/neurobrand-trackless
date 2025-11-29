@@ -1,0 +1,133 @@
+### Chillin API Fixes for neurobrand-trackless
+
+This patch fixes two critical bugs in the Chillin render job submission flow.
+
+## Fix #1: Add 10-second wait for api.video processing
+
+**Location:** src/hooks/useChillinAPI.js, after line 307
+
+**Replace this code:**
+```javascript
+      // Show a 10-second simulation
+      dialogManager.create({
+        title: "Processing",
+        text: "Preparing project for Chillin renderer (simulating 10s process)...",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
+
+      // Separate function for the API call
+```
+
+**With this code:**
+```javascript
+      // Show a 10-second preloader to allow api.video to finish processing
+      dialogManager.create({
+        title: "Processing",
+        text: "Preparing project for Chillin renderer...",
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
+
+      // Wait for 10 seconds to allow api.video to finish processing uploaded chunks
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+
+      // Wait 500ms before showing confirmation dialog
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Separate function for the API call
+```
+
+---
+
+## Fix #2: Correct Chillin API payload format
+
+**Location:** src/hooks/useChillinAPI.js, lines 267-283
+
+**Replace this code:**
+```javascript
+      // Create Chillin API request payload with chunk URLs
+      const chillinApiPayload = {
+        compositeWidth: 1280,
+        compositeHeight: 720,
+        fps: 30,
+        projectData: {
+          type: "",
+          width: 1280,
+          height: 720,
+          duration: totalDuration,
+          version: 0,
+          view: updatedTracks[0].items, // Use updated tracks from chunking
+          audio: [],
+          effect: [],
+          transition: [],
+        },
+      };
+```
+
+**With this code:**
+```javascript
+      // Create Chillin API request payload with chunk URLs
+      const chillinApiPayload = {
+        compositeWidth: 1280,
+        compositeHeight: 720,
+        fps: 30,
+        projectData: {
+          type: "",
+          width: 1280,
+          height: 720,
+          fill: "#000000", // Background fill color
+          duration: totalDuration,
+          version: 0,
+          view: updatedTracks[0].items.map((item, index) => ({
+            ...item,
+            type: "Video", // Capitalize for Chillin API
+            externalUrl: item.src, // Map src to externalUrl
+            startInSource: item.inPoint, // Map inPoint to startInSource
+            sourceDuration: item.sourceDuration,
+          })),
+          audio: [],
+          effect: [],
+          transition: [],
+        },
+      };
+```
+
+---
+
+## Why These Fixes Matter
+
+### Fix #1: 10-second wait
+- **Problem:** Without the wait, Chillin might try to access videos that api.video hasn't finished processing yet
+- **Solution:** The 10-second wait allows api.video's processing pipeline to complete before sending the render request
+
+### Fix #2: Correct payload mapping
+- **Problem:** The raw track items have the wrong field names for Chillin's API:
+  - `type: "video"` should be `type: "Video"` (capitalized)
+  - `src` should be `externalUrl`
+  - `inPoint` should be `startInSource`
+  - Missing `fill: "#000000"` property for background color
+- **Solution:** Map the fields to the correct Chillin API format
+
+---
+
+## How to Apply
+
+1. Stop any running development servers
+2. Open `src/hooks/useChillinAPI.js`
+3. Apply Fix #1 (lines 297-307)
+4. Apply Fix #2 (lines 267-283)
+5. Save the file
+6. Restart your development server
+
+---
+
+Generated: 2025-11-29

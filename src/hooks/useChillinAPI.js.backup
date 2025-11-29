@@ -274,15 +274,8 @@ export const useChillinAPI = (dialogManager) => {
           width: 1280,
           height: 720,
           duration: totalDuration,
-          fill: "#000000", // Background fill color
           version: 0,
-          view: updatedTracks[0].items.map((item, index) => ({
-            ...item,
-            type: "Video", // Capitalize for Chillin API
-            externalUrl: item.src, // Map src to externalUrl
-            startInSource: item.inPoint, // Map inPoint to startInSource
-            sourceDuration: item.sourceDuration,
-          })),
+          view: updatedTracks[0].items, // Use updated tracks from chunking
           audio: [],
           effect: [],
           transition: [],
@@ -301,10 +294,10 @@ export const useChillinAPI = (dialogManager) => {
         ]
       }).open();
 
-      // Show a 10-second preloader to allow api.video to finish processing
+      // Show a 10-second simulation
       dialogManager.create({
         title: "Processing",
-        text: "Preparing project for Chillin renderer...",
+        text: "Preparing project for Chillin renderer (simulating 10s process)...",
         buttons: [
           {
             text: "OK",
@@ -312,12 +305,6 @@ export const useChillinAPI = (dialogManager) => {
           }
         ]
       }).open();
-
-      // Wait for 10 seconds to allow api.video to finish processing uploaded chunks
-      await new Promise((resolve) => setTimeout(resolve, 10000));
-
-      // Wait 500ms before showing confirmation dialog
-      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Separate function for the API call
       const handleSendToChillin = async () => {
@@ -356,24 +343,10 @@ export const useChillinAPI = (dialogManager) => {
           }
 
           const result = await response.json();
-
-          // Log the actual response structure for debugging
-          console.log("[CHILLIN_API] Full API response:", result);
-          console.log("[CHILLIN_API] Response data:", result.data);
-
-          // Extract render_id from response (handle different possible structures)
-          const renderId = result.data?.render_id || result.render_id || result.data?.render?.render_id;
-
-          if (!renderId) {
-            console.error("[CHILLIN_API] Could not find render_id in response:", result);
-            throw new Error("Invalid Chillin API response: render_id not found");
-          }
-
-          console.log("[CHILLIN_API] Extracted render_id:", renderId);
-
+          
           // Update the chillinRenders state
           const newRenderJob = {
-            id: renderId,
+            id: result.data.render.render_id,
             name: `Render Job ${Date.now()}`,
             status: "created",
             timestamp: new Date().toISOString(),
@@ -386,7 +359,7 @@ export const useChillinAPI = (dialogManager) => {
 
           dialogManager.create({
             title: "Project Created",
-            text: `Video project created with smart chunking! Project ID: ${renderId}`,
+            text: `Video project created with smart chunking! Project ID: ${result.data.render_id}`,
             buttons: [
               {
                 text: "OK",
