@@ -1077,20 +1077,37 @@ const TracklessVideoEditor = () => {
         }
       };
 
-      // Simulate the confirmation dialog behavior with a simple confirmation
-      const confirmSend = window.confirm(
-        "Click OK to send your project to the Chillin renderer?"
-      );
-      if (confirmSend) {
-        return handleSendToChillin();
-      } else {
-        // User cancelled
-        const cancellationError = new Error(
-          "User cancelled Chillin project submission"
-        );
-        cancellationError.userCancelled = true;
-        throw cancellationError;
-      }
+      // Show confirmation dialog before sending to Chillin
+      return new Promise((resolve, reject) => {
+        dialog.create({
+          title: "Send to Chillin Renderer",
+          text: "Click OK to send your project to the Chillin renderer?",
+          buttons: [
+            {
+              text: "Cancel",
+              variant: "outline",
+              onClick: () => {
+                const cancellationError = new Error(
+                  "User cancelled Chillin project submission"
+                );
+                cancellationError.userCancelled = true;
+                reject(cancellationError);
+              }
+            },
+            {
+              text: "OK",
+              onClick: async () => {
+                try {
+                  const result = await handleSendToChillin();
+                  resolve(result);
+                } catch (error) {
+                  reject(error);
+                }
+              }
+            }
+          ]
+        }).open();
+      });
     } catch (error) {
       console.error("Error in processVideoUploadAndCreateProject:", error);
       if (!error.userCancelled) {

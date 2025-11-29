@@ -248,7 +248,6 @@ export const useChillinAPI = (dialogManager) => {
       // Process chunks using the actual chunk processing service
       const updatedTracks = await processTimelineChunks(
         tracks,
-        totalDuration,
         jobId,
         onProgress,
         "http://localhost" // Renderer API URL - using local by default for chunk processing
@@ -387,20 +386,37 @@ export const useChillinAPI = (dialogManager) => {
         }
       };
 
-      // Simulate the confirmation dialog behavior with a simple confirmation
-      const confirmSend = window.confirm(
-        "Click OK to send your project to the Chillin renderer?"
-      );
-      if (confirmSend) {
-        return handleSendToChillin();
-      } else {
-        // User cancelled
-        const cancellationError = new Error(
-          "User cancelled Chillin project submission"
-        );
-        cancellationError.userCancelled = true;
-        throw cancellationError;
-      }
+      // Show confirmation dialog before sending to Chillin
+      return new Promise((resolve, reject) => {
+        dialogManager.create({
+          title: "Send to Chillin Renderer",
+          text: "Click OK to send your project to the Chillin renderer?",
+          buttons: [
+            {
+              text: "Cancel",
+              variant: "outline",
+              onClick: () => {
+                const cancellationError = new Error(
+                  "User cancelled Chillin project submission"
+                );
+                cancellationError.userCancelled = true;
+                reject(cancellationError);
+              }
+            },
+            {
+              text: "OK",
+              onClick: async () => {
+                try {
+                  const result = await handleSendToChillin();
+                  resolve(result);
+                } catch (error) {
+                  reject(error);
+                }
+              }
+            }
+          ]
+        }).open();
+      });
     } catch (error) {
       console.error("Error in processVideoUploadAndCreateProject:", error);
       if (!error.userCancelled) {
