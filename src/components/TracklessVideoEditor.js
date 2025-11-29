@@ -327,9 +327,19 @@ const TracklessVideoEditor = () => {
             );
             const duration = parseFloat(durationInput);
             if (isNaN(duration) || duration <= 0) {
-              alert("Please enter a valid positive number for duration.");
-              // Re-collect for the current video if invalid
-              collectNewDescriptionsAndDurations();
+              dialog.create({
+                title: "Invalid Duration",
+                text: "Please enter a valid positive number for duration.",
+                buttons: [
+                  {
+                    text: "OK",
+                    onClick: () => {
+                      // Re-collect for the current video if invalid
+                      collectNewDescriptionsAndDurations();
+                    }
+                  }
+                ]
+              }).open();
               return;
             }
             newVideoDurations.push(duration);
@@ -350,7 +360,16 @@ const TracklessVideoEditor = () => {
               : t
           );
           saveCustomTemplates(updatedTemplates);
-          alert("Template updated successfully");
+          dialog.create({
+            title: "Success",
+            text: "Template updated successfully",
+            buttons: [
+              {
+                text: "OK",
+                onClick: () => {}
+              }
+            ]
+          }).open();
         }
       };
 

@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { calculateTotalRecordedTime } from "../js/utils";
+import dialog from "../lib/dialog";
 
 const DB_NAME = "recordings";
 const DEFAULT_DB_VERSION = 1;
@@ -277,8 +278,18 @@ export async function renameVideoInIndexedDB(id, newName) {
 export async function resetIndexedDB() {
   // Clear all IndexedDB data
   indexedDB.deleteDatabase(DB_NAME);
-  alert("IndexedDB has been reset.");
-  location.reload();
+  dialog.create({
+    title: "Database Reset",
+    text: "IndexedDB has been reset.",
+    buttons: [
+      {
+        text: "OK",
+        onClick: () => {
+          location.reload();
+        }
+      }
+    ]
+  }).open();
 }
 
 // HOOK
@@ -292,7 +303,7 @@ export const useIndexedDBVideos = ({
       const tx = db.transaction("videos", "readwrite");
       const store = tx.objectStore("videos");
 
-      alert("project_id", project_id);
+      console.log("project_id", project_id);
 
       if (project_id == "foo") {
         try {

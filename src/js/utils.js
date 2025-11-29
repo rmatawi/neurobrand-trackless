@@ -1,6 +1,7 @@
 import axios from "axios";
 import uuid4 from "uuid4";
 import _ from "lodash";
+import dialog from "../lib/dialog";
 
 // VITE_REACT_APP_OPENAI_API_KEY
 const openaiApiKey = (import.meta && import.meta.env && import.meta.env.VITE_REACT_APP_OPENAI_API_KEY) || null;
@@ -316,7 +317,16 @@ export function detectMedia(inputString) {
   } else if (mp3Regex.test(inputString)) {
     return "mp3";
   } else {
-    alert("Videosource not supported" + inputString);
+    dialog.create({
+      title: "Unsupported Video Source",
+      text: `Video source not supported: ${inputString}`,
+      buttons: [
+        {
+          text: "OK",
+          onClick: () => {}
+        }
+      ]
+    }).open();
     return "unknown";
   }
 }
@@ -362,11 +372,16 @@ export function videoAllowed(inputString) {
       return true;
     }
   }
-  alert(
-    `Only the following video formats and hosting services are allowed: ${allowedSources.join(
-      ", "
-    )}.`
-  );
+  dialog.create({
+    title: "Invalid Video Format",
+    text: `Only the following video formats and hosting services are allowed: ${allowedSources.join(", ")}.`,
+    buttons: [
+      {
+        text: "OK",
+        onClick: () => {}
+      }
+    ]
+  }).open();
   return false;
 }
 
@@ -647,7 +662,16 @@ export async function ChatGPT_OK({ prompt, mode = "smartscript" }) {
       .catch(() => {
         // f7.dialog.close(); // Removed Framework7 dependency
         setTimeout(() => {
-          alert("Please try again"); // Replaced f7.dialog.alert with alert
+          dialog.create({
+            title: "Error",
+            text: "Please try again",
+            buttons: [
+              {
+                text: "OK",
+                onClick: () => {}
+              }
+            ]
+          }).open();
         }, 500);
       });
   });
@@ -745,7 +769,16 @@ export async function ChatGPT({ prompt, mode = "smartscript" }) {
       .catch(() => {
         // f7.dialog.close(); // Removed Framework7 dependency
         setTimeout(() => {
-          alert("Please try again"); // Replaced f7.dialog.alert with alert
+          dialog.create({
+            title: "Error",
+            text: "Please try again",
+            buttons: [
+              {
+                text: "OK",
+                onClick: () => {}
+              }
+            ]
+          }).open();
         }, 500);
       });
   });
@@ -1186,9 +1219,16 @@ export const sendSlackMessage = (email, subject, message) => {
       method: "POST",
       body: JSON.stringify(data),
     });
-    alert(
-      "We've received your message. Thank you! We'll be in contact with you soon!"
-    );
+    dialog.create({
+      title: "Message Sent",
+      text: "We've received your message. Thank you! We'll be in contact with you soon!",
+      buttons: [
+        {
+          text: "OK",
+          onClick: () => {}
+        }
+      ]
+    }).open();
     // f7.popup.close("#popover-bugs"); // Removed Framework7 dependency
   } catch (error) {
     console.error(error);
@@ -1510,7 +1550,16 @@ export async function insertMetaData({ supabase, usr, metaData }) {
       })
       .select();
     if (error) {
-      alert(error.message); // Replaced f7.dialog.alert with alert
+      dialog.create({
+        title: "Error",
+        text: error.message,
+        buttons: [
+          {
+            text: "OK",
+            onClick: () => {}
+          }
+        ]
+      }).open();
       throw error;
     }
     if (data) {
@@ -1609,7 +1658,16 @@ export function webShare({ title, text, url }) {
         console.error("Error sharing:", error);
       });
   } else {
-    alert("Web Share API not supported.");
+    dialog.create({
+      title: "Not Supported",
+      text: "Web Share API not supported.",
+      buttons: [
+        {
+          text: "OK",
+          onClick: () => {}
+        }
+      ]
+    }).open();
   }
 }
 

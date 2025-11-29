@@ -214,9 +214,19 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
             );
             const duration = parseFloat(durationInput);
             if (isNaN(duration) || duration <= 0) {
-              alert("Please enter a valid positive number for duration.");
-              // Re-collect for the current video if invalid
-              collectNewDescriptionsAndDurations();
+              dialogManager.create({
+                title: "Invalid Duration",
+                text: "Please enter a valid positive number for duration.",
+                buttons: [
+                  {
+                    text: "OK",
+                    onClick: () => {
+                      // Re-collect for the current video if invalid
+                      collectNewDescriptionsAndDurations();
+                    }
+                  }
+                ]
+              }).open();
               return;
             }
             newVideoDurations.push(duration);
