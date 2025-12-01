@@ -1474,7 +1474,7 @@ const TracklessVideoEditor = () => {
               <Slider
                 id="inPoint"
                 min={0}
-                max={outPoint}
+                max={currentVideoIndex !== null && selectedVideos[currentVideoIndex] ? selectedVideos[currentVideoIndex].duration || 10 : 10}
                 step={0.1}
                 value={[inPoint]}
                 onValueChange={(value) => setInPoint(value[0])}
@@ -1482,6 +1482,8 @@ const TracklessVideoEditor = () => {
               />
               <Input
                 type="number"
+                min={0}
+                max={currentVideoIndex !== null && selectedVideos[currentVideoIndex] ? selectedVideos[currentVideoIndex].duration || 10 : 10}
                 value={inPoint}
                 onChange={(e) => setInPoint(parseFloat(e.target.value))}
                 className="w-full"
@@ -1492,7 +1494,7 @@ const TracklessVideoEditor = () => {
               <Slider
                 id="outPoint"
                 min={inPoint}
-                max={10}
+                max={currentVideoIndex !== null && selectedVideos[currentVideoIndex] ? selectedVideos[currentVideoIndex].duration || 10 : 10}
                 step={0.1}
                 value={[outPoint]}
                 onValueChange={(value) => setOutPoint(value[0])}
@@ -1500,6 +1502,8 @@ const TracklessVideoEditor = () => {
               />
               <Input
                 type="number"
+                min={inPoint}
+                max={currentVideoIndex !== null && selectedVideos[currentVideoIndex] ? selectedVideos[currentVideoIndex].duration || 10 : 10}
                 value={outPoint}
                 onChange={(e) => setOutPoint(parseFloat(e.target.value))}
                 className="w-full"

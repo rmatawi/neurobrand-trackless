@@ -13,6 +13,27 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(null);
   const [videoDuration, setVideoDuration] = useState(10);
 
+  // Function to get the actual duration of a video file
+  const getVideoDuration = (file) => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      const url = URL.createObjectURL(file);
+
+      video.onloadedmetadata = () => {
+        const duration = video.duration;
+        URL.revokeObjectURL(url); // Clean up the URL object
+        resolve(duration);
+      };
+
+      video.onerror = () => {
+        URL.revokeObjectURL(url); // Clean up the URL object
+        reject(new Error('Could not load video to get duration'));
+      };
+
+      video.src = url;
+    });
+  };
+
   // Clean up object URLs when videos change
   const cleanupVideoUrls = (videos) => {
     videos.forEach((video) => {
@@ -55,14 +76,17 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
       }
 
       try {
+        // Get the actual duration of the video file
+        const actualDuration = await getVideoDuration(file);
+
         const deviceVideo = {
           id: `device-${Date.now()}`,
           name: file.name,
           blob: file,
           timestamp: Date.now(),
           size: file.size,
-          duration: videoDuration, // Duration specified by the user
-          inOutPoints: { inPoint: 0, outPoint: videoDuration },
+          duration: actualDuration, // Use actual video duration
+          inOutPoints: { inPoint: 0, outPoint: actualDuration },
         };
 
         if (targetIndex !== null) {
