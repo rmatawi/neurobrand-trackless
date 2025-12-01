@@ -135,7 +135,6 @@ const TracklessVideoEditor = () => {
     sendTestJobToChillin,
   } = useChillinAPI(dialogManager);
 
-
   // Clean up object URLs when videos change
   React.useEffect(() => {
     return () => {
@@ -148,11 +147,11 @@ const TracklessVideoEditor = () => {
     <div className="min-h-screen bg-white">
       {/* Navbar */}
       <div className="bg-[#0F1A21] text-white p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center">
             <h1 className="text-xl font-bold">Trackless Video</h1>
           </div>
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap justify-center gap-2">
             <Button
               variant={activeTab === "templates" ? "default" : "outline"}
               onClick={() => setActiveTab("templates")}
@@ -222,7 +221,7 @@ const TracklessVideoEditor = () => {
                 Custom Template Manager
               </h2>
 
-              <div className="flex space-x-4 mb-6">
+              <div className="flex flex-wrap gap-4 mb-6">
                 <Button
                   className="bg-[#1E97A0] hover:bg-[#157a82]"
                   onClick={createCustomTemplate}
@@ -268,7 +267,7 @@ const TracklessVideoEditor = () => {
                         Videos required: {customTemplate.requiredVideos}
                       </p>
                       {template === customTemplate.id && (
-                        <div className="mt-4 flex space-x-2">
+                        <div className="mt-4 flex flex-wrap gap-2">
                           <Button
                             size="sm"
                             variant="outline"
@@ -290,7 +289,7 @@ const TracklessVideoEditor = () => {
                           </Button>
                         </div>
                       )}
-                      <div className="flex space-x-2 mt-4">
+                      <div className="flex flex-wrap gap-2 mt-4">
                         <Button
                           size="sm"
                           variant="outline"
@@ -353,7 +352,7 @@ const TracklessVideoEditor = () => {
                     <p className="text-sm text-gray-600">Two videos: 3s + 3s</p>
                   </CardContent>
                   {template === 1 && (
-                    <div className="mt-4 flex space-x-2">
+                    <div className="mt-4 flex flex-wrap gap-2">
                       <Button
                         size="sm"
                         variant="outline"
@@ -386,7 +385,8 @@ const TracklessVideoEditor = () => {
                               return;
                             }
                             const requiredVideos = getRequiredVideos(template);
-                            const videosNeeded = requiredVideos - selectedVideos.length;
+                            const videosNeeded =
+                              requiredVideos - selectedVideos.length;
                             if (videosNeeded <= 0) {
                               dialogManager
                                 .create({
@@ -403,7 +403,10 @@ const TracklessVideoEditor = () => {
                               return;
                             }
                             // Go straight to file selection without showing a dialog
-                            handlePickFromDevice(requiredVideos, template).catch((error) =>
+                            handlePickFromDevice(
+                              requiredVideos,
+                              template
+                            ).catch((error) =>
                               console.error("Error picking from device:", error)
                             );
                           }, 100); // Small delay to ensure tab has switched
@@ -431,7 +434,7 @@ const TracklessVideoEditor = () => {
                     </p>
                   </CardContent>
                   {template === 2 && (
-                    <div className="mt-4 flex space-x-2">
+                    <div className="mt-4 flex flex-wrap gap-2">
                       <Button
                         size="sm"
                         variant="outline"
@@ -464,7 +467,8 @@ const TracklessVideoEditor = () => {
                               return;
                             }
                             const requiredVideos = getRequiredVideos(template);
-                            const videosNeeded = requiredVideos - selectedVideos.length;
+                            const videosNeeded =
+                              requiredVideos - selectedVideos.length;
                             if (videosNeeded <= 0) {
                               dialogManager
                                 .create({
@@ -481,7 +485,10 @@ const TracklessVideoEditor = () => {
                               return;
                             }
                             // Go straight to file selection without showing a dialog
-                            handlePickFromDevice(requiredVideos, template).catch((error) =>
+                            handlePickFromDevice(
+                              requiredVideos,
+                              template
+                            ).catch((error) =>
                               console.error("Error picking from device:", error)
                             );
                           }, 100); // Small delay to ensure tab has switched
@@ -509,7 +516,7 @@ const TracklessVideoEditor = () => {
                     </p>
                   </CardContent>
                   {template === 3 && (
-                    <div className="mt-4 flex space-x-2">
+                    <div className="mt-4 flex flex-wrap gap-2">
                       <Button
                         size="sm"
                         variant="outline"
@@ -542,7 +549,8 @@ const TracklessVideoEditor = () => {
                               return;
                             }
                             const requiredVideos = getRequiredVideos(template);
-                            const videosNeeded = requiredVideos - selectedVideos.length;
+                            const videosNeeded =
+                              requiredVideos - selectedVideos.length;
                             if (videosNeeded <= 0) {
                               dialogManager
                                 .create({
@@ -559,7 +567,10 @@ const TracklessVideoEditor = () => {
                               return;
                             }
                             // Go straight to file selection without showing a dialog
-                            handlePickFromDevice(requiredVideos, template).catch((error) =>
+                            handlePickFromDevice(
+                              requiredVideos,
+                              template
+                            ).catch((error) =>
                               console.error("Error picking from device:", error)
                             );
                           }, 100); // Small delay to ensure tab has switched
@@ -619,8 +630,9 @@ const TracklessVideoEditor = () => {
                       return;
                     }
                     // Go straight to file selection without showing a dialog
-                    handlePickFromDevice(requiredVideos, template).catch((error) =>
-                      console.error("Error picking from device:", error)
+                    handlePickFromDevice(requiredVideos, template).catch(
+                      (error) =>
+                        console.error("Error picking from device:", error)
                     );
                   }}
                 >
@@ -711,7 +723,9 @@ const TracklessVideoEditor = () => {
                           ...selectedVideos.map((video, index) => {
                             const inPoint = video.inOutPoints?.inPoint || 0;
                             const outPoint =
-                              video.inOutPoints?.outPoint || video.duration || 10;
+                              video.inOutPoints?.outPoint ||
+                              video.duration ||
+                              10;
                             const startTime =
                               index === 0
                                 ? 0
@@ -753,48 +767,59 @@ const TracklessVideoEditor = () => {
                               ext: "mp4",
                               startInSource: inPoint,
                               sourceDuration: outPoint - inPoint,
-                              volume: videoVolumes[index] !== undefined ? videoVolumes[index] : 1,
+                              volume:
+                                videoVolumes[index] !== undefined
+                                  ? videoVolumes[index]
+                                  : 1,
                               hasAudio: true,
                               playrate: 1,
                               isFrontTrimmed: false,
                             };
                           }),
                           // Audio layers for separately added audio tracks
-                          ...selectedVideos.map((video, index) => {
-                            const audioTrack = videoAudioTracks[index];
-                            if (!audioTrack) return null; // Skip if no audio track for this video index
+                          ...selectedVideos
+                            .map((video, index) => {
+                              const audioTrack = videoAudioTracks[index];
+                              if (!audioTrack) return null; // Skip if no audio track for this video index
 
-                            const inPoint = video.inOutPoints?.inPoint || 0;
-                            const outPoint = video.inOutPoints?.outPoint || video.duration || 10;
-                            const startTime =
-                              index === 0
-                                ? 0
-                                : selectedVideos
-                                    .slice(0, index)
-                                    .reduce((acc, v) => {
-                                      const vIn = v.inOutPoints?.inPoint || 0;
-                                      const vOut =
-                                        v.inOutPoints?.outPoint ||
-                                        v.duration ||
-                                        10;
-                                      return acc + (vOut - vIn);
-                                    }, 0);
+                              const inPoint = video.inOutPoints?.inPoint || 0;
+                              const outPoint =
+                                video.inOutPoints?.outPoint ||
+                                video.duration ||
+                                10;
+                              const startTime =
+                                index === 0
+                                  ? 0
+                                  : selectedVideos
+                                      .slice(0, index)
+                                      .reduce((acc, v) => {
+                                        const vIn = v.inOutPoints?.inPoint || 0;
+                                        const vOut =
+                                          v.inOutPoints?.outPoint ||
+                                          v.duration ||
+                                          10;
+                                        return acc + (vOut - vIn);
+                                      }, 0);
 
-                            return {
-                              id: `audio-${video.id || index}`,
-                              type: "Audio",
-                              start: startTime,
-                              duration: audioTrack.duration,
-                              trackIndex: 10 + index, // Different track index for audio
-                              externalUrl: audioTrack.url,
-                              ext: "mp3", // Determine from the audio file
-                              startInSource: 0,
-                              sourceDuration: audioTrack.duration,
-                              volume: audioVolumes[index] !== undefined ? audioVolumes[index] : 1,
-                              playrate: 1,
-                              isFrontTrimmed: false,
-                            };
-                          }).filter(layer => layer !== null) // Remove null entries
+                              return {
+                                id: `audio-${video.id || index}`,
+                                type: "Audio",
+                                start: startTime,
+                                duration: audioTrack.duration,
+                                trackIndex: 10 + index, // Different track index for audio
+                                externalUrl: audioTrack.url,
+                                ext: "mp3", // Determine from the audio file
+                                startInSource: 0,
+                                sourceDuration: audioTrack.duration,
+                                volume:
+                                  audioVolumes[index] !== undefined
+                                    ? audioVolumes[index]
+                                    : 1,
+                                playrate: 1,
+                                isFrontTrimmed: false,
+                              };
+                            })
+                            .filter((layer) => layer !== null), // Remove null entries
                         ],
                       }}
                       controls
@@ -813,10 +838,10 @@ const TracklessVideoEditor = () => {
                     key={video.id || index}
                     className="border rounded-lg p-4 bg-white"
                   >
-                    <div className="flex items-center space-x-4">
-                      <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
-                      <div className="flex-1">
-                        <h3 className="font-semibold">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center space-x-0 sm:space-x-4 space-y-3 sm:space-y-0">
+                      <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 flex-shrink-0" />
+                      <div className="flex-1 w-full">
+                        <h3 className="font-semibold truncate">
                           {video.name || `Video ${index + 1}`}
                         </h3>
                         <p className="text-sm text-gray-600">
@@ -834,67 +859,75 @@ const TracklessVideoEditor = () => {
                           </p>
                         )}
                       </div>
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openInOutDialog(index)}
-                        >
-                          In/Out
-                        </Button>
-                        {videoAudioTracks[index] ? (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setCurrentVolumeVideoIndex(index);
-                                setIsAudioVolume(true);
-                                setVolumeValue(audioVolumes[index] !== undefined ? audioVolumes[index] : 1.0);
-                                setVolumeDialogOpen(true);
-                              }}
-                            >
-                              Audio Vol
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => removeAudioFromVideo(index)}
-                            >
-                              Remove Audio
-                            </Button>
-                          </>
-                        ) : (
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openInOutDialog(index)}
+                      >
+                        In/Out
+                      </Button>
+                      {videoAudioTracks[index] ? (
+                        <>
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleAddAudioToVideo(index)}
+                            onClick={() => {
+                              setCurrentVolumeVideoIndex(index);
+                              setIsAudioVolume(true);
+                              setVolumeValue(
+                                audioVolumes[index] !== undefined
+                                  ? audioVolumes[index]
+                                  : 1.0
+                              );
+                              setVolumeDialogOpen(true);
+                            }}
                           >
-                            Add Audio
+                            Audio Vol
                           </Button>
-                        )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => removeAudioFromVideo(index)}
+                          >
+                            Remove Audio
+                          </Button>
+                        </>
+                      ) : (
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => {
-                            setCurrentVolumeVideoIndex(index);
-                            setIsAudioVolume(false);
-                            setVolumeValue(videoVolumes[index] !== undefined ? videoVolumes[index] : 1.0);
-                            setVolumeDialogOpen(true);
-                          }}
+                          onClick={() => handleAddAudioToVideo(index)}
                         >
-                          Video Vol
+                          Add Audio
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => removeVideo(index)}
-                        >
-                          Remove
-                        </Button>
-                      </div>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setCurrentVolumeVideoIndex(index);
+                          setIsAudioVolume(false);
+                          setVolumeValue(
+                            videoVolumes[index] !== undefined
+                              ? videoVolumes[index]
+                              : 1.0
+                          );
+                          setVolumeDialogOpen(true);
+                        }}
+                      >
+                        Video Vol
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => removeVideo(index)}
+                      >
+                        Remove
+                      </Button>
                     </div>
-                    <div className="mt-3 flex space-x-2">
+                    <div className="mt-2 flex flex-wrap gap-2">
                       <Button
                         size="sm"
                         variant="outline"
@@ -989,7 +1022,7 @@ const TracklessVideoEditor = () => {
                           {new Date(render.timestamp).toLocaleString()}
                         </p>
 
-                        <div className="mt-4 flex space-x-2">
+                        <div className="mt-4 flex flex-wrap gap-2">
                           <Button
                             size="sm"
                             variant="outline"
@@ -1487,10 +1520,14 @@ const TracklessVideoEditor = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isAudioVolume ? 'Audio' : 'Video'} Volume for Video {currentVolumeVideoIndex !== null ? currentVolumeVideoIndex + 1 : ''}
+              {isAudioVolume ? "Audio" : "Video"} Volume for Video{" "}
+              {currentVolumeVideoIndex !== null
+                ? currentVolumeVideoIndex + 1
+                : ""}
             </DialogTitle>
             <DialogDescription>
-              Set the volume level for the {isAudioVolume ? 'audio' : 'video'} track.
+              Set the volume level for the {isAudioVolume ? "audio" : "video"}{" "}
+              track.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -1516,23 +1553,30 @@ const TracklessVideoEditor = () => {
                 max="1"
                 step="0.01"
                 value={volumeValue}
-                onChange={(e) => setVolumeValue(parseFloat(e.target.value) || 0)}
+                onChange={(e) =>
+                  setVolumeValue(parseFloat(e.target.value) || 0)
+                }
                 className="w-full"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setVolumeDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setVolumeDialogOpen(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={() => {
-              if (isAudioVolume) {
-                setAudioVolume(currentVolumeVideoIndex, volumeValue);
-              } else {
-                setVideoVolume(currentVolumeVideoIndex, volumeValue);
-              }
-              setVolumeDialogOpen(false);
-            }}>
+            <Button
+              onClick={() => {
+                if (isAudioVolume) {
+                  setAudioVolume(currentVolumeVideoIndex, volumeValue);
+                } else {
+                  setVideoVolume(currentVolumeVideoIndex, volumeValue);
+                }
+                setVolumeDialogOpen(false);
+              }}
+            >
               Set Volume
             </Button>
           </DialogFooter>
