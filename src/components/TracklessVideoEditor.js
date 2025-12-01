@@ -763,32 +763,6 @@ const TracklessVideoEditor = () => {
                   + Add Videos
                 </Button>
                 <Button
-                  variant="outline"
-                  className="w-full border-dashed border-2 border-gray-300 bg-blue-50 text-blue-700"
-                  onClick={() => {
-                    dialogManager
-                      .create({
-                        title: "Send Test Job",
-                        text: "Are you sure you want to send a test job to Chillin?",
-                        buttons: [
-                          {
-                            text: "Send",
-                            onClick: () => {
-                              sendTestJobToChillin();
-                            },
-                          },
-                          {
-                            text: "Cancel",
-                            onClick: () => {},
-                          },
-                        ],
-                      })
-                      .open();
-                  }}
-                >
-                  Send Test Job to Chillin
-                </Button>
-                <Button
                   className="w-full bg-[#A01E25] hover:bg-[#80171e] text-white"
                   onClick={() => {
                     dialogManager
