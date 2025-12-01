@@ -1629,8 +1629,9 @@ const TracklessVideoEditor = () => {
                 value={[inPoint]}
                 onValueChange={(value) => {
                   setInPoint(value[0]);
-                  // Update video preview when slider moves
+                  // Update video preview to show the new inpoint
                   if (videoPreviewRef && !isVideoPreviewPlaying) {
+                    // Move the video preview to the new inpoint position to let user see it
                     videoPreviewRef.currentTime = value[0];
                   }
                 }}
@@ -1653,7 +1654,14 @@ const TracklessVideoEditor = () => {
                 max={currentVideoIndex !== null && selectedVideos[currentVideoIndex] ? selectedVideos[currentVideoIndex].duration || 10 : 10}
                 step={0.1}
                 value={[outPoint]}
-                onValueChange={(value) => setOutPoint(value[0])}
+                onValueChange={(value) => {
+                  setOutPoint(value[0]);
+                  // Update video preview to show the new outpoint
+                  if (videoPreviewRef && !isVideoPreviewPlaying) {
+                    // Move the video preview to the new outpoint position to let user see it
+                    videoPreviewRef.currentTime = value[0];
+                  }
+                }}
                 className="w-full"
               />
               <Input
