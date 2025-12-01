@@ -14,6 +14,9 @@ import { Slider } from "./ui/slider";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Player } from "@remotion/player";
 import VideoComposition from "../remotion/VideoComposition";
+import ProgressIndicator from "./ui/ProgressIndicator";
+import TimelineVisualization from "./TimelineVisualization";
+import VideoCard from "./VideoCard";
 
 import { useDialogManager } from "../hooks/useDialogManager";
 import { useTemplateManagement } from "../hooks/useTemplateManagement";
@@ -119,6 +122,9 @@ const TracklessVideoEditor = () => {
   // Video preview state for In/Out dialog
   const [videoPreviewRef, setVideoPreviewRef] = useState(null);
   const [isVideoPreviewPlaying, setIsVideoPreviewPlaying] = useState(false);
+
+  // Video selection state for sequence tab
+  const [selectedVideoIndex, setSelectedVideoIndex] = useState(null);
 
   // Volume dialog state
   const [volumeDialogOpen, setVolumeDialogOpen] = useState(false);
@@ -334,6 +340,17 @@ const TracklessVideoEditor = () => {
           </div>
         </div>
       </div>
+
+      {/* Progress Indicator */}
+      <ProgressIndicator
+        currentStep={
+          activeTab === "templates" ? 1 :
+          activeTab === "sequence" ? 2 :
+          activeTab === "render" ? 3 : 1
+        }
+        totalSteps={3}
+        labels={["Template", "Sequence", "Render"]}
+      />
 
       {/* Main Content Area */}
       <div className="p-6">

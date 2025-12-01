@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { processTimelineChunks } from "../services/chunkProcessingService";
+import { showNotification } from "../components/NotificationSystem";
 
 // Custom hook for managing Chillin API operations
 export const useChillinAPI = (dialogManager) => {
@@ -323,32 +324,10 @@ export const useChillinAPI = (dialogManager) => {
           );
           setChillinRenders(updatedRenders);
 
-          dialogManager
-            .create({
-              title: "Project Created",
-              text: `Video project created with smart chunking! Project ID: ${renderId}`,
-              buttons: [
-                {
-                  text: "OK",
-                  onClick: () => {},
-                },
-              ],
-            })
-            .open();
+          showNotification.success(`Video project created with smart chunking! Project ID: ${renderId}`);
         } catch (error) {
           console.error("Error sending project to Chillin renderer:", error);
-          dialogManager
-            .create({
-              title: "API Error",
-              text: `Error: ${error.message}`,
-              buttons: [
-                {
-                  text: "OK",
-                  onClick: () => {},
-                },
-              ],
-            })
-            .open();
+          showNotification.error(`Error: ${error.message}`);
           throw error;
         }
       };
@@ -384,18 +363,7 @@ export const useChillinAPI = (dialogManager) => {
     } catch (error) {
       console.error("Error in processVideoUploadAndCreateProject:", error);
       if (!error.userCancelled) {
-        dialogManager
-          .create({
-            title: "Processing Error",
-            text: `Error: ${error.message}`,
-            buttons: [
-              {
-                text: "OK",
-                onClick: () => {},
-              },
-            ],
-          })
-          .open();
+        showNotification.error(`Error: ${error.message}`);
       }
       throw error; // Re-throw the error so calling code can handle it if needed
     }
@@ -618,18 +586,7 @@ export const useChillinAPI = (dialogManager) => {
         console.log("Test job sent successfully:", result);
 
         // Show success with the actual render ID from the API (same as in useChillinAPI)
-        dialogManager
-          .create({
-            title: "Success",
-            text: `Test job sent successfully! Render ID: ${result.data.render_id}`,
-            buttons: [
-              {
-                text: "OK",
-                onClick: () => {},
-              },
-            ],
-          })
-          .open();
+        showNotification.success(`Test job sent successfully! Render ID: ${result.data.render_id}`);
       } else {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
@@ -640,18 +597,7 @@ export const useChillinAPI = (dialogManager) => {
       }
     } catch (error) {
       console.error("Error sending test job to Chillin:", error);
-      dialogManager
-        .create({
-          title: "Error",
-          text: `Error sending test job: ${error.message}`,
-          buttons: [
-            {
-              text: "OK",
-              onClick: () => {},
-            },
-          ],
-        })
-        .open();
+      showNotification.error(`Error sending test job: ${error.message}`);
     }
   };
 

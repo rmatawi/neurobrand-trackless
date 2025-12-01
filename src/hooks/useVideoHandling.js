@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { showNotification } from '../components/NotificationSystem';
 
 // Custom hook for managing video handling
 export const useVideoHandling = (chillinApiKey, dialogManager) => {
@@ -51,16 +52,7 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
   ) => {
     // Check if videos have already been added for Template 1 or 3 but we need 2, or Template 2 but we need 3
     if (targetIndex === null && selectedVideos.length >= requiredVideos) {
-      dialogManager.create({
-        title: "Too Many Videos",
-        text: `Template ${currentTemplate} requires exactly ${requiredVideos} videos. Remove current videos before adding more.`,
-        buttons: [
-          {
-            text: "OK",
-            onClick: () => {}
-          }
-        ]
-      }).open();
+      showNotification.warning(`Template ${currentTemplate} requires exactly ${requiredVideos} videos. Remove current videos before adding more.`);
       return;
     }
 
@@ -99,16 +91,7 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
         } else {
           // Check if we've reached the limit for current template
           if (selectedVideos.length >= requiredVideos) {
-            dialogManager.create({
-              title: "Video Limit Reached",
-              text: `Template ${currentTemplate} requires exactly ${requiredVideos} videos.`,
-              buttons: [
-                {
-                  text: "OK",
-                  onClick: () => {}
-                }
-              ]
-            }).open();
+            showNotification.warning(`Template ${currentTemplate} requires exactly ${requiredVideos} videos.`);
             return;
           }
 
@@ -120,16 +103,7 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
         }
       } catch (error) {
         console.error("Error processing device video:", error);
-        dialogManager.create({
-          title: "Processing Error",
-          text: `Error loading video: ${error.message}`,
-          buttons: [
-            {
-              text: "OK",
-              onClick: () => {}
-            }
-          ]
-        }).open();
+        showNotification.error(`Error loading video: ${error.message}`);
       }
     };
 
@@ -264,16 +238,7 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
         };
 
         audioElement.onerror = () => {
-          dialogManager.create({
-            title: "Error",
-            text: "Could not load audio to get duration",
-            buttons: [
-              {
-                text: "OK",
-                onClick: () => {}
-              }
-            ]
-          }).open();
+          showNotification.error("Could not load audio to get duration");
           URL.revokeObjectURL(audioUrl);
         };
       }
@@ -300,16 +265,7 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
       },
     }));
 
-    dialogManager.create({
-      title: "Audio Added",
-      text: `Audio file added to Video ${videoIndex + 1}`,
-      buttons: [
-        {
-          text: "OK",
-          onClick: () => {}
-        }
-      ]
-    }).open();
+    showNotification.success(`Audio file added to Video ${videoIndex + 1}`);
   };
 
   // Function to remove audio from a video
@@ -324,16 +280,7 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
       return newTracks;
     });
 
-    dialogManager.create({
-      title: "Audio Removed",
-      text: `Audio removed from Video ${videoIndex + 1}`,
-      buttons: [
-        {
-          text: "OK",
-          onClick: () => {}
-        }
-      ]
-    }).open();
+    showNotification.info(`Audio removed from Video ${videoIndex + 1}`);
   };
 
   // Function to set video volume

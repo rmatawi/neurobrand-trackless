@@ -5,6 +5,7 @@ import axios from "axios";
 import LandingPage from "./components/LandingPage";
 import TracklessVideoEditor from "./components/TracklessVideoEditor";
 import TestDialogComponent from "./components/TestDialogComponent";
+import NotificationSystem from "./components/NotificationSystem";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -35,6 +36,7 @@ function App() {
           <Route path="/trackless-video-editor" element={<TracklessVideoEditor />} />
           <Route path="/test-dialog" element={<TestDialogComponent />} />
         </Routes>
+        <NotificationSystem />
       </BrowserRouter>
     </div>
   );
