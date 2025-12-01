@@ -116,6 +116,12 @@ const TracklessVideoEditor = () => {
     moveVideoForward,
   } = useVideoHandling(process.env.REACT_APP_CHILLIN, dialogManager);
 
+  // Volume dialog state
+  const [volumeDialogOpen, setVolumeDialogOpen] = useState(false);
+  const [currentVolumeVideoIndex, setCurrentVolumeVideoIndex] = useState(null);
+  const [isAudioVolume, setIsAudioVolume] = useState(false);
+  const [volumeValue, setVolumeValue] = useState(1.0);
+
   const {
     // State
     chillinRenders,
@@ -660,7 +666,9 @@ const TracklessVideoEditor = () => {
                               sendChillinProjectToRenderer(
                                 selectedVideos,
                                 template,
-                                customTemplates
+                                customTemplates,
+                                videoVolumes,
+                                audioVolumes
                               );
                             },
                           },
@@ -698,57 +706,96 @@ const TracklessVideoEditor = () => {
                         height: "100%",
                       }}
                       inputProps={{
-                        layers: selectedVideos.map((video, index) => {
-                          const inPoint = video.inOutPoints?.inPoint || 0;
-                          const outPoint =
-                            video.inOutPoints?.outPoint || video.duration || 10;
-                          const startTime =
-                            index === 0
-                              ? 0
-                              : selectedVideos
-                                  .slice(0, index)
-                                  .reduce((acc, v) => {
-                                    const vIn = v.inOutPoints?.inPoint || 0;
-                                    const vOut =
-                                      v.inOutPoints?.outPoint ||
-                                      v.duration ||
-                                      10;
-                                    return acc + (vOut - vIn);
-                                  }, 0);
+                        layers: [
+                          // Video layers
+                          ...selectedVideos.map((video, index) => {
+                            const inPoint = video.inOutPoints?.inPoint || 0;
+                            const outPoint =
+                              video.inOutPoints?.outPoint || video.duration || 10;
+                            const startTime =
+                              index === 0
+                                ? 0
+                                : selectedVideos
+                                    .slice(0, index)
+                                    .reduce((acc, v) => {
+                                      const vIn = v.inOutPoints?.inPoint || 0;
+                                      const vOut =
+                                        v.inOutPoints?.outPoint ||
+                                        v.duration ||
+                                        10;
+                                      return acc + (vOut - vIn);
+                                    }, 0);
 
-                          return {
-                            id: video.id || `video-${index}`,
-                            type: "Video",
-                            start: startTime,
-                            duration: outPoint - inPoint,
-                            trackIndex: 0,
-                            x: 0,
-                            y: 0,
-                            width: 1280,
-                            height: 720,
-                            blendMode: "normal",
-                            anchorX: 640,
-                            anchorY: 360,
-                            rotation: 0,
-                            scaleX: 1,
-                            scaleY: 1,
-                            alpha: 1,
-                            skewX: 0,
-                            skewY: 0,
-                            hidden: false,
-                            locked: false,
-                            keyframes: [],
-                            externalUrl:
-                              video.src || URL.createObjectURL(video.blob),
-                            ext: "mp4",
-                            startInSource: inPoint,
-                            sourceDuration: outPoint - inPoint,
-                            volume: 1,
-                            hasAudio: true,
-                            playrate: 1,
-                            isFrontTrimmed: false,
-                          };
-                        }),
+                            return {
+                              id: video.id || `video-${index}`,
+                              type: "Video",
+                              start: startTime,
+                              duration: outPoint - inPoint,
+                              trackIndex: 0,
+                              x: 0,
+                              y: 0,
+                              width: 1280,
+                              height: 720,
+                              blendMode: "normal",
+                              anchorX: 640,
+                              anchorY: 360,
+                              rotation: 0,
+                              scaleX: 1,
+                              scaleY: 1,
+                              alpha: 1,
+                              skewX: 0,
+                              skewY: 0,
+                              hidden: false,
+                              locked: false,
+                              keyframes: [],
+                              externalUrl:
+                                video.src || URL.createObjectURL(video.blob),
+                              ext: "mp4",
+                              startInSource: inPoint,
+                              sourceDuration: outPoint - inPoint,
+                              volume: videoVolumes[index] !== undefined ? videoVolumes[index] : 1,
+                              hasAudio: true,
+                              playrate: 1,
+                              isFrontTrimmed: false,
+                            };
+                          }),
+                          // Audio layers for separately added audio tracks
+                          ...selectedVideos.map((video, index) => {
+                            const audioTrack = videoAudioTracks[index];
+                            if (!audioTrack) return null; // Skip if no audio track for this video index
+
+                            const inPoint = video.inOutPoints?.inPoint || 0;
+                            const outPoint = video.inOutPoints?.outPoint || video.duration || 10;
+                            const startTime =
+                              index === 0
+                                ? 0
+                                : selectedVideos
+                                    .slice(0, index)
+                                    .reduce((acc, v) => {
+                                      const vIn = v.inOutPoints?.inPoint || 0;
+                                      const vOut =
+                                        v.inOutPoints?.outPoint ||
+                                        v.duration ||
+                                        10;
+                                      return acc + (vOut - vIn);
+                                    }, 0);
+
+                            return {
+                              id: `audio-${video.id || index}`,
+                              type: "Audio",
+                              start: startTime,
+                              duration: audioTrack.duration,
+                              trackIndex: 10 + index, // Different track index for audio
+                              externalUrl: audioTrack.url,
+                              ext: "mp3", // Determine from the audio file
+                              startInSource: 0,
+                              sourceDuration: audioTrack.duration,
+                              volume: audioVolumes[index] !== undefined ? audioVolumes[index] : 1,
+                              playrate: 1,
+                              isFrontTrimmed: false,
+                            };
+                          }).filter(layer => layer !== null) // Remove null entries
+                        ],
                       }}
                       controls
                     />
@@ -800,7 +847,12 @@ const TracklessVideoEditor = () => {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => openVolumeDialog(index, true)}
+                              onClick={() => {
+                                setCurrentVolumeVideoIndex(index);
+                                setIsAudioVolume(true);
+                                setVolumeValue(audioVolumes[index] !== undefined ? audioVolumes[index] : 1.0);
+                                setVolumeDialogOpen(true);
+                              }}
                             >
                               Audio Vol
                             </Button>
@@ -824,7 +876,12 @@ const TracklessVideoEditor = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => openVolumeDialog(index, false)}
+                          onClick={() => {
+                            setCurrentVolumeVideoIndex(index);
+                            setIsAudioVolume(false);
+                            setVolumeValue(videoVolumes[index] !== undefined ? videoVolumes[index] : 1.0);
+                            setVolumeDialogOpen(true);
+                          }}
                         >
                           Video Vol
                         </Button>
@@ -889,7 +946,9 @@ const TracklessVideoEditor = () => {
                               sendChillinProjectToRenderer(
                                 selectedVideos,
                                 template,
-                                customTemplates
+                                customTemplates,
+                                videoVolumes,
+                                audioVolumes
                               );
                             },
                           },
@@ -1419,6 +1478,63 @@ const TracklessVideoEditor = () => {
               Cancel
             </Button>
             <Button onClick={handleSetInOutPoints}>Set Points</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Volume Dialog */}
+      <Dialog open={volumeDialogOpen} onOpenChange={setVolumeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {isAudioVolume ? 'Audio' : 'Video'} Volume for Video {currentVolumeVideoIndex !== null ? currentVolumeVideoIndex + 1 : ''}
+            </DialogTitle>
+            <DialogDescription>
+              Set the volume level for the {isAudioVolume ? 'audio' : 'video'} track.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="volumeSlider">Volume Level (0.0 - 1.0)</Label>
+              <Slider
+                id="volumeSlider"
+                min={0}
+                max={1}
+                step={0.01}
+                value={[volumeValue]}
+                onValueChange={(value) => setVolumeValue(value[0])}
+                className="w-full"
+              />
+              <div className="flex justify-between">
+                <span>0.0</span>
+                <span className="font-bold">{volumeValue.toFixed(2)}</span>
+                <span>1.0</span>
+              </div>
+              <Input
+                type="number"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volumeValue}
+                onChange={(e) => setVolumeValue(parseFloat(e.target.value) || 0)}
+                className="w-full"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setVolumeDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => {
+              if (isAudioVolume) {
+                setAudioVolume(currentVolumeVideoIndex, volumeValue);
+              } else {
+                setVideoVolume(currentVolumeVideoIndex, volumeValue);
+              }
+              setVolumeDialogOpen(false);
+            }}>
+              Set Volume
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

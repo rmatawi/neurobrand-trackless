@@ -27,7 +27,9 @@ export const useChillinAPI = (dialogManager) => {
   const processVideoUploadAndCreateProject = async (
     selectedVideos,
     template = null,
-    customTemplates = []
+    customTemplates = [],
+    videoVolumes = {},
+    audioVolumes = {}
   ) => {
     try {
       selectedVideos.forEach((video, index) => {
@@ -172,7 +174,7 @@ export const useChillinAPI = (dialogManager) => {
           ext: "mp4", // Assuming all videos are mp4
           inPoint: inPoint, // Start point in source video
           outPoint: outPoint, // End point in source video
-          volume: 1,
+          volume: videoVolumes[index] !== undefined ? videoVolumes[index] : 1,
           hasAudio: true,
           playrate: 1,
           isFrontTrimmed: false,
@@ -464,7 +466,9 @@ export const useChillinAPI = (dialogManager) => {
   const sendChillinProjectToRenderer = async (
     selectedVideos,
     template,
-    customTemplates
+    customTemplates,
+    videoVolumes = {},
+    audioVolumes = {}
   ) => {
     try {
       // Validate that we have videos to process
@@ -488,7 +492,9 @@ export const useChillinAPI = (dialogManager) => {
       await processVideoUploadAndCreateProject(
         selectedVideos,
         template,
-        customTemplates
+        customTemplates,
+        videoVolumes,
+        audioVolumes
       );
     } catch (error) {
       if (!error.userCancelled) {

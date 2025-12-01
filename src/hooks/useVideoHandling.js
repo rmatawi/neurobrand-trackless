@@ -211,21 +211,28 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
 
           // Check if video duration is less than audio duration
           if (videoDuration < audioDuration) {
-            const shouldTrim = window.confirm(
-              `Video duration is ${videoDuration.toFixed(
-                2
-              )}s, but audio is ${audioDuration.toFixed(
-                2
-              )}s long. Trim audio to match video length?`
-            );
-
-            if (shouldTrim) {
-              // User wants to trim audio, store audio reference with video
-              addAudioToVideo(videoIndex, file, true, videoDuration);
-            } else {
-              // User doesn't want to trim, use full audio
-              addAudioToVideo(videoIndex, file, false, audioDuration);
-            }
+            dialogManager
+              .create({
+                title: "Audio Duration Mismatch",
+                text: `Video duration is ${videoDuration.toFixed(2)}s, but audio is ${audioDuration.toFixed(2)}s long. Trim audio to match video length?`,
+                buttons: [
+                  {
+                    text: "Yes, Trim Audio",
+                    onClick: () => {
+                      // User wants to trim audio, store audio reference with video
+                      addAudioToVideo(videoIndex, file, true, videoDuration);
+                    },
+                  },
+                  {
+                    text: "No, Use Full Audio",
+                    onClick: () => {
+                      // User doesn't want to trim, use full audio
+                      addAudioToVideo(videoIndex, file, false, audioDuration);
+                    },
+                  },
+                ],
+              })
+              .open();
           } else {
             // Video is longer than or equal to audio, no need to trim
             addAudioToVideo(videoIndex, file, false, audioDuration);
@@ -321,6 +328,14 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
     }));
   };
 
+  // Function to open volume dialog - simplified to just return the current volume
+  const openVolumeDialog = (index, isAudio) => {
+    const currentVolume = isAudio
+      ? (audioVolumes[index] !== undefined ? audioVolumes[index] : 1.0)
+      : (videoVolumes[index] !== undefined ? videoVolumes[index] : 1.0);
+    return currentVolume;
+  };
+
   return {
     // State
     selectedVideos,
@@ -341,7 +356,7 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
     setCurrentVideoIndex,
     videoDuration,
     setVideoDuration,
-    
+
     // Functions
     cleanupVideoUrls,
     handlePickFromDevice,
@@ -356,6 +371,7 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
     addAudioToVideo,
     removeAudioFromVideo,
     setVideoVolume,
-    setAudioVolume
+    setAudioVolume,
+    openVolumeDialog
   };
 };
