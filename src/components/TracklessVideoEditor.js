@@ -17,6 +17,8 @@ import VideoComposition from "../remotion/VideoComposition";
 import ProgressIndicator from "./ui/ProgressIndicator";
 import TimelineVisualization from "./TimelineVisualization";
 import VideoCard from "./VideoCard";
+import AdvancedTimeline from "./AdvancedTimeline";
+import { OnboardingManager } from "./OnboardingManager";
 
 import { useDialogManager } from "../hooks/useDialogManager";
 import { useTemplateManagement } from "../hooks/useTemplateManagement";
@@ -125,6 +127,68 @@ const TracklessVideoEditor = () => {
 
   // Video selection state for sequence tab
   const [selectedVideoIndex, setSelectedVideoIndex] = useState(null);
+
+  // Onboarding steps configuration
+  const onboardingSteps = [
+    {
+      title: "Welcome to Trackless Video Editor",
+      description: "This tool helps you create videos using templates. Let's take a quick tour.",
+      targetElementId: "templates-nav-btn"
+    },
+    {
+      title: "Select a Template",
+      description: "Choose from built-in templates or create your own custom templates.",
+      targetElementId: "template-selection"
+    },
+    {
+      title: "Add Your Videos",
+      description: "Click 'Add Videos' to upload your video files for the selected template.",
+      targetElementId: "add-videos-btn"
+    },
+    {
+      title: "Sequence Tab",
+      description: "Arrange your videos, set in/out points, and manage audio in the Sequence tab.",
+      targetElementId: "sequence-nav-btn"
+    },
+    {
+      title: "Preview & Render",
+      description: "Preview your video and send it to the renderer when ready.",
+      targetElementId: "render-nav-btn"
+    }
+  ];
+
+  // ThumbnailVideo component to properly manage URL object lifecycle
+  const ThumbnailVideo = ({ blob }) => {
+    const videoRef = React.useRef(null);
+    const [url, setUrl] = React.useState(null);
+
+    React.useEffect(() => {
+      if (blob) {
+        const objectUrl = URL.createObjectURL(blob);
+        setUrl(objectUrl);
+
+        return () => {
+          URL.revokeObjectURL(objectUrl);
+        };
+      }
+    }, [blob]);
+
+    React.useEffect(() => {
+      if (videoRef.current && url) {
+        videoRef.current.src = url;
+      }
+    }, [url]);
+
+    return (
+      <video
+        ref={videoRef}
+        className="w-16 h-16 flex-shrink-0 rounded-xl object-cover border-2 border-gray-200"
+        muted
+        preload="metadata"
+        poster="" // No poster since we want to show the actual first frame
+      />
+    );
+  };
 
   // Volume dialog state
   const [volumeDialogOpen, setVolumeDialogOpen] = useState(false);
@@ -239,39 +303,6 @@ const TracklessVideoEditor = () => {
     };
   }, [selectedVideos, cleanupVideoUrls]);
 
-  // ThumbnailVideo component to properly manage URL object lifecycle
-  const ThumbnailVideo = ({ blob }) => {
-    const videoRef = React.useRef(null);
-    const [url, setUrl] = React.useState(null);
-
-    React.useEffect(() => {
-      if (blob) {
-        const objectUrl = URL.createObjectURL(blob);
-        setUrl(objectUrl);
-
-        return () => {
-          URL.revokeObjectURL(objectUrl);
-        };
-      }
-    }, [blob]);
-
-    React.useEffect(() => {
-      if (videoRef.current && url) {
-        videoRef.current.src = url;
-      }
-    }, [url]);
-
-    return (
-      <video
-        ref={videoRef}
-        className="w-16 h-16 flex-shrink-0 rounded-xl object-cover border-2 border-gray-200"
-        muted
-        preload="metadata"
-        poster="" // No poster since we want to show the actual first frame
-      />
-    );
-  };
-
   // Main render method
   return (
     <div className="min-h-screen bg-white">
@@ -283,6 +314,7 @@ const TracklessVideoEditor = () => {
           </div>
           <div className="flex flex-wrap justify-center gap-2">
             <Button
+              id="templates-nav-btn"
               variant={activeTab === "templates" ? "default" : "outline"}
               onClick={() => setActiveTab("templates")}
               className={
@@ -294,6 +326,7 @@ const TracklessVideoEditor = () => {
               Templates
             </Button>
             <Button
+              id="sequence-nav-btn"
               variant={activeTab === "sequence" ? "default" : "outline"}
               onClick={() => setActiveTab("sequence")}
               className={
@@ -305,6 +338,7 @@ const TracklessVideoEditor = () => {
               Sequence
             </Button>
             <Button
+              id="render-nav-btn"
               variant={activeTab === "render" ? "default" : "outline"}
               onClick={() => {
                 setActiveTab("render");
@@ -352,11 +386,14 @@ const TracklessVideoEditor = () => {
         labels={["Template", "Sequence", "Render"]}
       />
 
+      {/* Onboarding Manager */}
+      <OnboardingManager steps={onboardingSteps} enabled={true} />
+
       {/* Main Content Area */}
       <div className="p-6">
         {/* Templates Tab */}
         {activeTab === "templates" && (
-          <div className="space-y-6">
+          <div id="templates-tab" className="space-y-6">
             <div className="bg-gray-50 p-6 rounded-lg">
               <h2 className="text-xl font-bold mb-4">
                 Custom Template Manager
@@ -475,7 +512,7 @@ const TracklessVideoEditor = () => {
               </div>
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-lg">
+            <div id="template-selection" className="bg-gray-50 p-6 rounded-lg">
               <h2 className="text-xl font-bold mb-4">Template Selection</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card
@@ -735,6 +772,7 @@ const TracklessVideoEditor = () => {
 
               <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Button
+                  id="add-videos-btn"
                   variant="outline"
                   className="w-full border-dashed border-2 border-gray-300"
                   onClick={() => {
@@ -947,124 +985,77 @@ const TracklessVideoEditor = () => {
                 </div>
               </div>
 
+              {/* Timeline Visualization */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-2">Timeline</h3>
+                <div className="space-y-4">
+                  <TimelineVisualization
+                    videos={selectedVideos}
+                    selectedVideoIndex={selectedVideoIndex}
+                    onClickVideo={setSelectedVideoIndex}
+                    totalDuration={selectedVideos.reduce((acc, video) => {
+                      const inOut = video.inOutPoints || { inPoint: 0, outPoint: video.duration || 10 };
+                      return acc + (inOut.outPoint - inOut.inPoint);
+                    }, 0)}
+                  />
+
+                  <AdvancedTimeline
+                    videos={selectedVideos}
+                    audioTracks={videoAudioTracks}
+                    videoVolumes={videoVolumes}
+                    audioVolumes={audioVolumes}
+                    onInOutChange={openInOutDialog}
+                    onVolumeChange={(type, index, newVolume) => {
+                      if (type === 'audio') {
+                        setAudioVolume(index, newVolume);
+                      } else {
+                        setVideoVolume(index, newVolume);
+                      }
+                    }}
+                    selectedVideoIndex={selectedVideoIndex}
+                  />
+                </div>
+              </div>
+
               <div className="space-y-4">
                 {selectedVideos.map((video, index) => (
-                  <Card
+                  <VideoCard
                     key={video.id || index}
-                    className="border rounded-lg p-4 bg-white"
-                  >
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center space-x-0 sm:space-x-4 space-y-3 sm:space-y-0">
-                      {video.blob ? (
-                        <ThumbnailVideo blob={video.blob} />
-                      ) : (
-                        <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 flex-shrink-0" />
-                      )}
-                      <div className="flex-1 w-full">
-                        <h3 className="font-semibold truncate">
-                          {video.name || `Video ${index + 1}`}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          Duration:{" "}
-                          {video.inOutPoints
-                            ? `${
-                                video.inOutPoints.outPoint -
-                                video.inOutPoints.inPoint
-                              }s`
-                            : `${video.duration || 10}s`}
-                        </p>
-                        {videoAudioTracks[index] && (
-                          <p className="text-sm text-green-600">
-                            Audio attached
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => openInOutDialog(index)}
-                      >
-                        In/Out
-                      </Button>
-                      {videoAudioTracks[index] ? (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              setCurrentVolumeVideoIndex(index);
-                              setIsAudioVolume(true);
-                              setVolumeValue(
-                                audioVolumes[index] !== undefined
-                                  ? audioVolumes[index]
-                                  : 1.0
-                              );
-                              setVolumeDialogOpen(true);
-                            }}
-                          >
-                            Audio Vol
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => removeAudioFromVideo(index)}
-                          >
-                            Remove Audio
-                          </Button>
-                        </>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleAddAudioToVideo(index)}
-                        >
-                          Add Audio
-                        </Button>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setCurrentVolumeVideoIndex(index);
-                          setIsAudioVolume(false);
-                          setVolumeValue(
-                            videoVolumes[index] !== undefined
-                              ? videoVolumes[index]
-                              : 1.0
-                          );
-                          setVolumeDialogOpen(true);
-                        }}
-                      >
-                        Video Vol
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => removeVideo(index)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => moveVideoBack(index)}
-                        disabled={index === 0}
-                      >
-                        ← Move Back
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => moveVideoForward(index)}
-                        disabled={index === selectedVideos.length - 1}
-                      >
-                        Move Forward →
-                      </Button>
-                    </div>
-                  </Card>
+                    video={video}
+                    index={index}
+                    videoAudioTracks={videoAudioTracks}
+                    videoVolumes={videoVolumes}
+                    audioVolumes={audioVolumes}
+                    onInOutDialog={openInOutDialog}
+                    onAudioVolumeDialog={(idx) => {
+                      setCurrentVolumeVideoIndex(idx);
+                      setIsAudioVolume(true);
+                      setVolumeValue(
+                        audioVolumes[idx] !== undefined
+                          ? audioVolumes[idx]
+                          : 1.0
+                      );
+                      setVolumeDialogOpen(true);
+                    }}
+                    onVideoVolumeDialog={(idx) => {
+                      setCurrentVolumeVideoIndex(idx);
+                      setIsAudioVolume(false);
+                      setVolumeValue(
+                        videoVolumes[idx] !== undefined
+                          ? videoVolumes[idx]
+                          : 1.0
+                      );
+                      setVolumeDialogOpen(true);
+                    }}
+                    onRemoveAudio={removeAudioFromVideo}
+                    onAddAudio={handleAddAudioToVideo}
+                    onRemoveVideo={removeVideo}
+                    onMoveBack={moveVideoBack}
+                    onMoveForward={moveVideoForward}
+                    isSelected={index === selectedVideoIndex}
+                    totalVideos={selectedVideos.length}
+                    thumbnailRenderer={ThumbnailVideo}
+                  />
                 ))}
 
                 {selectedVideos.length === 0 && (
