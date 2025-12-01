@@ -116,6 +116,10 @@ const TracklessVideoEditor = () => {
     moveVideoForward,
   } = useVideoHandling(process.env.REACT_APP_CHILLIN, dialogManager);
 
+  // Video preview state for In/Out dialog
+  const [videoPreviewRef, setVideoPreviewRef] = useState(null);
+  const [isVideoPreviewPlaying, setIsVideoPreviewPlaying] = useState(false);
+
   // Volume dialog state
   const [volumeDialogOpen, setVolumeDialogOpen] = useState(false);
   const [currentVolumeVideoIndex, setCurrentVolumeVideoIndex] = useState(null);
@@ -134,6 +138,93 @@ const TracklessVideoEditor = () => {
     sendChillinProjectToRenderer,
     sendTestJobToChillin,
   } = useChillinAPI(dialogManager);
+
+  // Effect to handle video preview when dialog opens or current video changes
+  React.useEffect(() => {
+    if (!inOutDialogOpen || currentVideoIndex === null || !selectedVideos[currentVideoIndex]) {
+      return;
+    }
+
+    const video = videoPreviewRef;
+    if (!video) return;
+
+    // Get the current video
+    const currentVideo = selectedVideos[currentVideoIndex];
+    if (!currentVideo || !currentVideo.blob) return;
+
+    // Create object URL for the video blob
+    const url = URL.createObjectURL(currentVideo.blob);
+    video.src = url;
+
+    // Clean up the URL when effect ends
+    return () => {
+      video.src = "";
+      URL.revokeObjectURL(url);
+    };
+  }, [inOutDialogOpen, currentVideoIndex, selectedVideos, videoPreviewRef]);
+
+  // Effect to handle video preview when in/out points change
+  React.useEffect(() => {
+    if (!videoPreviewRef || !inOutDialogOpen) return;
+
+    // Update video preview when in/out points change
+    const handleTimeUpdate = () => {
+      if (videoPreviewRef.currentTime > outPoint) {
+        videoPreviewRef.currentTime = inPoint; // Loop back to in point when reaching out point
+      }
+    };
+
+    const video = videoPreviewRef;
+    video.addEventListener('timeupdate', handleTimeUpdate);
+
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+    };
+  }, [inPoint, outPoint, videoPreviewRef, inOutDialogOpen]);
+
+  // Function to jump to in point
+  const jumpToInPoint = () => {
+    if (videoPreviewRef) {
+      videoPreviewRef.currentTime = inPoint;
+    }
+  };
+
+  // Function to play preview between in and out points
+  const playPreview = async () => {
+    if (!videoPreviewRef) return;
+
+    try {
+      // Jump to in point
+      videoPreviewRef.currentTime = inPoint;
+      setIsVideoPreviewPlaying(true);
+
+      // Start playing
+      await videoPreviewRef.play();
+
+      // Handle end of preview (when reaching out point)
+      const handleTimeUpdate = () => {
+        if (videoPreviewRef.currentTime >= outPoint) {
+          videoPreviewRef.pause();
+          setIsVideoPreviewPlaying(false);
+          videoPreviewRef.currentTime = inPoint; // Return to in point
+          videoPreviewRef.removeEventListener('timeupdate', handleTimeUpdate);
+        }
+      };
+
+      videoPreviewRef.addEventListener('timeupdate', handleTimeUpdate);
+    } catch (error) {
+      console.error("Error playing video preview:", error);
+      setIsVideoPreviewPlaying(false);
+    }
+  };
+
+  // Function to pause preview
+  const pausePreview = () => {
+    if (videoPreviewRef) {
+      videoPreviewRef.pause();
+      setIsVideoPreviewPlaying(false);
+    }
+  };
 
   // Clean up object URLs when videos change
   React.useEffect(() => {
@@ -1461,7 +1552,7 @@ const TracklessVideoEditor = () => {
 
       {/* In/Out Points Dialog */}
       <Dialog open={inOutDialogOpen} onOpenChange={setInOutDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Set In/Out Points</DialogTitle>
             <DialogDescription>
@@ -1469,6 +1560,65 @@ const TracklessVideoEditor = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {/* Video Preview Section */}
+            <div className="space-y-2">
+              <Label>Video Preview</Label>
+              <div className="relative bg-black rounded-lg overflow-hidden">
+                <video
+                  ref={setVideoPreviewRef}
+                  className="w-full h-48 object-contain bg-black"
+                  controls={false}
+                  preload="metadata"
+                  onLoadedMetadata={() => {
+                    if (videoPreviewRef) {
+                      videoPreviewRef.currentTime = inPoint;
+                    }
+                  }}
+                  onClick={() => {
+                    if (isVideoPreviewPlaying) {
+                      pausePreview();
+                    } else {
+                      playPreview();
+                    }
+                  }}
+                />
+                <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
+                  {videoPreviewRef && videoPreviewRef.currentTime ?
+                    videoPreviewRef.currentTime.toFixed(2) + 's / ' +
+                    (currentVideoIndex !== null && selectedVideos[currentVideoIndex] ?
+                      (selectedVideos[currentVideoIndex].duration || 10).toFixed(2) + 's' : '0.00s')
+                    : '0.00s / 0.00s'}
+                </div>
+              </div>
+
+              {/* Video Controls */}
+              <div className="flex flex-wrap gap-2 mt-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={jumpToInPoint}
+                >
+                  Jump to In ({inPoint.toFixed(2)}s)
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={isVideoPreviewPlaying ? pausePreview : playPreview}
+                >
+                  {isVideoPreviewPlaying ? 'Pause Preview' : 'Play Preview'}
+                </Button>
+                {isVideoPreviewPlaying && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={pausePreview}
+                  >
+                    Stop
+                  </Button>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="inPoint">In Point (seconds)</Label>
               <Slider
@@ -1477,7 +1627,13 @@ const TracklessVideoEditor = () => {
                 max={currentVideoIndex !== null && selectedVideos[currentVideoIndex] ? selectedVideos[currentVideoIndex].duration || 10 : 10}
                 step={0.1}
                 value={[inPoint]}
-                onValueChange={(value) => setInPoint(value[0])}
+                onValueChange={(value) => {
+                  setInPoint(value[0]);
+                  // Update video preview when slider moves
+                  if (videoPreviewRef && !isVideoPreviewPlaying) {
+                    videoPreviewRef.currentTime = value[0];
+                  }
+                }}
                 className="w-full"
               />
               <Input
