@@ -910,7 +910,7 @@ const TracklessVideoEditor = () => {
                 {chillinRenders.length > 0 ? (
                   chillinRenders.map((render, index) => (
                     <Card
-                      key={render.render_id}
+                      key={render.id}
                       className="border rounded-lg p-4 bg-white"
                     >
                       <CardHeader>
@@ -920,7 +920,7 @@ const TracklessVideoEditor = () => {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm">
-                          <strong>ID:</strong> {render.render_id}
+                          <strong>ID:</strong> {render.id}
                         </p>
                         <p className="text-sm">
                           <strong>Status:</strong> {render.status || "pending"}
@@ -946,7 +946,7 @@ const TracklessVideoEditor = () => {
                                       Authorization: `Bearer ${process.env.REACT_APP_CHILLIN}`,
                                     },
                                     body: JSON.stringify({
-                                      render_id: render.render_id,
+                                      render_id: render.id,
                                     }),
                                   }
                                 );
