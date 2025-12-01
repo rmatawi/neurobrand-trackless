@@ -328,6 +328,30 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
     }));
   };
 
+  // Move video to previous position (backwards in the list)
+  const moveVideoBack = (index) => {
+    if (index <= 0 || index >= selectedVideos.length) return;
+
+    setSelectedVideos((prev) => {
+      const newVideos = [...prev];
+      // Swap current index with the previous index
+      [newVideos[index], newVideos[index - 1]] = [newVideos[index - 1], newVideos[index]];
+      return newVideos;
+    });
+  };
+
+  // Move video to next position (forward in the list)
+  const moveVideoForward = (index) => {
+    if (index < 0 || index >= selectedVideos.length - 1) return;
+
+    setSelectedVideos((prev) => {
+      const newVideos = [...prev];
+      // Swap current index with the next index
+      [newVideos[index], newVideos[index + 1]] = [newVideos[index + 1], newVideos[index]];
+      return newVideos;
+    });
+  };
+
   // Function to open volume dialog - simplified to just return the current volume
   const openVolumeDialog = (index, isAudio) => {
     const currentVolume = isAudio
@@ -372,6 +396,8 @@ export const useVideoHandling = (chillinApiKey, dialogManager) => {
     removeAudioFromVideo,
     setVideoVolume,
     setAudioVolume,
-    openVolumeDialog
+    openVolumeDialog,
+    moveVideoBack,
+    moveVideoForward
   };
 };
