@@ -46,8 +46,6 @@ const TracklessVideoEditor = () => {
     setTemplate,
     createTemplateDialogOpen,
     setCreateTemplateDialogOpen,
-    createFromCurrentDialogOpen,
-    setCreateFromCurrentDialogOpen,
     editTemplateDialogOpen,
     setEditTemplateDialogOpen,
     editTemplateId,
@@ -63,14 +61,12 @@ const TracklessVideoEditor = () => {
     // Functions
     getRequiredVideos,
     createCustomTemplate,
-    createTemplateFromCurrent,
     loadCustomTemplate,
     editCustomTemplate,
     handleEditTemplate,
     deleteCustomTemplate,
     handleDeleteTemplate,
     handleCreateCustomTemplate,
-    handleCreateTemplateFromCurrent,
     showChillinPreview,
     showTemplatePreview,
   } = useTemplateManagement(
@@ -405,15 +401,6 @@ const TracklessVideoEditor = () => {
                   onClick={createCustomTemplate}
                 >
                   Create Custom Template
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-[#1E97A0] text-[#1E97A0]"
-                  onClick={() =>
-                    createTemplateFromCurrent(selectedVideos, template)
-                  }
-                >
-                  Create from Current
                 </Button>
               </div>
 
@@ -1450,51 +1437,6 @@ const TracklessVideoEditor = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Create from Current Dialog */}
-      <Dialog
-        open={createFromCurrentDialogOpen}
-        onOpenChange={setCreateFromCurrentDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create Template from Current</DialogTitle>
-            <DialogDescription>
-              Enter a name for your template based on current selection.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="currentTemplateName">Template Name</Label>
-              <Input
-                id="currentTemplateName"
-                value={videoName}
-                onChange={(e) => setVideoName(e.target.value)}
-                placeholder="Enter template name"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setCreateFromCurrentDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() =>
-                handleCreateTemplateFromCurrent(
-                  selectedVideos,
-                  videoAudioTracks,
-                  videoVolumes,
-                  audioVolumes
-                )
-              }
-            >
-              Create from Current
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Edit Template Dialog */}
       <Dialog
