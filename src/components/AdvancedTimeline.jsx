@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '../ui/button';
+import { Button } from './ui/button';
 import AudioWaveform from './AudioWaveform';
 import { Volume2, VolumeX, Scissors } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 
 const AdvancedTimeline = ({ 
   videos = [], 

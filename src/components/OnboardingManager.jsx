@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
 import { ArrowRight, HelpCircle, X } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 
 const OnboardingTooltip = ({ 
   step, 
