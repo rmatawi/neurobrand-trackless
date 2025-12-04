@@ -1,6 +1,17 @@
 import React from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
+import {
+  Scissors,
+  Volume2,
+  VolumeX,
+  Music,
+  Trash,
+  Upload,
+  ArrowLeft,
+  ArrowRight,
+  Volume
+} from 'lucide-react';
 
 const VideoCard = ({
   video,
@@ -70,10 +81,11 @@ const VideoCard = ({
             size="sm"
             variant="outline"
             onClick={() => onInOutDialog(index)}
+            aria-label={`Set In/Out points for Video ${index + 1} (${duration.toFixed(2)}s)`}
           >
-            In/Out ({duration.toFixed(2)}s)
+            <Scissors className="h-4 w-4" />
           </Button>
-          
+
           {videoAudioTracks[index] ? (
             <>
               <Button
@@ -82,15 +94,17 @@ const VideoCard = ({
                 onClick={() => {
                   onAudioVolumeDialog(index);
                 }}
+                aria-label={`Set Audio Volume for Video ${index + 1}`}
               >
-                Audio Vol
+                <Volume2 className="h-4 w-4" />
               </Button>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => onRemoveAudio(index)}
+                aria-label={`Remove Audio from Video ${index + 1}`}
               >
-                Remove Audio
+                <Trash className="h-4 w-4" />
               </Button>
             </>
           ) : (
@@ -98,44 +112,49 @@ const VideoCard = ({
               size="sm"
               variant="outline"
               onClick={() => onAddAudio(index)}
+              aria-label={`Add Audio to Video ${index + 1}`}
             >
-              Add Audio
+              <Music className="h-4 w-4" />
             </Button>
           )}
-          
+
           <Button
             size="sm"
             variant="outline"
             onClick={() => onVideoVolumeDialog(index)}
+            aria-label={`Set Video Volume for Video ${index + 1}`}
           >
-            Video Vol
+            <Volume className="h-4 w-4" />
           </Button>
-          
+
           <Button
             size="sm"
             variant="outline"
             onClick={() => onRemoveVideo(index)}
+            aria-label={`Remove Video ${index + 1}`}
           >
-            Remove
+            <Trash className="h-4 w-4" />
           </Button>
         </div>
-        
+
         <div className="mt-2 flex flex-wrap gap-2">
           <Button
             size="sm"
             variant="outline"
             onClick={() => onMoveBack(index)}
             disabled={index === 0}
+            aria-label={`Move Video ${index + 1} Back`}
           >
-            ← Move Back
+            <ArrowLeft className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
             variant="outline"
             onClick={() => onMoveForward(index)}
             disabled={index === totalVideos - 1}
+            aria-label={`Move Video ${index + 1} Forward`}
           >
-            Move Forward →
+            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </CardContent>
