@@ -1406,12 +1406,23 @@ const TracklessVideoEditor = () => {
         setVideoDurations={setEditVideoDurations}
         videoName={videoName}
         setVideoName={setVideoName}
-        onConfirm={() => {
+        onConfirm={(updatedVideoName, updatedNumVideos, updatedVideoDescriptions, updatedVideoDurations) => {
+          // Update the hook state with the values from the dialog
+          setVideoName(updatedVideoName);
+          setEditNumVideos(updatedNumVideos);
+          setEditVideoDescriptions([...updatedVideoDescriptions]);
+          setEditVideoDurations([...updatedVideoDurations]);
+
+          // Then call the handleEditTemplate function with the updated values
           handleEditTemplate(
             selectedVideos,
             videoAudioTracks,
             videoVolumes,
-            audioVolumes
+            audioVolumes,
+            updatedVideoName,
+            updatedNumVideos,
+            updatedVideoDescriptions,
+            updatedVideoDurations
           );
         }}
       />

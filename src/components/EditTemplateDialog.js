@@ -20,9 +20,22 @@ const EditTemplateDialog = ({
   const [tempVideoDurations, setTempVideoDurations] = useState([...videoDurations]);
   const [tempVideoName, setTempVideoName] = useState(videoName || '');
 
+  console.log("[ETD-DEBUG] EditTemplateDialog rendered with props:", {
+    open,
+    numVideos,
+    videoDescriptions,
+    videoDurations,
+    videoName
+  });
+
   // Sync with parent state when dialog opens
   useEffect(() => {
+    console.log("[ETD-DEBUG] Dialog sync effect, open:", open);
     if (open) {
+      console.log("[ETD-DEBUG] Setting temp values from parent - numVideos:", numVideos,
+                  "videoName:", videoName,
+                  "videoDescriptions:", videoDescriptions,
+                  "videoDurations:", videoDurations);
       setTempNumVideos(numVideos);
       setTempVideoDescriptions([...videoDescriptions]);
       setTempVideoDurations([...videoDurations]);
@@ -32,6 +45,8 @@ const EditTemplateDialog = ({
 
   // Adjust arrays when number of videos changes
   useEffect(() => {
+    console.log("[ETD-DEBUG] Temp num videos changed to:", tempNumVideos,
+                "tempVideoDescriptions length:", tempVideoDescriptions.length);
     if (tempNumVideos > tempVideoDescriptions.length) {
       // Add new empty descriptions and default durations
       const newDescriptions = [...tempVideoDescriptions];
@@ -40,24 +55,48 @@ const EditTemplateDialog = ({
         newDescriptions.push('');
         newDurations.push(3);
       }
+      console.log("[ETD-DEBUG] Added new items, new descriptions:", newDescriptions,
+                  "new durations:", newDurations);
       setTempVideoDescriptions(newDescriptions);
       setTempVideoDurations(newDurations);
     } else if (tempNumVideos < tempVideoDescriptions.length) {
       // Remove extra descriptions and durations
-      setTempVideoDescriptions(tempVideoDescriptions.slice(0, tempNumVideos));
-      setTempVideoDurations(tempVideoDurations.slice(0, tempNumVideos));
+      const newDescriptions = tempVideoDescriptions.slice(0, tempNumVideos);
+      const newDurations = tempVideoDurations.slice(0, tempNumVideos);
+      console.log("[ETD-DEBUG] Removed extra items, new descriptions:", newDescriptions,
+                  "new durations:", newDurations);
+      setTempVideoDescriptions(newDescriptions);
+      setTempVideoDurations(newDurations);
     }
   }, [tempNumVideos, tempVideoDescriptions, tempVideoDurations.length]);
 
   const handleConfirm = () => {
+    console.log("[ETD-DEBUG] handleConfirm called with temp values:", {
+      tempVideoName,
+      tempNumVideos,
+      tempVideoDescriptions,
+      tempVideoDurations
+    });
+
     // Update parent state with temp values
+    console.log("[ETD-DEBUG] Updating parent state with values:", {
+      numVideos: tempNumVideos,
+      videoName: tempVideoName
+    });
     setNumVideos(tempNumVideos);
     setVideoDescriptions([...tempVideoDescriptions]);
     setVideoDurations([...tempVideoDurations]);
     setVideoName(tempVideoName);
 
-    // Call the parent confirm function
-    onConfirm();
+    console.log("[ETD-DEBUG] Updated parent state, values passed:", {
+      numVideos: tempNumVideos,
+      videoName: tempVideoName,
+      videoDescriptions: [...tempVideoDescriptions],
+      videoDurations: [...tempVideoDurations]
+    });
+
+    // Call the parent confirm function with the updated values to ensure we have fresh data
+    onConfirm(tempVideoName, tempNumVideos, [...tempVideoDescriptions], [...tempVideoDurations]);
   };
 
   return (
@@ -78,7 +117,10 @@ const EditTemplateDialog = ({
               <input
                 type="text"
                 value={tempVideoName}
-                onChange={(e) => setTempVideoName(e.target.value)}
+                onChange={(e) => {
+                  console.log("[ETD-DEBUG] Template name changed to:", e.target.value);
+                  setTempVideoName(e.target.value);
+                }}
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Enter template name"
               />
@@ -93,7 +135,11 @@ const EditTemplateDialog = ({
                 min="1"
                 max="10"
                 value={tempNumVideos}
-                onChange={(e) => setTempNumVideos(Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))}
+                onChange={(e) => {
+                  const newValue = Math.max(1, Math.min(10, parseInt(e.target.value) || 1));
+                  console.log("[ETD-DEBUG] Number of videos changed to:", newValue);
+                  setTempNumVideos(newValue);
+                }}
                 className="w-full p-2 border border-gray-300 rounded"
               />
             </div>
@@ -110,6 +156,7 @@ const EditTemplateDialog = ({
                     type="text"
                     value={tempVideoDescriptions[index] || ''}
                     onChange={(e) => {
+                      console.log("[ETD-DEBUG] Description for video", index + 1, "changed to:", e.target.value);
                       const newDescriptions = [...tempVideoDescriptions];
                       newDescriptions[index] = e.target.value;
                       setTempVideoDescriptions(newDescriptions);
@@ -129,8 +176,10 @@ const EditTemplateDialog = ({
                     min="0.1"
                     value={tempVideoDurations[index] || 3}
                     onChange={(e) => {
+                      const newDuration = parseFloat(e.target.value) || 3;
+                      console.log("[ETD-DEBUG] Duration for video", index + 1, "changed to:", newDuration);
                       const newDurations = [...tempVideoDurations];
-                      newDurations[index] = parseFloat(e.target.value) || 3;
+                      newDurations[index] = newDuration;
                       setTempVideoDurations(newDurations);
                     }}
                     className="w-full p-2 border border-gray-300 rounded"

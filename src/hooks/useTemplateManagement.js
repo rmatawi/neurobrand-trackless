@@ -24,10 +24,14 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
 
   // Load custom templates from localStorage on component mount
   useEffect(() => {
+    console.log("[TM-DEBUG] Loading custom templates from localStorage");
     const savedTemplates = localStorage.getItem("customTemplates");
+    console.log("[TM-DEBUG] Retrieved from localStorage:", savedTemplates);
     if (savedTemplates) {
       try {
-        setCustomTemplates(JSON.parse(savedTemplates));
+        const parsedTemplates = JSON.parse(savedTemplates);
+        console.log("[TM-DEBUG] Parsed templates:", parsedTemplates);
+        setCustomTemplates(parsedTemplates);
       } catch (error) {
         console.error(
           "Error parsing custom templates from localStorage:",
@@ -35,14 +39,18 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
         );
         setCustomTemplates([]);
       }
+    } else {
+      console.log("[TM-DEBUG] No custom templates found in localStorage");
     }
   }, []);
 
   // Function to save custom templates to localStorage
   const saveCustomTemplates = (templates) => {
+    console.log("[TM-DEBUG] saveCustomTemplates called with templates:", templates);
     try {
       localStorage.setItem("customTemplates", JSON.stringify(templates));
       setCustomTemplates(templates);
+      console.log("[TM-DEBUG] Custom templates state updated:", templates);
     } catch (error) {
       console.error("Error saving custom templates to localStorage:", error);
     }
@@ -103,8 +111,12 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
 
   // Function to edit a custom template
   const editCustomTemplate = (templateId) => {
+    console.log("[TM-DEBUG] editCustomTemplate called with templateId:", templateId);
+    console.log("[TM-DEBUG] Current customTemplates:", customTemplates);
+
     const templateToEdit = customTemplates.find((t) => t.id === templateId);
     if (!templateToEdit) {
+      console.log("[TM-DEBUG] Template not found for id:", templateId);
       dialogManager.create({
         title: "Error",
         text: "Template not found",
@@ -113,16 +125,21 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
       return;
     }
 
+    console.log("[TM-DEBUG] Template to edit:", templateToEdit);
+    console.log("[TM-DEBUG] Template type:", templateToEdit.type);
+
     setVideoName(templateToEdit.name); // Set the current name in the input field
     setEditTemplateId(templateId);
 
     // Initialize form state based on template type
     if (templateToEdit.type === "from-current") {
+      console.log("[TM-DEBUG] Initializing from-current template with", templateToEdit.requiredVideos, "videos");
       // For from-current templates, we only edit the name
       setEditNumVideos(templateToEdit.requiredVideos || 2);
       setEditVideoDescriptions([]);
       setEditVideoDurations([]);
     } else {
+      console.log("[TM-DEBUG] Initializing custom template with", templateToEdit.requiredVideos, "videos");
       // For custom templates, initialize with existing values
       const numVideos = templateToEdit.requiredVideos || 2;
       setEditNumVideos(numVideos);
@@ -132,29 +149,53 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
       const durations = [];
 
       for (let i = 0; i < numVideos; i++) {
-        descriptions.push(templateToEdit.videoDescriptions?.[i] || "");
-        durations.push(templateToEdit.videoDurations?.[i] !== undefined ? templateToEdit.videoDurations[i] : 3);
+        const desc = templateToEdit.videoDescriptions?.[i] || "";
+        const duration = templateToEdit.videoDurations?.[i] !== undefined ? templateToEdit.videoDurations[i] : 3;
+        descriptions.push(desc);
+        durations.push(duration);
+        console.log("[TM-DEBUG] Video", i, "description:", desc, "duration:", duration);
       }
 
       setEditVideoDescriptions(descriptions);
       setEditVideoDurations(durations);
+      console.log("[TM-DEBUG] Initialized descriptions:", descriptions);
+      console.log("[TM-DEBUG] Initialized durations:", durations);
     }
 
+    console.log("[TM-DEBUG] Setting dialog open with videoName:", videoName);
     setEditTemplateDialogOpen(true);
   };
 
   // Handle editing a custom template
-  const handleEditTemplate = (selectedVideos, videoAudioTracks, videoVolumes, audioVolumes) => {
-    if (!editTemplateId) return;
+  const handleEditTemplate = (selectedVideos, videoAudioTracks, videoVolumes, audioVolumes, updatedVideoName, updatedNumVideos, updatedVideoDescriptions, updatedVideoDurations) => {
+    console.log("[TM-DEBUG] handleEditTemplate called with editTemplateId:", editTemplateId);
+    console.log("[TM-DEBUG] Current customTemplates:", customTemplates);
+
+    // If updated values are passed, use them; otherwise use current state values
+    const newName = (updatedVideoName !== undefined ? updatedVideoName : videoName).trim();
+    const numVideosToUse = updatedNumVideos !== undefined ? updatedNumVideos : editNumVideos;
+    const videoDescriptionsToUse = updatedVideoDescriptions !== undefined ? updatedVideoDescriptions : editVideoDescriptions;
+    const videoDurationsToUse = updatedVideoDurations !== undefined ? updatedVideoDurations : editVideoDurations;
+
+    console.log("[TM-DEBUG] Using values - Name:", newName, "Num videos:", numVideosToUse,
+                "Descriptions:", videoDescriptionsToUse, "Durations:", videoDurationsToUse);
+
+    if (!editTemplateId) {
+      console.log("[TM-DEBUG] No editTemplateId provided, returning");
+      return;
+    }
 
     const templateToEdit = customTemplates.find((t) => t.id === editTemplateId);
     if (!templateToEdit) {
+      console.log("[TM-DEBUG] Template not found for id:", editTemplateId);
       showNotification.error("Template not found");
       return;
     }
 
-    const newName = videoName.trim();
+    console.log("[TM-DEBUG] Template to edit:", templateToEdit);
+
     if (!newName) {
+      console.log("[TM-DEBUG] Template name is empty");
       showNotification.error("Template name cannot be empty");
       return;
     }
@@ -163,22 +204,32 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
     if (
       customTemplates.some((t) => t.id !== editTemplateId && t.name === newName)
     ) {
+      console.log("[TM-DEBUG] Template name already exists:", newName);
       showNotification.error("A template with this name already exists");
       return;
     }
 
     // Handle templates based on their type
     if (templateToEdit.type === "from-current") {
+      console.log("[TM-DEBUG] Editing from-current template, only updating name from:", templateToEdit.name, "to:", newName);
       // For templates created from current selection, we can only edit the name
       const updatedTemplates = customTemplates.map((t) =>
         t.id === editTemplateId ? { ...t, name: newName } : t
       );
+      console.log("[TM-DEBUG] Updated templates:", updatedTemplates);
       saveCustomTemplates(updatedTemplates);
       showNotification.success("Template name updated successfully");
     } else {
+      console.log("[TM-DEBUG] Editing custom template, updating name, numVideos, descriptions, and durations");
+      console.log("[TM-DEBUG] New name:", newName);
+      console.log("[TM-DEBUG] New numVideos:", numVideosToUse);
+      console.log("[TM-DEBUG] New descriptions:", videoDescriptionsToUse);
+      console.log("[TM-DEBUG] New durations:", videoDurationsToUse);
+
       // For templates created from scratch, we can edit name, required videos, and descriptions
       // Validation for number of videos
-      if (isNaN(editNumVideos) || editNumVideos <= 0 || editNumVideos > 10) {
+      if (isNaN(numVideosToUse) || numVideosToUse <= 0 || numVideosToUse > 10) {
+        console.log("[TM-DEBUG] Invalid number of videos:", numVideosToUse);
         dialogManager.create({
           title: "Invalid Number",
           text: "Please enter a valid number between 1 and 10",
@@ -192,12 +243,13 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
       const newVideoDurations = [];
       let hasInvalidDuration = false;
 
-      for (let i = 0; i < editNumVideos; i++) {
-        const desc = editVideoDescriptions[i] || "";
+      for (let i = 0; i < numVideosToUse; i++) {
+        const desc = videoDescriptionsToUse[i] || "";
         newDescriptions.push(desc);
 
-        const duration = parseFloat(editVideoDurations[i]);
+        const duration = parseFloat(videoDurationsToUse[i]);
         if (isNaN(duration) || duration <= 0) {
+          console.log("[TM-DEBUG] Invalid duration for video", i + 1, ":", videoDurationsToUse[i]);
           showNotification.error(`Please enter a valid positive number for duration of video ${i + 1}.`);
           hasInvalidDuration = true;
           break;
@@ -206,6 +258,7 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
       }
 
       if (hasInvalidDuration) {
+        console.log("[TM-DEBUG] Has invalid duration, returning");
         return;
       }
 
@@ -215,21 +268,24 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
           ? {
               ...t,
               name: newName.trim(),
-              requiredVideos: editNumVideos,
+              requiredVideos: numVideosToUse,
               videoDescriptions: newDescriptions,
               videoDurations: newVideoDurations,
             }
           : t
       );
+      console.log("[TM-DEBUG] About to save updated templates:", updatedTemplates);
       saveCustomTemplates(updatedTemplates);
       dialogManager.create({
         title: "Success",
         text: "Template updated successfully",
         buttons: [{ text: "OK", onClick: () => {} }]
       }).open();
+      console.log("[TM-DEBUG] Dialog closed, template updated successfully");
     }
 
     // Reset the dialog state after successful update
+    console.log("[TM-DEBUG] Resetting dialog state");
     setEditTemplateDialogOpen(false);
     setEditTemplateId(null);
     setVideoName("");
@@ -615,6 +671,16 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
     setShowTemplatePreviewDialog(true);
   };
 
+  // Wrapper function to maintain backward compatibility
+  const handleEditTemplateWrapper = (selectedVideos, videoAudioTracks, videoVolumes, audioVolumes, updatedVideoName, updatedNumVideos, updatedVideoDescriptions, updatedVideoDurations) => {
+    // If updated values are provided (from EditTemplateDialog), use them; otherwise use current state values
+    if (updatedVideoName !== undefined) {
+      return handleEditTemplate(selectedVideos, videoAudioTracks, videoVolumes, audioVolumes, updatedVideoName, updatedNumVideos, updatedVideoDescriptions, updatedVideoDurations);
+    } else {
+      return handleEditTemplate(selectedVideos, videoAudioTracks, videoVolumes, audioVolumes, videoName, editNumVideos, editVideoDescriptions, editVideoDurations);
+    }
+  };
+
   return {
     // State
     customTemplates,
@@ -650,7 +716,7 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
     createTemplateFromCurrent,
     loadCustomTemplate,
     editCustomTemplate,
-    handleEditTemplate,
+    handleEditTemplate: handleEditTemplateWrapper,
     deleteCustomTemplate,
     handleDeleteTemplate,
     handleCreateCustomTemplate,
