@@ -960,6 +960,55 @@ const TracklessVideoEditor = () => {
                   </div>
                 )}
 
+                {/* Video description for the next video that needs to be uploaded */}
+                {(() => {
+                  const requiredVideos = getRequiredVideos(template);
+
+                  // Check if we still need more videos
+                  if (selectedVideos.length < requiredVideos) {
+                    // Find the index of the next video that needs to be uploaded
+                    const nextVideoIndex = selectedVideos.length;
+
+                    // Check if current template is a custom template
+                    const currentTemplate = customTemplates.find(t => t.id === template);
+                    let nextVideoDescription = '';
+
+                    if (currentTemplate && currentTemplate.videoDescriptions && Array.isArray(currentTemplate.videoDescriptions)) {
+                      // Use custom template description for the next video
+                      nextVideoDescription = currentTemplate.videoDescriptions[nextVideoIndex] || `Video ${nextVideoIndex + 1}`;
+                    } else {
+                      // For built-in templates, provide default description based on template ID and video index
+                      switch(template) {
+                        case 1:
+                          const builtIn1Descriptions = ['First video (3 seconds)', 'Second video (3 seconds)'];
+                          nextVideoDescription = builtIn1Descriptions[nextVideoIndex] || `Video ${nextVideoIndex + 1}`;
+                          break;
+                        case 2:
+                          const builtIn2Descriptions = ['First video (3 seconds)', 'Second video (1 second)', 'Third video (3 seconds)'];
+                          nextVideoDescription = builtIn2Descriptions[nextVideoIndex] || `Video ${nextVideoIndex + 1}`;
+                          break;
+                        case 3:
+                          const builtIn3Descriptions = ['Main video (7 seconds)', 'Overlay video (2 seconds, plays from 3-5s)'];
+                          nextVideoDescription = builtIn3Descriptions[nextVideoIndex] || `Video ${nextVideoIndex + 1}`;
+                          break;
+                        default:
+                          nextVideoDescription = `Video ${nextVideoIndex + 1} for this template`;
+                          break;
+                      }
+                    }
+
+                    return (
+                      <div className="mb-4">
+                        <h4 className="font-medium text-sm mb-2">Next Video Required:</h4>
+                        <div className="p-3 rounded border border-blue-200 bg-blue-50 text-blue-800 text-sm">
+                          <span className="font-medium">Video {nextVideoIndex + 1}:</span> {nextVideoDescription || `Please upload video ${nextVideoIndex + 1}`}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null; // Don't show if all required videos are uploaded
+                })()}
+
                 {(() => {
                   const requiredVideos = getRequiredVideos(template);
                   const videosNeeded = requiredVideos - selectedVideos.length;
