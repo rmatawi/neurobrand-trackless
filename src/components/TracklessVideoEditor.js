@@ -1047,129 +1047,129 @@ const TracklessVideoEditor = () => {
 
               <div className="space-y-4">
                 {chillinRenders.length > 0 ? (
-                  chillinRenders.map((render, index) => (
-                    <Card
-                      key={render.id}
-                      className="border rounded-lg p-4 bg-white"
-                    >
-                      <CardHeader>
-                        <CardTitle className="text-base">
-                          Render Job {index + 1}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm">
-                          <strong>ID:</strong> {render.id}
-                        </p>
-                        <p className="text-sm">
-                          <strong>Status:</strong> {render.status || "pending"}
-                        </p>
-                        <p className="text-sm">
-                          <strong>Created:</strong>{" "}
-                          {new Date(render.timestamp).toLocaleString()}
-                        </p>
-
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={async () => {
-                              try {
-                                const response = await fetch(
-                                  "https://render-api.chillin.online/render/result",
-                                  {
-                                    method: "POST",
-                                    headers: {
-                                      Accept: "application/json",
-                                      "Content-Type": "application/json",
-                                      Authorization: `Bearer ${process.env.REACT_APP_CHILLIN}`,
-                                    },
-                                    body: JSON.stringify({
-                                      render_id: render.id,
-                                    }),
-                                  }
-                                );
-
-                                const data = await response.json();
-
-                                if (data?.data?.render?.state === "success") {
-                                  setDownloadUrl(data.data.render.video_url);
-                                  dialogManager
-                                    .create({
-                                      title: "Render Success",
-                                      text: `Your video is ready! Video URL: ${data.data.render.video_url}`,
-                                      buttons: [
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {chillinRenders.map((render, index) => (
+                          <tr key={render.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{render.id}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {new Date(render.timestamp).toLocaleString()}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                              <div className="flex flex-wrap gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={async () => {
+                                    try {
+                                      const response = await fetch(
+                                        "https://render-api.chillin.online/render/result",
                                         {
-                                          text: "OK",
-                                          onClick: () => {},
-                                        },
-                                      ],
-                                    })
-                                    .open();
-                                } else if (
-                                  data?.data?.render?.state === "pending"
-                                ) {
-                                  dialogManager
-                                    .create({
-                                      title: "Pending",
-                                      text: "Please try again later.",
-                                      buttons: [
-                                        {
-                                          text: "OK",
-                                          onClick: () => {},
-                                        },
-                                      ],
-                                    })
-                                    .open();
-                                } else if (
-                                  data?.data?.render?.state === "failed"
-                                ) {
-                                  dialogManager
-                                    .create({
-                                      title: "Failed",
-                                      text: "Render job failed.",
-                                      buttons: [
-                                        {
-                                          text: "OK",
-                                          onClick: () => {},
-                                        },
-                                      ],
-                                    })
-                                    .open();
-                                }
-                              } catch (error) {
-                                dialogManager
-                                  .create({
-                                    title: "Error",
-                                    text: `Error getting render result: ${error.message}`,
-                                    buttons: [
-                                      {
-                                        text: "OK",
-                                        onClick: () => {},
-                                      },
-                                    ],
-                                  })
-                                  .open();
-                              }
-                            }}
-                          >
-                            Check Status
-                          </Button>
-                          {downloadUrl && (
-                            <a
-                              href={downloadUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <Button size="sm" variant="outline">
-                                Download
-                              </Button>
-                            </a>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                                          method: "POST",
+                                          headers: {
+                                            Accept: "application/json",
+                                            "Content-Type": "application/json",
+                                            Authorization: `Bearer ${process.env.REACT_APP_CHILLIN}`,
+                                          },
+                                          body: JSON.stringify({
+                                            render_id: render.id,
+                                          }),
+                                        }
+                                      );
+
+                                      const data = await response.json();
+
+                                      if (data?.data?.render?.state === "success") {
+                                        setDownloadUrl(data.data.render.video_url);
+                                        dialogManager
+                                          .create({
+                                            title: "Render Success",
+                                            text: `Your video is ready! Video URL: ${data.data.render.video_url}`,
+                                            buttons: [
+                                              {
+                                                text: "OK",
+                                                onClick: () => {},
+                                              },
+                                            ],
+                                          })
+                                          .open();
+                                      } else if (
+                                        data?.data?.render?.state === "pending"
+                                      ) {
+                                        dialogManager
+                                          .create({
+                                            title: "Pending",
+                                            text: "Please try again later.",
+                                            buttons: [
+                                              {
+                                                text: "OK",
+                                                onClick: () => {},
+                                              },
+                                            ],
+                                          })
+                                          .open();
+                                      } else if (
+                                        data?.data?.render?.state === "failed"
+                                      ) {
+                                        dialogManager
+                                          .create({
+                                            title: "Failed",
+                                            text: "Render job failed.",
+                                            buttons: [
+                                              {
+                                                text: "OK",
+                                                onClick: () => {},
+                                              },
+                                            ],
+                                          })
+                                          .open();
+                                      }
+                                    } catch (error) {
+                                      dialogManager
+                                        .create({
+                                          title: "Error",
+                                          text: `Error getting render result: ${error.message}`,
+                                          buttons: [
+                                            {
+                                              text: "OK",
+                                              onClick: () => {},
+                                            },
+                                          ],
+                                        })
+                                        .open();
+                                    }
+                                  }}
+                                >
+                                  Check Status
+                                </Button>
+                                {downloadUrl && (
+                                  <a
+                                    href={downloadUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <Button size="sm" variant="outline">
+                                      Download
+                                    </Button>
+                                  </a>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
                     No render jobs yet. Start a new render to see it here.
