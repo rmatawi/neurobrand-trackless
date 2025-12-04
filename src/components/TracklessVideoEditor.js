@@ -18,6 +18,7 @@ import ProgressIndicator from "./ui/ProgressIndicator";
 import TimelineVisualization from "./TimelineVisualization";
 import VideoCard from "./VideoCard";
 import AdvancedTimeline from "./AdvancedTimeline";
+import { Settings } from "lucide-react";
 import { OnboardingManager } from "./OnboardingManager";
 
 import { useDialogManager } from "../hooks/useDialogManager";
@@ -354,7 +355,7 @@ const TracklessVideoEditor = () => {
                   : "bg-white text-[#0F1A21]"
               }
             >
-              Render Jobs
+              Renders
             </Button>
             <Button
               variant={activeTab === "management" ? "default" : "outline"}
@@ -364,8 +365,9 @@ const TracklessVideoEditor = () => {
                   ? "bg-[#1E97A0] hover:bg-[#157a82]"
                   : "bg-white text-[#0F1A21]"
               }
+              aria-label="Management"
             >
-              Management
+              <Settings className="h-4 w-4" />
             </Button>
           </div>
         </div>
