@@ -15,9 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Player } from "@remotion/player";
 import VideoComposition from "../remotion/VideoComposition";
 import ProgressIndicator from "./ui/ProgressIndicator";
-import TimelineVisualization from "./TimelineVisualization";
 import VideoCard from "./VideoCard";
-import AdvancedTimeline from "./AdvancedTimeline";
 import { Settings, LayoutTemplate, Video, Download } from "lucide-react";
 import { OnboardingManager } from "./OnboardingManager";
 
@@ -977,37 +975,6 @@ const TracklessVideoEditor = () => {
                 </div>
               </div>
 
-              {/* Timeline Visualization */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">Timeline</h3>
-                <div className="space-y-4">
-                  <TimelineVisualization
-                    videos={selectedVideos}
-                    selectedVideoIndex={selectedVideoIndex}
-                    onClickVideo={setSelectedVideoIndex}
-                    totalDuration={selectedVideos.reduce((acc, video) => {
-                      const inOut = video.inOutPoints || { inPoint: 0, outPoint: video.duration || 10 };
-                      return acc + (inOut.outPoint - inOut.inPoint);
-                    }, 0)}
-                  />
-
-                  <AdvancedTimeline
-                    videos={selectedVideos}
-                    audioTracks={videoAudioTracks}
-                    videoVolumes={videoVolumes}
-                    audioVolumes={audioVolumes}
-                    onInOutChange={openInOutDialog}
-                    onVolumeChange={(type, index, newVolume) => {
-                      if (type === 'audio') {
-                        setAudioVolume(index, newVolume);
-                      } else {
-                        setVideoVolume(index, newVolume);
-                      }
-                    }}
-                    selectedVideoIndex={selectedVideoIndex}
-                  />
-                </div>
-              </div>
 
               <div className="space-y-4">
                 {selectedVideos.map((video, index) => (

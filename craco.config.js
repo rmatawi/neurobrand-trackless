@@ -11,6 +11,15 @@ module.exports = {
     return {
       ...devServerConfig,
       port: 3001,
+      hot: !config.disableHotReload,
+      liveReload: !config.disableHotReload,
+      client: config.disableHotReload ? undefined : {
+        webSocketURL: 'auto://0.0.0.0:0/ws',
+        overlay: {
+          errors: true,
+          warnings: false,
+        },
+      },
     };
   },
   webpack: {
