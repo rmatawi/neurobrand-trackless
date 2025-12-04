@@ -23,6 +23,7 @@ import { useDialogManager } from "../hooks/useDialogManager";
 import { useTemplateManagement } from "../hooks/useTemplateManagement";
 import { useVideoHandling } from "../hooks/useVideoHandling";
 import { useChillinAPI } from "../hooks/useChillinAPI";
+import EditTemplateDialog from "./EditTemplateDialog";
 
 const TracklessVideoEditor = () => {
   const [activeTab, setActiveTab] = useState("templates");
@@ -57,6 +58,12 @@ const TracklessVideoEditor = () => {
     setVideoName,
     numVideosForTemplate,
     setNumVideosForTemplate,
+    editNumVideos,
+    setEditNumVideos,
+    editVideoDescriptions,
+    setEditVideoDescriptions,
+    editVideoDurations,
+    setEditVideoDurations,
     // Functions
     getRequiredVideos,
     createCustomTemplate,
@@ -1388,50 +1395,26 @@ const TracklessVideoEditor = () => {
       </Dialog>
 
       {/* Edit Template Dialog */}
-      <Dialog
+      <EditTemplateDialog
         open={editTemplateDialogOpen}
         onOpenChange={setEditTemplateDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Template</DialogTitle>
-            <DialogDescription>
-              Modify the details of your template.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="editTemplateName">Template Name</Label>
-              <Input
-                id="editTemplateName"
-                value={videoName}
-                onChange={(e) => setVideoName(e.target.value)}
-                placeholder="Enter template name"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setEditTemplateDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() =>
-                handleEditTemplate(
-                  selectedVideos,
-                  videoAudioTracks,
-                  videoVolumes,
-                  audioVolumes
-                )
-              }
-            >
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        numVideos={editNumVideos}
+        setNumVideos={setEditNumVideos}
+        videoDescriptions={editVideoDescriptions}
+        setVideoDescriptions={setEditVideoDescriptions}
+        videoDurations={editVideoDurations}
+        setVideoDurations={setEditVideoDurations}
+        videoName={videoName}
+        setVideoName={setVideoName}
+        onConfirm={() => {
+          handleEditTemplate(
+            selectedVideos,
+            videoAudioTracks,
+            videoVolumes,
+            audioVolumes
+          );
+        }}
+      />
 
       {/* Delete Template Confirmation Dialog */}
       <Dialog

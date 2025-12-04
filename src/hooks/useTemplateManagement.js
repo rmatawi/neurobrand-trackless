@@ -6,7 +6,7 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
   // State for custom templates
   const [customTemplates, setCustomTemplates] = useState([]);
   const [template, setTemplate] = useState(1);
-  
+
   // State for template dialogs
   const [createTemplateDialogOpen, setCreateTemplateDialogOpen] = useState(false);
   const [createFromCurrentDialogOpen, setCreateFromCurrentDialogOpen] = useState(false);
@@ -16,6 +16,11 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
   const [deleteTemplateId, setDeleteTemplateId] = useState(null);
   const [videoName, setVideoName] = useState("");
   const [numVideosForTemplate, setNumVideosForTemplate] = useState(2);
+
+  // State for editing form
+  const [editNumVideos, setEditNumVideos] = useState(2);
+  const [editVideoDescriptions, setEditVideoDescriptions] = useState([]);
+  const [editVideoDurations, setEditVideoDurations] = useState([]);
 
   // Load custom templates from localStorage on component mount
   useEffect(() => {
@@ -110,6 +115,31 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
 
     setVideoName(templateToEdit.name); // Set the current name in the input field
     setEditTemplateId(templateId);
+
+    // Initialize form state based on template type
+    if (templateToEdit.type === "from-current") {
+      // For from-current templates, we only edit the name
+      setEditNumVideos(templateToEdit.requiredVideos || 2);
+      setEditVideoDescriptions([]);
+      setEditVideoDurations([]);
+    } else {
+      // For custom templates, initialize with existing values
+      const numVideos = templateToEdit.requiredVideos || 2;
+      setEditNumVideos(numVideos);
+
+      // Initialize descriptions and durations with existing values or defaults
+      const descriptions = [];
+      const durations = [];
+
+      for (let i = 0; i < numVideos; i++) {
+        descriptions.push(templateToEdit.videoDescriptions?.[i] || "");
+        durations.push(templateToEdit.videoDurations?.[i] !== undefined ? templateToEdit.videoDurations[i] : 3);
+      }
+
+      setEditVideoDescriptions(descriptions);
+      setEditVideoDurations(durations);
+    }
+
     setEditTemplateDialogOpen(true);
   };
 
@@ -147,12 +177,8 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
       showNotification.success("Template name updated successfully");
     } else {
       // For templates created from scratch, we can edit name, required videos, and descriptions
-      const numVideosStr = prompt(
-        `How many videos does this template require? (Current: ${templateToEdit.requiredVideos})`,
-        templateToEdit.requiredVideos
-      );
-      const num = parseInt(numVideosStr);
-      if (isNaN(num) || num <= 0 || num > 10) {
+      // Validation for number of videos
+      if (isNaN(editNumVideos) || editNumVideos <= 0 || editNumVideos > 10) {
         dialogManager.create({
           title: "Invalid Number",
           text: "Please enter a valid number between 1 and 10",
@@ -161,73 +187,55 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
         return;
       }
 
-      // Get new descriptions for each video
-      let descriptionIndex = 0;
+      // Validate durations and create new arrays
       const newDescriptions = [];
-      const newVideoDurations = []; // New array for durations
-      const collectNewDescriptionsAndDurations = () => {
-        if (descriptionIndex < num) {
-          const currentDescription =
-            templateToEdit.videoDescriptions?.[descriptionIndex] || "";
-          const currentDuration =
-            templateToEdit.videoDurations?.[descriptionIndex] !== undefined
-            ? templateToEdit.videoDurations[descriptionIndex]
-            : 3; // Default to 3 seconds if not set
+      const newVideoDurations = [];
+      let hasInvalidDuration = false;
 
-          const description = prompt(
-            `Enter description for video ${descriptionIndex + 1} (optional):`,
-            currentDescription
-          );
+      for (let i = 0; i < editNumVideos; i++) {
+        const desc = editVideoDescriptions[i] || "";
+        newDescriptions.push(desc);
 
-          if (description !== null) {
-            newDescriptions.push(description || "");
-
-            const durationInput = prompt(
-              `Enter duration for video ${
-                descriptionIndex + 1
-              } in seconds (e.g., 5 for 5 seconds):`,
-              currentDuration.toString()
-            );
-            const duration = parseFloat(durationInput);
-            if (isNaN(duration) || duration <= 0) {
-              showNotification.error("Please enter a valid positive number for duration.");
-              // Re-collect for the current video if invalid
-              collectNewDescriptionsAndDurations();
-              return;
-            }
-            newVideoDurations.push(duration);
-            descriptionIndex++;
-            collectNewDescriptionsAndDurations(); // Recursive call for next video
-          }
-        } else {
-          // All descriptions and durations collected, update the template
-          const updatedTemplates = customTemplates.map((t) =>
-            t.id === editTemplateId
-              ? {
-                  ...t,
-                  name: newName.trim(),
-                  requiredVideos: num,
-                  videoDescriptions: newDescriptions,
-                  videoDurations: newVideoDurations, // Store new durations
-                }
-              : t
-          );
-          saveCustomTemplates(updatedTemplates);
-          dialogManager.create({
-            title: "Success",
-            text: "Template updated successfully",
-            buttons: [{ text: "OK", onClick: () => {} }]
-          }).open();
+        const duration = parseFloat(editVideoDurations[i]);
+        if (isNaN(duration) || duration <= 0) {
+          showNotification.error(`Please enter a valid positive number for duration of video ${i + 1}.`);
+          hasInvalidDuration = true;
+          break;
         }
-      };
+        newVideoDurations.push(duration);
+      }
 
-      // Start collecting new descriptions and durations
-      collectNewDescriptionsAndDurations();
+      if (hasInvalidDuration) {
+        return;
+      }
+
+      // Update the template with new values
+      const updatedTemplates = customTemplates.map((t) =>
+        t.id === editTemplateId
+          ? {
+              ...t,
+              name: newName.trim(),
+              requiredVideos: editNumVideos,
+              videoDescriptions: newDescriptions,
+              videoDurations: newVideoDurations,
+            }
+          : t
+      );
+      saveCustomTemplates(updatedTemplates);
+      dialogManager.create({
+        title: "Success",
+        text: "Template updated successfully",
+        buttons: [{ text: "OK", onClick: () => {} }]
+      }).open();
     }
 
+    // Reset the dialog state after successful update
     setEditTemplateDialogOpen(false);
     setEditTemplateId(null);
     setVideoName("");
+    setEditNumVideos(2);
+    setEditVideoDescriptions([]);
+    setEditVideoDurations([]);
   };
 
   // Function to delete a custom template
@@ -629,7 +637,13 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
     setVideoName,
     numVideosForTemplate,
     setNumVideosForTemplate,
-    
+    editNumVideos,
+    setEditNumVideos,
+    editVideoDescriptions,
+    setEditVideoDescriptions,
+    editVideoDurations,
+    setEditVideoDurations,
+
     // Functions
     getRequiredVideos,
     createCustomTemplate,
