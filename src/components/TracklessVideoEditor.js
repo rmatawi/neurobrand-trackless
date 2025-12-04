@@ -960,85 +960,91 @@ const TracklessVideoEditor = () => {
                   </div>
                 )}
 
-                <Button
-                  id="add-videos-btn"
-                  variant="outline"
-                  className="w-full border-dashed border-2 border-gray-300"
-                  onClick={() => {
-                    if (!template) {
-                      dialogManager
-                        .create({
-                          title: "No Template Selected",
-                          text: "Please select a template first",
-                          buttons: [
-                            {
-                              text: "OK",
-                              onClick: () => {},
-                            },
-                          ],
-                        })
-                        .open();
-                      return;
-                    }
-                    const requiredVideos = getRequiredVideos(template);
-                    const videosNeeded = requiredVideos - selectedVideos.length;
-                    if (videosNeeded <= 0) {
-                      dialogManager
-                        .create({
-                          title: "Too Many Videos",
-                          text: `Template ${template} already has the required ${requiredVideos} videos. Remove some videos before adding more.`,
-                          buttons: [
-                            {
-                              text: "OK",
-                              onClick: () => {},
-                            },
-                          ],
-                        })
-                        .open();
-                      return;
-                    }
-                    // Go straight to file selection without showing a dialog
-                    handlePickFromDevice(requiredVideos, template).catch(
-                      (error) =>
-                        console.error("Error picking from device:", error)
-                    );
-                  }}
-                >
-                  + Add Videos
-                </Button>
+                {(() => {
+                  const requiredVideos = getRequiredVideos(template);
+                  const videosNeeded = requiredVideos - selectedVideos.length;
+                  return videosNeeded > 0 ? (
+                    <Button
+                      id="add-videos-btn"
+                      variant="outline"
+                      className="w-full border-dashed border-2 border-gray-300"
+                      onClick={() => {
+                        if (!template) {
+                          dialogManager
+                            .create({
+                              title: "No Template Selected",
+                              text: "Please select a template first",
+                              buttons: [
+                                {
+                                  text: "OK",
+                                  onClick: () => {},
+                                },
+                              ],
+                            })
+                            .open();
+                          return;
+                        }
+                        if (videosNeeded <= 0) {
+                          dialogManager
+                            .create({
+                              title: "Too Many Videos",
+                              text: `Template ${template} already has the required ${requiredVideos} videos. Remove some videos before adding more.`,
+                              buttons: [
+                                {
+                                  text: "OK",
+                                  onClick: () => {},
+                                },
+                              ],
+                            })
+                            .open();
+                          return;
+                        }
+                        // Go straight to file selection without showing a dialog
+                        handlePickFromDevice(requiredVideos, template).catch(
+                          (error) =>
+                            console.error("Error picking from device:", error)
+                        );
+                      }}
+                    >
+                      + Add Videos
+                    </Button>
+                  ) : null; // Don't render the button if limit is reached
+                })()}
 
                 <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button
-                    className="w-full bg-[#A01E25] hover:bg-[#80171e] text-white"
-                    onClick={() => {
-                      dialogManager
-                        .create({
-                          title: "Start Render",
-                          text: `Are you sure you want to start rendering? You have ${selectedVideos.length} video(s) selected with template ${template}.`,
-                          buttons: [
-                            {
-                              text: "Start Render",
-                              onClick: () => {
-                                sendChillinProjectToRenderer(
-                                  selectedVideos,
-                                  template,
-                                  customTemplates,
-                                  videoVolumes,
-                                  audioVolumes
-                                );
+                  {selectedVideos.length === getRequiredVideos(template) ? (
+                    <Button
+                      className="w-full bg-[#A01E25] hover:bg-[#80171e] text-white"
+                      onClick={() => {
+                        dialogManager
+                          .create({
+                            title: "Start Render",
+                            text: `Are you sure you want to start rendering? You have ${selectedVideos.length} video(s) selected with template ${template}.`,
+                            buttons: [
+                              {
+                                text: "Start Render",
+                                onClick: () => {
+                                  sendChillinProjectToRenderer(
+                                    selectedVideos,
+                                    template,
+                                    customTemplates,
+                                    videoVolumes,
+                                    audioVolumes
+                                  );
+                                },
                               },
-                            },
-                            {
-                              text: "Cancel",
-                              onClick: () => {},
-                            },
-                          ],
-                        })
-                        .open();
-                    }}
-                  >
-                    Start Render
-                  </Button>
+                              {
+                                text: "Cancel",
+                                onClick: () => {},
+                              },
+                            ],
+                          })
+                          .open();
+                      }}
+                    >
+                      Start Render
+                    </Button>
+                  ) : null} {/* Don't render the button if required videos not met */}
                 </div>
               </div>
             </div>
