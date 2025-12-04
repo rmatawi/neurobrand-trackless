@@ -127,29 +127,33 @@ const TracklessVideoEditor = () => {
   const onboardingSteps = [
     {
       title: "Welcome to Trackless Video Editor",
-      description: "This tool helps you create videos using templates. Let's take a quick tour.",
-      targetElementId: "templates-nav-btn"
+      description:
+        "This tool helps you create videos using templates. Let's take a quick tour.",
+      targetElementId: "templates-nav-btn",
     },
     {
       title: "Select a Template",
-      description: "Choose from built-in templates or create your own custom templates.",
-      targetElementId: "template-selection"
+      description:
+        "Choose from built-in templates or create your own custom templates.",
+      targetElementId: "template-selection",
     },
     {
       title: "Add Your Videos",
-      description: "Click 'Add Videos' to upload your video files for the selected template.",
-      targetElementId: "add-videos-btn"
+      description:
+        "Click 'Add Videos' to upload your video files for the selected template.",
+      targetElementId: "add-videos-btn",
     },
     {
       title: "Sequence Tab",
-      description: "Arrange your videos, set in/out points, and manage audio in the Sequence tab.",
-      targetElementId: "sequence-nav-btn"
+      description:
+        "Arrange your videos, set in/out points, and manage audio in the Sequence tab.",
+      targetElementId: "sequence-nav-btn",
     },
     {
       title: "Preview & Render",
       description: "Preview your video and send it to the renderer when ready.",
-      targetElementId: "render-nav-btn"
-    }
+      targetElementId: "render-nav-btn",
+    },
   ];
 
   // ThumbnailVideo component to properly manage URL object lifecycle
@@ -206,7 +210,11 @@ const TracklessVideoEditor = () => {
 
   // Effect to handle video preview when dialog opens or current video changes
   React.useEffect(() => {
-    if (!inOutDialogOpen || currentVideoIndex === null || !selectedVideos[currentVideoIndex]) {
+    if (
+      !inOutDialogOpen ||
+      currentVideoIndex === null ||
+      !selectedVideos[currentVideoIndex]
+    ) {
       return;
     }
 
@@ -240,10 +248,10 @@ const TracklessVideoEditor = () => {
     };
 
     const video = videoPreviewRef;
-    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener("timeupdate", handleTimeUpdate);
 
     return () => {
-      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener("timeupdate", handleTimeUpdate);
     };
   }, [inPoint, outPoint, videoPreviewRef, inOutDialogOpen]);
 
@@ -272,11 +280,11 @@ const TracklessVideoEditor = () => {
           videoPreviewRef.pause();
           setIsVideoPreviewPlaying(false);
           videoPreviewRef.currentTime = inPoint; // Return to in point
-          videoPreviewRef.removeEventListener('timeupdate', handleTimeUpdate);
+          videoPreviewRef.removeEventListener("timeupdate", handleTimeUpdate);
         }
       };
 
-      videoPreviewRef.addEventListener('timeupdate', handleTimeUpdate);
+      videoPreviewRef.addEventListener("timeupdate", handleTimeUpdate);
     } catch (error) {
       console.error("Error playing video preview:", error);
       setIsVideoPreviewPlaying(false);
@@ -377,9 +385,13 @@ const TracklessVideoEditor = () => {
       {/* Progress Indicator */}
       <ProgressIndicator
         currentStep={
-          activeTab === "templates" ? 1 :
-          activeTab === "sequence" ? 2 :
-          activeTab === "render" ? 3 : 1
+          activeTab === "templates"
+            ? 1
+            : activeTab === "sequence"
+            ? 2
+            : activeTab === "render"
+            ? 3
+            : 1
         }
         totalSteps={3}
         labels={["Template", "Sequence", "Render"]}
@@ -760,86 +772,6 @@ const TracklessVideoEditor = () => {
             <div className="bg-gray-50 p-6 rounded-lg">
               <h2 className="text-xl font-bold mb-4">Video Sequence Display</h2>
 
-              <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button
-                  id="add-videos-btn"
-                  variant="outline"
-                  className="w-full border-dashed border-2 border-gray-300"
-                  onClick={() => {
-                    if (!template) {
-                      dialogManager
-                        .create({
-                          title: "No Template Selected",
-                          text: "Please select a template first",
-                          buttons: [
-                            {
-                              text: "OK",
-                              onClick: () => {},
-                            },
-                          ],
-                        })
-                        .open();
-                      return;
-                    }
-                    const requiredVideos = getRequiredVideos(template);
-                    const videosNeeded = requiredVideos - selectedVideos.length;
-                    if (videosNeeded <= 0) {
-                      dialogManager
-                        .create({
-                          title: "Too Many Videos",
-                          text: `Template ${template} already has the required ${requiredVideos} videos. Remove some videos before adding more.`,
-                          buttons: [
-                            {
-                              text: "OK",
-                              onClick: () => {},
-                            },
-                          ],
-                        })
-                        .open();
-                      return;
-                    }
-                    // Go straight to file selection without showing a dialog
-                    handlePickFromDevice(requiredVideos, template).catch(
-                      (error) =>
-                        console.error("Error picking from device:", error)
-                    );
-                  }}
-                >
-                  + Add Videos
-                </Button>
-                <Button
-                  className="w-full bg-[#A01E25] hover:bg-[#80171e] text-white"
-                  onClick={() => {
-                    dialogManager
-                      .create({
-                        title: "Start Render",
-                        text: `Are you sure you want to start rendering? You have ${selectedVideos.length} video(s) selected with template ${template}.`,
-                        buttons: [
-                          {
-                            text: "Start Render",
-                            onClick: () => {
-                              sendChillinProjectToRenderer(
-                                selectedVideos,
-                                template,
-                                customTemplates,
-                                videoVolumes,
-                                audioVolumes
-                              );
-                            },
-                          },
-                          {
-                            text: "Cancel",
-                            onClick: () => {},
-                          },
-                        ],
-                      })
-                      .open();
-                  }}
-                >
-                  Start Render
-                </Button>
-              </div>
-
               {/* Video Preview Player */}
               <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-2">Preview</h3>
@@ -975,7 +907,6 @@ const TracklessVideoEditor = () => {
                 </div>
               </div>
 
-
               <div className="space-y-4">
                 {selectedVideos.map((video, index) => (
                   <VideoCard
@@ -1022,6 +953,87 @@ const TracklessVideoEditor = () => {
                     No videos added yet. Click "Add Videos" to get started.
                   </div>
                 )}
+
+                <Button
+                  id="add-videos-btn"
+                  variant="outline"
+                  className="w-full border-dashed border-2 border-gray-300"
+                  onClick={() => {
+                    if (!template) {
+                      dialogManager
+                        .create({
+                          title: "No Template Selected",
+                          text: "Please select a template first",
+                          buttons: [
+                            {
+                              text: "OK",
+                              onClick: () => {},
+                            },
+                          ],
+                        })
+                        .open();
+                      return;
+                    }
+                    const requiredVideos = getRequiredVideos(template);
+                    const videosNeeded = requiredVideos - selectedVideos.length;
+                    if (videosNeeded <= 0) {
+                      dialogManager
+                        .create({
+                          title: "Too Many Videos",
+                          text: `Template ${template} already has the required ${requiredVideos} videos. Remove some videos before adding more.`,
+                          buttons: [
+                            {
+                              text: "OK",
+                              onClick: () => {},
+                            },
+                          ],
+                        })
+                        .open();
+                      return;
+                    }
+                    // Go straight to file selection without showing a dialog
+                    handlePickFromDevice(requiredVideos, template).catch(
+                      (error) =>
+                        console.error("Error picking from device:", error)
+                    );
+                  }}
+                >
+                  + Add Videos
+                </Button>
+
+                <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Button
+                    className="w-full bg-[#A01E25] hover:bg-[#80171e] text-white"
+                    onClick={() => {
+                      dialogManager
+                        .create({
+                          title: "Start Render",
+                          text: `Are you sure you want to start rendering? You have ${selectedVideos.length} video(s) selected with template ${template}.`,
+                          buttons: [
+                            {
+                              text: "Start Render",
+                              onClick: () => {
+                                sendChillinProjectToRenderer(
+                                  selectedVideos,
+                                  template,
+                                  customTemplates,
+                                  videoVolumes,
+                                  audioVolumes
+                                );
+                              },
+                            },
+                            {
+                              text: "Cancel",
+                              onClick: () => {},
+                            },
+                          ],
+                        })
+                        .open();
+                    }}
+                  >
+                    Start Render
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -1409,7 +1421,6 @@ const TracklessVideoEditor = () => {
         </DialogContent>
       </Dialog>
 
-
       {/* Edit Template Dialog */}
       <Dialog
         open={editTemplateDialogOpen}
@@ -1516,21 +1527,22 @@ const TracklessVideoEditor = () => {
                   }}
                 />
                 <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
-                  {videoPreviewRef && videoPreviewRef.currentTime ?
-                    videoPreviewRef.currentTime.toFixed(2) + 's / ' +
-                    (currentVideoIndex !== null && selectedVideos[currentVideoIndex] ?
-                      (selectedVideos[currentVideoIndex].duration || 10).toFixed(2) + 's' : '0.00s')
-                    : '0.00s / 0.00s'}
+                  {videoPreviewRef && videoPreviewRef.currentTime
+                    ? videoPreviewRef.currentTime.toFixed(2) +
+                      "s / " +
+                      (currentVideoIndex !== null &&
+                      selectedVideos[currentVideoIndex]
+                        ? (
+                            selectedVideos[currentVideoIndex].duration || 10
+                          ).toFixed(2) + "s"
+                        : "0.00s")
+                    : "0.00s / 0.00s"}
                 </div>
               </div>
 
               {/* Video Controls */}
               <div className="flex flex-wrap gap-2 mt-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={jumpToInPoint}
-                >
+                <Button size="sm" variant="outline" onClick={jumpToInPoint}>
                   Jump to In ({inPoint.toFixed(2)}s)
                 </Button>
                 <Button
@@ -1538,14 +1550,10 @@ const TracklessVideoEditor = () => {
                   variant="outline"
                   onClick={isVideoPreviewPlaying ? pausePreview : playPreview}
                 >
-                  {isVideoPreviewPlaying ? 'Pause Preview' : 'Play Preview'}
+                  {isVideoPreviewPlaying ? "Pause Preview" : "Play Preview"}
                 </Button>
                 {isVideoPreviewPlaying && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={pausePreview}
-                  >
+                  <Button size="sm" variant="outline" onClick={pausePreview}>
                     Stop
                   </Button>
                 )}
@@ -1557,7 +1565,12 @@ const TracklessVideoEditor = () => {
               <Slider
                 id="inPoint"
                 min={0}
-                max={currentVideoIndex !== null && selectedVideos[currentVideoIndex] ? selectedVideos[currentVideoIndex].duration || 10 : 10}
+                max={
+                  currentVideoIndex !== null &&
+                  selectedVideos[currentVideoIndex]
+                    ? selectedVideos[currentVideoIndex].duration || 10
+                    : 10
+                }
                 step={0.1}
                 value={[inPoint]}
                 onValueChange={(value) => {
@@ -1573,7 +1586,12 @@ const TracklessVideoEditor = () => {
               <Input
                 type="number"
                 min={0}
-                max={currentVideoIndex !== null && selectedVideos[currentVideoIndex] ? selectedVideos[currentVideoIndex].duration || 10 : 10}
+                max={
+                  currentVideoIndex !== null &&
+                  selectedVideos[currentVideoIndex]
+                    ? selectedVideos[currentVideoIndex].duration || 10
+                    : 10
+                }
                 value={inPoint}
                 onChange={(e) => setInPoint(parseFloat(e.target.value))}
                 className="w-full"
@@ -1584,7 +1602,12 @@ const TracklessVideoEditor = () => {
               <Slider
                 id="outPoint"
                 min={inPoint}
-                max={currentVideoIndex !== null && selectedVideos[currentVideoIndex] ? selectedVideos[currentVideoIndex].duration || 10 : 10}
+                max={
+                  currentVideoIndex !== null &&
+                  selectedVideos[currentVideoIndex]
+                    ? selectedVideos[currentVideoIndex].duration || 10
+                    : 10
+                }
                 step={0.1}
                 value={[outPoint]}
                 onValueChange={(value) => {
@@ -1600,7 +1623,12 @@ const TracklessVideoEditor = () => {
               <Input
                 type="number"
                 min={inPoint}
-                max={currentVideoIndex !== null && selectedVideos[currentVideoIndex] ? selectedVideos[currentVideoIndex].duration || 10 : 10}
+                max={
+                  currentVideoIndex !== null &&
+                  selectedVideos[currentVideoIndex]
+                    ? selectedVideos[currentVideoIndex].duration || 10
+                    : 10
+                }
                 value={outPoint}
                 onChange={(e) => setOutPoint(parseFloat(e.target.value))}
                 className="w-full"
