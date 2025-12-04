@@ -18,7 +18,7 @@ import ProgressIndicator from "./ui/ProgressIndicator";
 import TimelineVisualization from "./TimelineVisualization";
 import VideoCard from "./VideoCard";
 import AdvancedTimeline from "./AdvancedTimeline";
-import { Settings } from "lucide-react";
+import { Settings, LayoutTemplate, Video, Download } from "lucide-react";
 import { OnboardingManager } from "./OnboardingManager";
 
 import { useDialogManager } from "../hooks/useDialogManager";
@@ -319,8 +319,9 @@ const TracklessVideoEditor = () => {
                   ? "bg-[#1E97A0] hover:bg-[#157a82]"
                   : "bg-white text-[#0F1A21]"
               }
+              aria-label="Templates"
             >
-              Templates
+              <LayoutTemplate className="h-4 w-4" />
             </Button>
             <Button
               id="sequence-nav-btn"
@@ -331,8 +332,9 @@ const TracklessVideoEditor = () => {
                   ? "bg-[#1E97A0] hover:bg-[#157a82]"
                   : "bg-white text-[#0F1A21]"
               }
+              aria-label="Sequence"
             >
-              Sequence
+              <Video className="h-4 w-4" />
             </Button>
             <Button
               id="render-nav-btn"
@@ -354,8 +356,9 @@ const TracklessVideoEditor = () => {
                   ? "bg-[#1E97A0] hover:bg-[#157a82]"
                   : "bg-white text-[#0F1A21]"
               }
+              aria-label="Renders"
             >
-              Renders
+              <Download className="h-4 w-4" />
             </Button>
             <Button
               variant={activeTab === "management" ? "default" : "outline"}
