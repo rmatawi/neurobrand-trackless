@@ -306,11 +306,7 @@ export const useTemplateManagement = (chillinProjectJson, setChillinProjectJson,
     const updatedTemplates = [...customTemplates, newTemplate];
     saveCustomTemplates(updatedTemplates);
 
-    dialogManager.create({
-      title: "Template Created",
-      text: `Custom template "${name}" has been created! Now select it to configure.`,
-      buttons: [{ text: "OK", onClick: () => {} }]
-    }).open();
+    showNotification.success(`Custom template "${name}" has been created! Now select it to configure.`);
     setCreateTemplateDialogOpen(false);
     setVideoName("");
     setNumVideosForTemplate(2); // Reset to default
