@@ -774,7 +774,6 @@ const TracklessVideoEditor = () => {
 
               {/* Video Preview Player */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">Preview</h3>
                 <div className="w-full h-64 bg-black rounded-lg overflow-hidden">
                   {selectedVideos && selectedVideos.length > 0 ? (
                     <Player
@@ -1045,39 +1044,6 @@ const TracklessVideoEditor = () => {
             <div className="bg-gray-50 p-6 rounded-lg">
               <h2 className="text-xl font-bold mb-4">Render Jobs</h2>
 
-              <div className="mb-4">
-                <Button
-                  className="bg-[#A01E25] hover:bg-[#80171e]"
-                  onClick={() => {
-                    dialogManager
-                      .create({
-                        title: "Start New Render",
-                        text: `Are you sure you want to start a new render? You have ${selectedVideos.length} video(s) selected with template ${template}.`,
-                        buttons: [
-                          {
-                            text: "Start Render",
-                            onClick: () => {
-                              sendChillinProjectToRenderer(
-                                selectedVideos,
-                                template,
-                                customTemplates,
-                                videoVolumes,
-                                audioVolumes
-                              );
-                            },
-                          },
-                          {
-                            text: "Cancel",
-                            onClick: () => {},
-                          },
-                        ],
-                      })
-                      .open();
-                  }}
-                >
-                  Start New Render
-                </Button>
-              </div>
 
               <div className="space-y-4">
                 {chillinRenders.length > 0 ? (
